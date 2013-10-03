@@ -1,6 +1,9 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam;
 
+import java.util.List;
+
 import android.hardware.Camera;
+import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
@@ -39,7 +42,11 @@ public class MainActivity extends Activity
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
         {
             Camera.Parameters parameters = camera.getParameters ();
-            parameters.setPreviewSize (width, height);
+            
+            List<Size> previewSizes = camera.getParameters().getSupportedPreviewSizes();
+            Size size = previewSizes.get(0);
+            
+            parameters.setPreviewSize (size.width, size.height);
             camera.setParameters (parameters);
             camera.startPreview ();
         }
