@@ -4,10 +4,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
+import android.opengl.Matrix;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -125,48 +129,33 @@ public class MainActivity extends Activity
         	{
         		return;
         	}
-        	
-        	String SD_PATH = Environment.getExternalStorageDirectory ().getAbsolutePath ();
-        	String folderPath = SD_PATH + File.separator + getString(R.string.app_name);
-        	File file = new File (folderPath);
         	try
         	{
-        		if (!file.exists ())
-        		{
-        			Log.d("a", "a");
-        			file.mkdir ();
-        		}
-        	}
-        	catch (Exception e)
-        	{
-        		e.printStackTrace ();
-        	}
-        	
-        	// 画像保存パス
-        	String saveDir = Environment.getExternalStorageDirectory ().getAbsolutePath () + File.separator + getString(R.string.app_name);
-        	Calendar cal = Calendar.getInstance ();
-        	SimpleDateFormat sf = new SimpleDateFormat ("yyyyMMdd_HHmmss");
-        	String imgPath = saveDir + "/" + sf.format (cal.getTime()) + ".jpg";
-        	
-        	// ファイル保存
-        	FileOutputStream fos;
-        	
-        	try
-        	{
-        		fos = new FileOutputStream (imgPath, true);
-        		fos.write (data);
-        		fos.close();
+        		Bitmap tmp_bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
         		
+        		
+        		Bitmap bitmap = Bitmap.createBitmap (tmp_bitmap);
+        		
+        		String name = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", java.util.Locale.JAPAN).format (new Date()) + ".jpg";
+        		MediaStore.Images.Media.insertImage (getContentResolver(), bitmap, name, null);
+        		// ファイル保存
+//        		FileOutputStream fos;
+        	
+//        		fos = new FileOutputStream (folderPath, false);
+//        		fos = new FileOutputStream ("/sdcard/camera_test.jpg");
+//        		fos.write (data);
+//        		fos.flush ();
+//        		fos.close();
+//        		
         		// Androidのデータベースへ登録
         		// （登録しないとギャラリーなどにすぐに反映されないらしい）
-        		registAndroidDB(imgPath);
+//        		registAndroidDB("/sdcard/camera_test.jpg");
         	}
         	catch (Exception e)
         	{
         		Log.e("Debug", e.getMessage ());
         	}
         	
-        	fos = null;
         	
         	camera.startPreview ();
         	
@@ -182,6 +171,8 @@ public class MainActivity extends Activity
     	values.put (Images.Media.MIME_TYPE, "image/jpeg");
     	values.put ("_data", path);
     	contentResolver.insert (MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+    	
+    	Toast.makeText (this, "registFinish", Toast.LENGTH_SHORT).show();
     }
     
 //    // 画面タッチのイベントリスナ
