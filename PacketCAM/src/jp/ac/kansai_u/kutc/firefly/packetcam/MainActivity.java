@@ -20,6 +20,9 @@ import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.View.OnTouchListener;
+import android.widget.Toast;
 
 public class MainActivity extends Activity
 {
@@ -49,6 +52,7 @@ public class MainActivity extends Activity
         {
             camera.release ();
             camera = null;
+            
         }
         
         // SurfaceViewの大きさやフォーマットが変わったらプレビューの大きさを設定する
@@ -75,6 +79,28 @@ public class MainActivity extends Activity
         SurfaceHolder holder = surfaceView.getHolder();
         holder.addCallback (surfaceListener);
 //        holder.setType (SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        
+        surfaceView.setOnTouchListener (new OnTouchListener()
+        {
+			@Override
+			public boolean onTouch (View v, MotionEvent event)
+			{
+		        if (event.getAction() == MotionEvent.ACTION_DOWN)
+		        {
+		            if (camera!= null)
+		            {
+		            	if (!mIsTake)
+		            	{
+		            		Toast.makeText (MainActivity.this, "撮影", Toast.LENGTH_SHORT).show();
+		            		mIsTake = true;
+		            		camera.takePicture (shutterListener, null, pictureListener);
+		            	}
+		            }
+		        }
+		        return true;
+			}
+        	
+        });
     }
     
     // シャッターが押された時に呼ばれるコールバック
@@ -100,21 +126,24 @@ public class MainActivity extends Activity
         		return;
         	}
         	
-        	String saveDir = Environment.getExternalStorageDirectory ().getPath () + "test";
-        	
-        	// SDカードフォルダを取得
-        	File file = new File(saveDir);
-        	
-        	// フォルダ作成
-        	if (!file.exists())
+        	String SD_PATH = Environment.getExternalStorageDirectory ().getAbsolutePath ();
+        	String folderPath = SD_PATH + File.separator + getString(R.string.app_name);
+        	File file = new File (folderPath);
+        	try
         	{
-        		if (!file.mkdir ())
+        		if (!file.exists ())
         		{
-        			Log.e("Debug", "Make Dir Error");
+        			Log.d("a", "a");
+        			file.mkdir ();
         		}
+        	}
+        	catch (Exception e)
+        	{
+        		e.printStackTrace ();
         	}
         	
         	// 画像保存パス
+        	String saveDir = Environment.getExternalStorageDirectory ().getAbsolutePath () + File.separator + getString(R.string.app_name);
         	Calendar cal = Calendar.getInstance ();
         	SimpleDateFormat sf = new SimpleDateFormat ("yyyyMMdd_HHmmss");
         	String imgPath = saveDir + "/" + sf.format (cal.getTime()) + ".jpg";
@@ -155,22 +184,23 @@ public class MainActivity extends Activity
     	contentResolver.insert (MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
     }
     
-    // 画面タッチのイベントリスナ
-    public boolean onTouthEvent(MotionEvent event)
-    {
-        if (event.getAction() == MotionEvent.ACTION_DOWN)
-        {
-            if (camera!= null)
-            {
-            	if (!mIsTake)
-            	{
-            		mIsTake = true;
-            		camera.takePicture (shutterListener, null, pictureListener);
-            	}
-            }
-        }
-        return true;
-    }
+//    // 画面タッチのイベントリスナ
+//    public boolean onTouthEvent(MotionEvent event)
+//    {
+//    	Toast.makeText (this, "a", Toast.LENGTH_SHORT).show();
+//        if (event.getAction() == MotionEvent.ACTION_DOWN)
+//        {
+//            if (camera!= null)
+//            {
+//            	if (!mIsTake)
+//            	{
+//            		mIsTake = true;
+//            		camera.takePicture (shutterListener, null, pictureListener);
+//            	}
+//            }
+//        }
+//        return true;
+//    }
 
     @Override
     public boolean onCreateOptionsMenu (Menu menu)
