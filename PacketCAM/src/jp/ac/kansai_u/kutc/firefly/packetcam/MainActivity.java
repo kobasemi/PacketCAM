@@ -1,11 +1,21 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.provider.MediaStore.Images;
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -14,6 +24,9 @@ import android.view.SurfaceView;
 public class MainActivity extends Activity
 {
     private Camera camera;
+    
+    // 画面タッチの2度押し禁止用フラグ
+    private boolean mIsTake = false;
     
     private SurfaceHolder.Callback surfaceListener = new SurfaceHolder.Callback()
     {
@@ -74,13 +87,73 @@ public class MainActivity extends Activity
     };
     
     // JPEGイメージ生成後に呼ばれるコールバック
+    
+    /*********************************************************/
+    /*****************画像保存のコードを書く*******************/
+    /*********************************************************/
     private Camera.PictureCallback pictureListener = new Camera.PictureCallback()
     {
         public void onPictureTaken (byte[] data, Camera camera)
         {
-            camera.startPreview ();
+        	if (data == null)
+        	{
+        		return;
+        	}
+        	
+        	String saveDir = Environment.getExternalStorageDirectory ().getPath () + "test";
+        	
+        	// SDカードフォルダを取得
+        	File file = new File(saveDir);
+        	
+        	// フォルダ作成
+        	if (!file.exists())
+        	{
+        		if (!file.mkdir ())
+        		{
+        			Log.e("Debug", "Make Dir Error");
+        		}
+        	}
+        	
+        	// 画像保存パス
+        	Calendar cal = Calendar.getInstance ();
+        	SimpleDateFormat sf = new SimpleDateFormat ("yyyyMMdd_HHmmss");
+        	String imgPath = saveDir + "/" + sf.format (cal.getTime()) + ".jpg";
+        	
+        	// ファイル保存
+        	FileOutputStream fos;
+        	
+        	try
+        	{
+        		fos = new FileOutputStream (imgPath, true);
+        		fos.write (data);
+        		fos.close();
+        		
+        		// Androidのデータベースへ登録
+        		// （登録しないとギャラリーなどにすぐに反映されないらしい）
+        		registAndroidDB(imgPath);
+        	}
+        	catch (Exception e)
+        	{
+        		Log.e("Debug", e.getMessage ());
+        	}
+        	
+        	fos = null;
+        	
+        	camera.startPreview ();
+        	
+        	mIsTake = false;
         }
     };
+    
+    
+    private void registAndroidDB (String path)
+    {
+    	ContentValues values = new ContentValues ();
+    	ContentResolver contentResolver = MainActivity.this.getContentResolver();
+    	values.put (Images.Media.MIME_TYPE, "image/jpeg");
+    	values.put ("_data", path);
+    	contentResolver.insert (MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+    }
     
     // 画面タッチのイベントリスナ
     public boolean onTouthEvent(MotionEvent event)
@@ -89,7 +162,11 @@ public class MainActivity extends Activity
         {
             if (camera!= null)
             {
-                camera.takePicture (shutterListener, null, pictureListener);
+            	if (!mIsTake)
+            	{
+            		mIsTake = true;
+            		camera.takePicture (shutterListener, null, pictureListener);
+            	}
             }
         }
         return true;
