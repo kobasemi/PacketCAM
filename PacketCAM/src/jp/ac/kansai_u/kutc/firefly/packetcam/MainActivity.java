@@ -36,7 +36,9 @@ public class MainActivity extends Activity
 
 	private SurfaceHolder.Callback surfaceListener = new SurfaceHolder.Callback ()
 	{
-		// SurfaceViewが生成されたらカメラをオープンする
+		/**
+		 * SurfaceViewが生成されたらカメラをオープンする
+		 */
 		public void surfaceCreated (SurfaceHolder holder)
 		{
 			camera = Camera.open ();
@@ -51,7 +53,9 @@ public class MainActivity extends Activity
 		}
 
 
-		// SurfaceViewが破棄されたらカメラを解放する
+		/**
+		 * SurfaceViewが破棄されたらカメラを解放する
+		 */
 		public void surfaceDestroyed (SurfaceHolder holder)
 		{
 			camera.release ();
@@ -60,7 +64,9 @@ public class MainActivity extends Activity
 		}
 
 
-		// SurfaceViewの大きさやフォーマットが変わったらプレビューの大きさを設定する
+		/**
+		 * SurfaceViewの大きさやフォーマットが変わったらプレビューの大きさを設定する
+		 */
 		public void surfaceChanged (SurfaceHolder holder, int format, int width, int height)
 		{
 			Camera.Parameters parameters = camera.getParameters ();
@@ -131,7 +137,10 @@ public class MainActivity extends Activity
 		return false;
 	}
 
-	// シャッターが押された時に呼ばれるコールバック
+	
+	/**
+	 * シャッターが押された時に呼ばれるコールバック
+	 */
 	private Camera.ShutterCallback shutterListener = new Camera.ShutterCallback ()
 	{
 		public void onShutter ()
@@ -140,11 +149,13 @@ public class MainActivity extends Activity
 		}
 	};
 
-	// JPEGイメージ生成後に呼ばれるコールバック
 
 	/*********************************************************/
 	/***************** 画像保存のコードを書く *******************/
 	/*********************************************************/
+	/**
+	 * イメージデータ生成後に呼ばれるコールバック
+	 */
 	private Camera.PictureCallback pictureListener = new Camera.PictureCallback ()
 	{
 		public void onPictureTaken (byte[] data, Camera camera)
