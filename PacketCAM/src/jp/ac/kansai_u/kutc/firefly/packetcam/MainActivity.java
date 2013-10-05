@@ -22,6 +22,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 
@@ -81,6 +83,10 @@ public class MainActivity extends Activity
 	{
 		super.onCreate (savedInstanceState);
 		setContentView (R.layout.activity_main);
+		
+		// 画面をフルスクリーンに設定
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		SurfaceView surfaceView = (SurfaceView) findViewById (R.id.surfaceView1);
 		SurfaceHolder holder = surfaceView.getHolder ();
