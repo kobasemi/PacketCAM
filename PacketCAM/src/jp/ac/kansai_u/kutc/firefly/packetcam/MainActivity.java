@@ -1,6 +1,9 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +36,48 @@ public class MainActivity extends Activity
 
 	// 画面タッチの2度押し禁止用フラグ
 	private boolean mIsTake = false;
+	
+	private static String FOLDER_PATH = null;
+	
+	/**
+	 * アクティビティ起動時に呼び出される
+	 */
+	@Override
+	protected void onCreate (Bundle savedInstanceState)
+	{
+		super.onCreate (savedInstanceState);
+		setContentView (R.layout.activity_main);
+		
+		
+		SurfaceView surfaceView = (SurfaceView) findViewById (R.id.surfaceView1);
+		SurfaceHolder holder = surfaceView.getHolder ();
+		holder.addCallback (surfaceListener);
 
+		
+		surfaceView.setOnTouchListener (new OnTouchListener ()
+		{
+			@Override
+			public boolean onTouch (View v, MotionEvent event)
+			{
+				if (event.getAction () == MotionEvent.ACTION_DOWN)
+				{
+					if (camera != null)
+					{
+						if (!mIsTake)
+						{
+							Toast.makeText (MainActivity.this, "撮影", Toast.LENGTH_SHORT).show ();
+							mIsTake = true;
+							camera.takePicture (shutterListener, null, pictureListener);
+						}
+					}
+				}
+				return true;
+			}
+
+		});
+	}
+
+	
 	private SurfaceHolder.Callback surfaceListener = new SurfaceHolder.Callback ()
 	{
 		/**
@@ -79,47 +123,107 @@ public class MainActivity extends Activity
 			camera.startPreview ();
 		}
 	};
+	
+	
+	/**
+	 * シャッターが押された時に呼ばれるコールバック
+	 */
+	private Camera.ShutterCallback shutterListener = new Camera.ShutterCallback ()
+	{
+		public void onShutter ()
+		{
+
+		}
+	};
 
 
 	/**
-	 * アクティビティ起動時に呼び出される
+	 * イメージデータ生成後に呼ばれるコールバック
 	 */
-	@Override
-	protected void onCreate (Bundle savedInstanceState)
+	private Camera.PictureCallback pictureListener = new Camera.PictureCallback ()
 	{
-		super.onCreate (savedInstanceState);
-		setContentView (R.layout.activity_main);
-		
-		// 画面をフルスクリーンに設定
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-		SurfaceView surfaceView = (SurfaceView) findViewById (R.id.surfaceView1);
-		SurfaceHolder holder = surfaceView.getHolder ();
-		holder.addCallback (surfaceListener);
-		// holder.setType (SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-
-		surfaceView.setOnTouchListener (new OnTouchListener ()
+		public void onPictureTaken (byte[] data, Camera camera)
 		{
-			@Override
-			public boolean onTouch (View v, MotionEvent event)
+			if (data == null)
 			{
-				if (event.getAction () == MotionEvent.ACTION_DOWN)
-				{
-					if (camera != null)
-					{
-						if (!mIsTake)
-						{
-							Toast.makeText (MainActivity.this, "撮影", Toast.LENGTH_SHORT).show ();
-							mIsTake = true;
-							camera.takePicture (shutterListener, null, pictureListener);
-						}
-					}
-				}
-				return true;
+				return;
+			}
+			
+			// フォルダの作成を行う
+			if (!createFolder())
+			{
+				Toast.makeText(MainActivity.this, "failure", Toast.LENGTH_SHORT).show();
+			}
+			else
+			{
+				Toast.makeText (MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
+			}
+			
+			
+			try
+			{
+				// ファイル名を設定
+				Calendar cal = Calendar.getInstance ();
+				SimpleDateFormat sf = new SimpleDateFormat ("yyyyMMdd_HHmmss");
+				String imgPath = FOLDER_PATH + File.separator + sf.format (cal.getTime()) + ".jpg";
+				
+				FileOutputStream fos;
+				fos = new FileOutputStream (imgPath, true);
+				fos.write (data);
+				fos.close ();
+				
+				// Androidのデータベースへ登録
+				// 登録しないとギャラリーなどにすぐに反映されないらしい
+				registAndroidDB (imgPath);
+			}
+			catch (Exception e)
+			{
+				Toast.makeText (MainActivity.this, e.getMessage (), Toast.LENGTH_SHORT).show();
 			}
 
-		});
+			camera.startPreview ();
+
+			mIsTake = false;
+		}
+	};
+	
+	
+	private boolean createFolder()
+	{
+		String status = Environment.getExternalStorageState ();
+		
+		if (!isSdCardMounted(status))
+		{
+			Toast.makeText (this, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show();
+			return false;
+		}
+		
+		// SDカードのフォルダパスの取得
+		String SD_PATH = Environment.getExternalStorageDirectory ().getPath ();
+		
+		// SDカードにアプリ名でフォルダを新規作成
+		FOLDER_PATH = SD_PATH + File.separator + getString(R.string.app_name);
+		
+		Toast.makeText (this,  "FolderPath = " + FOLDER_PATH, Toast.LENGTH_SHORT).show ();
+		
+		File file = new File (FOLDER_PATH);
+		
+		try
+		{
+			if (!file.exists())
+			{
+				Toast.makeText (this, "fileNotExists", Toast.LENGTH_SHORT).show();
+				file.mkdirs ();
+			}
+		}
+		catch (Exception e)
+		{
+			Toast.makeText (this,  "mkFileException", Toast.LENGTH_SHORT).show();
+			Toast.makeText (this, e.getMessage (), Toast.LENGTH_SHORT).show ();
+			e.printStackTrace ();
+			return false;
+		}
+		return true;
 	}
 	
 	
@@ -137,73 +241,6 @@ public class MainActivity extends Activity
 		return false;
 	}
 
-	
-	/**
-	 * シャッターが押された時に呼ばれるコールバック
-	 */
-	private Camera.ShutterCallback shutterListener = new Camera.ShutterCallback ()
-	{
-		public void onShutter ()
-		{
-
-		}
-	};
-
-
-	/*********************************************************/
-	/***************** 画像保存のコードを書く *******************/
-	/*********************************************************/
-	/**
-	 * イメージデータ生成後に呼ばれるコールバック
-	 */
-	private Camera.PictureCallback pictureListener = new Camera.PictureCallback ()
-	{
-		public void onPictureTaken (byte[] data, Camera camera)
-		{
-			if (data == null)
-			{
-				return;
-			}
-			
-			// SDカードがマウントされているかの確認を行う
-			String status = Environment.getExternalStorageState ();
-			if (!isSdCardMounted(status))
-			{
-				Toast.makeText (MainActivity.this, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show();
-				return;
-			}
-			
-			try
-			{
-				Bitmap tmp_bitmap = BitmapFactory.decodeByteArray (data, 0, data.length);
-
-				Bitmap bitmap = Bitmap.createBitmap (tmp_bitmap);
-
-				String name = new SimpleDateFormat ("yyyy-MM-dd_HH-mm-ss", java.util.Locale.JAPAN).format (new Date ()) + ".jpg";
-				MediaStore.Images.Media.insertImage (getContentResolver (), bitmap, name, null);
-				// ファイル保存
-				// FileOutputStream fos;
-
-				// fos = new FileOutputStream (folderPath, false);
-				// fos = new FileOutputStream ("/sdcard/camera_test.jpg");
-				// fos.write (data);
-				// fos.flush ();
-				// fos.close();
-				//
-				// Androidのデータベースへ登録
-				// （登録しないとギャラリーなどにすぐに反映されないらしい）
-				// registAndroidDB("/sdcard/camera_test.jpg");
-			}
-			catch (Exception e)
-			{
-				Log.e ("Debug", e.getMessage ());
-			}
-
-			camera.startPreview ();
-
-			mIsTake = false;
-		}
-	};
 
 
 	private void registAndroidDB (String path)
