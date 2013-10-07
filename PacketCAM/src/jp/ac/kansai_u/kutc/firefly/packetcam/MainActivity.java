@@ -37,6 +37,7 @@ public class MainActivity extends Activity
 	// 画面タッチの2度押し禁止用フラグ
 	private boolean mIsTake = false;
 	
+	// 画像保存フォルダのパス
 	private static String FOLDER_PATH = null;
 	
 	/**
