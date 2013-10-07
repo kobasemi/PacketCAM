@@ -9,6 +9,9 @@ import java.util.List;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Rect;
+import android.graphics.Bitmap.CompressFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
@@ -25,6 +28,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -33,6 +37,8 @@ import android.widget.Toast;
 public class MainActivity extends Activity
 {
 	private Camera camera;
+	
+	private OverLayView overlay;
 
 	// 画面タッチの2度押し禁止用フラグ
 	private boolean mIsTake = false;
@@ -57,6 +63,10 @@ public class MainActivity extends Activity
 		SurfaceView surfaceView = (SurfaceView) findViewById (R.id.surfaceView1);
 		SurfaceHolder holder = surfaceView.getHolder ();
 		holder.addCallback (surfaceListener);
+		
+		// オーバーレイ
+		overlay = new OverLayView(this);
+		addContentView(overlay, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
 		
 		surfaceView.setOnTouchListener (new OnTouchListener ()
@@ -148,15 +158,15 @@ public class MainActivity extends Activity
 	
 	
 	/**
-	 * シャッターが押された時に呼ばれるコールバック
+	 * シャッターが押された時に呼ばれるコールバック（画面タッチで撮影を行うため，コメントアウト）
 	 */
-	private Camera.ShutterCallback shutterListener = new Camera.ShutterCallback ()
-	{
-		public void onShutter ()
-		{
-
-		}
-	};
+//	private Camera.ShutterCallback shutterListener = new Camera.ShutterCallback ()
+//	{
+//		public void onShutter ()
+//		{
+//
+//		}
+//	};
 
 
 	/**
@@ -187,6 +197,21 @@ public class MainActivity extends Activity
 				// createBitmapより，画像データを生成
 				
 				// オーバーレイ表示された画像との合成処理を行う
+				// カメラのイメージ
+				Bitmap cameraBitmap = BitmapFactory.decodeByteArray(data, 0, data.length, null);
+				
+				// オーバーレイイメージ viewから画像を取得
+				Bitmap overlayBitmap = overlay.getDrawingCache();
+				
+				// 空のイメージを作成
+				Bitmap offBitmap = Bitmap.createBitmap (cameraBitmap.getWidth(), cameraBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+				
+				Canvas offScreen = new Canvas (offBitmap);
+				
+				offScreen.drawBitmap (cameraBitmap, null, new Rect (0, 0, cameraBitmap.getWidth(), cameraBitmap.getHeight()), null);
+				offScreen.drawBitmap(overlayBitmap, null, new Rect(0, 0, cameraBitmap.getWidth(), cameraBitmap.getHeight()), null);
+				
+				// 合成した画像：offBitmap
 				
 				// ファイル名を設定
 				Calendar cal = Calendar.getInstance ();
@@ -195,7 +220,9 @@ public class MainActivity extends Activity
 				
 				FileOutputStream fos;
 				fos = new FileOutputStream (imgPath, true);
-				fos.write (data);
+//				fos.write (data);
+				
+				offBitmap.compress(CompressFormat.JPEG, 100, fos);
 				fos.close ();
 				
 				// Androidのデータベースへ登録
