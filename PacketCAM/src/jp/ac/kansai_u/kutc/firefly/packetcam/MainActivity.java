@@ -70,9 +70,12 @@ public class MainActivity extends Activity
 					{
 						if (!mIsTake)
 						{
+							
 							Toast.makeText (MainActivity.this, "撮影", Toast.LENGTH_SHORT).show ();
 							mIsTake = true;
-							camera.takePicture (shutterListener, null, pictureListener);
+//							camera.takePicture (shutterListener, null, pictureListener);
+							// オートフォーカス
+							camera.autoFocus(mAutoFocusListener);
 						}
 					}
 				}
@@ -131,6 +134,20 @@ public class MainActivity extends Activity
 	
 	
 	/**
+	 * オートフォーカス完了のコールバック
+	 */
+	private Camera.AutoFocusCallback mAutoFocusListener = new Camera.AutoFocusCallback() 
+	{
+		
+		@Override
+		public void onAutoFocus(boolean success, Camera camera) 
+		{
+			camera.takePicture(null, null, pictureListener);
+		}
+	};
+	
+	
+	/**
 	 * シャッターが押された時に呼ばれるコールバック
 	 */
 	private Camera.ShutterCallback shutterListener = new Camera.ShutterCallback ()
@@ -167,6 +184,10 @@ public class MainActivity extends Activity
 			
 			try
 			{
+				// createBitmapより，画像データを生成
+				
+				// オーバーレイ表示された画像との合成処理を行う
+				
 				// ファイル名を設定
 				Calendar cal = Calendar.getInstance ();
 				SimpleDateFormat sf = new SimpleDateFormat ("yyyyMMdd_HHmmss");
