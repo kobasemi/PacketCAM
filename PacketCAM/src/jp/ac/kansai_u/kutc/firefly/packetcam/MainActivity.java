@@ -54,6 +54,7 @@ public class MainActivity extends Activity
 	{
 		super.onCreate (savedInstanceState);
 		
+		// フルスクリーン化と，タイトルバーの非表示化
 		getWindow().addFlags (WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
@@ -83,7 +84,6 @@ public class MainActivity extends Activity
 							
 							Toast.makeText (MainActivity.this, "撮影", Toast.LENGTH_SHORT).show ();
 							mIsTake = true;
-//							camera.takePicture (shutterListener, null, pictureListener);
 							// オートフォーカス
 							camera.autoFocus(mAutoFocusListener);
 						}
@@ -207,7 +207,8 @@ public class MainActivity extends Activity
 				Bitmap offBitmap = Bitmap.createBitmap (cameraBitmap.getWidth(), cameraBitmap.getHeight(), Bitmap.Config.ARGB_8888);
 				
 				Canvas offScreen = new Canvas (offBitmap);
-				
+			
+				// 画像の合成処理
 				offScreen.drawBitmap (cameraBitmap, null, new Rect (0, 0, cameraBitmap.getWidth(), cameraBitmap.getHeight()), null);
 				offScreen.drawBitmap(overlayBitmap, null, new Rect(0, 0, cameraBitmap.getWidth(), cameraBitmap.getHeight()), null);
 				
@@ -241,6 +242,10 @@ public class MainActivity extends Activity
 	};
 	
 	
+	/**
+	 * 画像保存フォルダの作成
+	 * @return 正常に作成できればtrue，できなければfalseを返す
+	 */
 	private boolean createFolder()
 	{
 		String status = Environment.getExternalStorageState ();
@@ -295,7 +300,10 @@ public class MainActivity extends Activity
 	}
 
 
-
+	/**
+	 * Androidのギャラリーに画像を登録する
+	 * @param path 画像の保存パス
+	 */
 	private void registAndroidDB (String path)
 	{
 		ContentValues values = new ContentValues ();
