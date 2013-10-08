@@ -47,7 +47,7 @@ public class MainActivity extends Activity
 	private static String FOLDER_PATH = null;
 	
 	private static final String TAG = "MainActivity";
-	
+		
 	/**
 	 * アクティビティ起動時に呼び出される
 	 */
@@ -146,15 +146,27 @@ public class MainActivity extends Activity
 			Log.d(TAG, "f");
 			Camera.Parameters parameters = camera.getParameters ();
 
-			List <Size> previewSizes = camera.getParameters ().getSupportedPreviewSizes ();
-			Size size = previewSizes.get (0);
+//			List <Size> previewSizes = camera.getParameters ().getSupportedPreviewSizes ();
+//			Size size = previewSizes.get (0);
+//			
+//			Log.d(TAG, "g");
+//
+//			parameters.setPreviewSize (size.width, size.height);
+//			Log.d(TAG, "h");
+//
+//			camera.setParameters (parameters);
+
+			// 修正点
+			List <Size> supportedSizes = Reflect.getSuportedPreviewSizes(parameters);
 			
-			Log.d(TAG, "g");
-
-			parameters.setPreviewSize (size.width, size.height);
-			Log.d(TAG, "h");
-
-			camera.setParameters (parameters);
+			if (supportedSizes != null && supportedSizes.size() > 0)
+			{
+				Size size = supportedSizes.get(0);
+				parameters.setPreviewSize(size.width, size.height);
+				camera.setParameters(parameters);
+			}
+			// ここまで
+			
 			Log.d(TAG, "i");
 			camera.startPreview ();
 			Log.d(TAG, "j");
