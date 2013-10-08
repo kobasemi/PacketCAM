@@ -46,6 +46,8 @@ public class MainActivity extends Activity
 	// 画像保存フォルダのパス
 	private static String FOLDER_PATH = null;
 	
+	private static final String TAG = "MainActivity";
+	
 	/**
 	 * アクティビティ起動時に呼び出される
 	 */
@@ -58,6 +60,7 @@ public class MainActivity extends Activity
 		getWindow().addFlags (WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
+		Log.d(TAG, "a");
 		setContentView (R.layout.activity_main);
 		
 		
@@ -69,6 +72,7 @@ public class MainActivity extends Activity
 		overlay = new OverLayView(this);
 		addContentView(overlay, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
+		Log.d(TAG, "b");
 		
 		surfaceView.setOnTouchListener (new OnTouchListener ()
 		{
@@ -106,10 +110,12 @@ public class MainActivity extends Activity
 			camera = Camera.open ();
 			try
 			{
+				Log.d(TAG, "c");
 				camera.setPreviewDisplay (holder);
 			}
 			catch (Exception e)
 			{
+				Log.d(TAG, "d");
 				e.printStackTrace ();
 			}
 		}
@@ -120,6 +126,7 @@ public class MainActivity extends Activity
 		 */
 		public void surfaceDestroyed (SurfaceHolder holder)
 		{
+			Log.d(TAG, "e");
 			camera.release ();
 			camera = null;
 
@@ -131,14 +138,33 @@ public class MainActivity extends Activity
 		 */
 		public void surfaceChanged (SurfaceHolder holder, int format, int width, int height)
 		{
+			/**
+			 * 古い端末ではstartPreviewが正常に開始されない
+			 */
+			try
+			{
+			Log.d(TAG, "f");
 			Camera.Parameters parameters = camera.getParameters ();
 
 			List <Size> previewSizes = camera.getParameters ().getSupportedPreviewSizes ();
 			Size size = previewSizes.get (0);
+			
+			Log.d(TAG, "g");
 
 			parameters.setPreviewSize (size.width, size.height);
+			Log.d(TAG, "h");
+
 			camera.setParameters (parameters);
+			Log.d(TAG, "i");
 			camera.startPreview ();
+			Log.d(TAG, "j");
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				String a = e.getMessage();
+				Log.d(TAG, a);
+			}
 		}
 	};
 	
