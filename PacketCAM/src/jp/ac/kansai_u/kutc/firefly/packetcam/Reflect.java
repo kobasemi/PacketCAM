@@ -10,17 +10,16 @@ import android.hardware.Camera.Size;
 /**
  * Androidバージョン間の差異を吸収するクラス
  */
-public class Reflect 
+public class Reflect
 {
-	// バージョン（端末？）によってgetSupportedPreviewSizeがおかしくなるっぽいので，
-	// 以下で対応する
+	// バージョン（端末？）によって必要になるかも
 	private static Method Parameters_getSupportedPreviewSizes;
-	
+
 	static
 	{
 		initCompatibility();
 	};
-	
+
 	private static void initCompatibility()
 	{
 		try
@@ -31,8 +30,8 @@ public class Reflect
 		{
 		}
 	}
-	
-	
+
+
 	@SuppressWarnings("unchecked")
 	public static List<Size> getSuportedPreviewSizes (Camera.Parameters p)
 	{
@@ -50,7 +49,7 @@ public class Reflect
 		catch (InvocationTargetException ite)
 		{
 			Throwable cause = ite.getCause();
-			
+
 			if (cause instanceof RuntimeException)
 			{
 				throw (RuntimeException) cause;
