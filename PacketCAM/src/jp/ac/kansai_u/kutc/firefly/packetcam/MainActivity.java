@@ -22,6 +22,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -384,6 +385,59 @@ public class MainActivity extends Activity
 	// return true;
 	// }
 
+	
+	@Override
+	public boolean dispatchKeyEvent (KeyEvent event)
+	{
+		int nowZoom;
+		Camera.Parameters parameter;
+		switch (event.getAction())
+		{
+		case KeyEvent.ACTION_DOWN:
+			switch (event.getKeyCode())
+			{
+			case KeyEvent.KEYCODE_VOLUME_UP:
+				// ズームイン機能
+				parameter = camera.getParameters();
+				nowZoom = parameter.getZoom();
+				
+				if (nowZoom < parameter.getMaxZoom())
+				{
+					parameter.setZoom(nowZoom + 1);
+				}
+				camera.setParameters(parameter);
+				return true;
+			case KeyEvent.KEYCODE_VOLUME_DOWN:
+				// ズームアウト機能
+				parameter = camera.getParameters();
+				nowZoom = parameter.getZoom();
+				
+				if (nowZoom > 0)
+				{
+					parameter.setZoom(nowZoom - 1);
+				}
+				camera.setParameters(parameter);
+				return true;
+			default:
+				break;
+			}
+			break;
+		case KeyEvent.ACTION_UP:
+			switch (event.getKeyCode())
+			{
+			case KeyEvent.KEYCODE_VOLUME_UP:
+			case KeyEvent.KEYCODE_VOLUME_DOWN:
+				// キーが離された場合にはイベントを捨てる
+				return true;
+			default:
+				break;
+			}
+		default:
+			break;
+		}
+		
+		return super.dispatchKeyEvent(event);
+	}
 	@Override
 	public boolean onCreateOptionsMenu (Menu menu)
 	{
