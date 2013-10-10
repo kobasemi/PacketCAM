@@ -25,8 +25,9 @@ public final class R {
         public static final int ic_launcher=0x7f020001;
     }
     public static final class id {
-        public static final int FrameLayout1=0x7f080000;
-        public static final int action_settings=0x7f080002;
+        public static final int RelativeLayout1=0x7f080000;
+        public static final int action_settings=0x7f080003;
+        public static final int button1=0x7f080002;
         public static final int surfaceView1=0x7f080001;
     }
     public static final class layout {
@@ -38,6 +39,7 @@ public final class R {
     public static final class string {
         public static final int action_settings=0x7f050001;
         public static final int app_name=0x7f050000;
+        public static final int flash=0x7f050003;
         public static final int hello_world=0x7f050002;
     }
     public static final class style {

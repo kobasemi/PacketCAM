@@ -28,10 +28,12 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.Toast;
 
 
@@ -43,6 +45,9 @@ public class MainActivity extends Activity
     //テスト
 	// 画面タッチの2度押し禁止用フラグ
 	private boolean mIsTake = false;
+	
+	private boolean status = false;
+	
 
 	// 画像保存フォルダのパス
 	private static String FOLDER_PATH = null;
@@ -81,6 +86,32 @@ public class MainActivity extends Activity
 		addContentView(overlay, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
 		Log.d(TAG, "b");
+		
+		Button flashBtn = (Button) findViewById(R.id.button1);
+		flashBtn.setOnClickListener(new OnClickListener()
+		{
+
+			@Override
+			public void onClick(View arg0) {
+				// TODO 自動生成されたメソッド・スタブ
+				if(status==false)
+				{
+					Camera.Parameters parameters = camera.getParameters();
+					parameters.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
+					camera.setParameters(parameters);
+					status = true;
+				}
+				else
+				{
+					Camera.Parameters parameters = camera.getParameters();
+					parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+					camera.setParameters(parameters);
+					status = false;
+				}
+			}
+			
+		});
+		
 
 		surfaceView.setOnTouchListener (new OnTouchListener ()
 		{
@@ -131,7 +162,7 @@ public class MainActivity extends Activity
 
 		/**
 		 * SurfaceViewが破棄されたらカメラを解放する
-		 */
+		*/
 		public void surfaceDestroyed (SurfaceHolder holder)
 		{
 			Log.d(TAG, "e");
