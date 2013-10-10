@@ -40,7 +40,7 @@ public class MainActivity extends Activity
 	private Camera camera;
 
 	private OverLayView overlay;
-
+    //テスト
 	// 画面タッチの2度押し禁止用フラグ
 	private boolean mIsTake = false;
 
