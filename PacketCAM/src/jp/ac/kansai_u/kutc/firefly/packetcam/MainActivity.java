@@ -391,6 +391,8 @@ public class MainActivity extends Activity
 	{
 		int nowZoom;
 		Camera.Parameters parameter;
+		List <Size> previewSizes = camera.getParameters ().getSupportedPreviewSizes ();
+
 		switch (event.getAction())
 		{
 		case KeyEvent.ACTION_DOWN:
@@ -418,6 +420,11 @@ public class MainActivity extends Activity
 				}
 				camera.setParameters(parameter);
 				return true;
+				
+			case KeyEvent.KEYCODE_MENU:
+				// メニューボタンで解像度選択
+				
+				
 			default:
 				break;
 			}
