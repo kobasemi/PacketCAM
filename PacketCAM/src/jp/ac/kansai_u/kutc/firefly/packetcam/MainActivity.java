@@ -86,6 +86,7 @@ public class MainActivity extends Activity
 
 		Log.d(TAG, "b");
 		
+		
 		Button flashBtn = (Button) findViewById(R.id.button1);
 		flashBtn.setOnClickListener(new OnClickListener()
 		{
