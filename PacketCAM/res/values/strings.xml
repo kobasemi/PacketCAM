@@ -6,5 +6,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="flash">Flash</string>
     <string name="INOUT">INOUT</string>
+    <string name="resolution">解像度</string>
 
 </resources>
