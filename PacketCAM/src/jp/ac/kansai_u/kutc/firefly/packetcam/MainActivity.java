@@ -7,8 +7,10 @@ import java.util.Calendar;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -112,6 +114,43 @@ public class MainActivity extends Activity
 			
 		});
 		
+		Button resolutionBtn = (Button) findViewById(R.id.button3);
+		resolutionBtn.setOnClickListener(new OnClickListener()
+		{
+			@Override
+			public void onClick (View v)
+			{
+				List <Size> supportedPictureSize = camera.getParameters().getSupportedPictureSizes();
+				
+				int numItem = supportedPictureSize.size();
+				
+				String[] picHeight = new String[numItem];
+				String[] picWidth = new String[numItem];
+				final String[] pic = new String[numItem];
+				
+				Size picSize;
+				
+				for (int i = 0; i <= supportedPictureSize.size(); i++)
+				{
+					picSize = supportedPictureSize.get(i);
+					picHeight[i] = String.valueOf(picSize.height);
+					picWidth[i] = String.valueOf(picSize.width);
+					pic[i] = "Height: " + picHeight[i] + "Width: " + picWidth[i];
+				}
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+				builder.setTitle("解像度を選択してください");
+				builder.setItems(pic, new DialogInterface.OnClickListener() 
+				{
+					public void onClick(DialogInterface dialog, int item) 
+					{
+						Toast.makeText(getApplicationContext(), pic[item], Toast.LENGTH_SHORT).show();
+					}
+				});
+				builder.show();
+				
+			}
+		});
 
 		surfaceView.setOnTouchListener (new OnTouchListener ()
 		{
