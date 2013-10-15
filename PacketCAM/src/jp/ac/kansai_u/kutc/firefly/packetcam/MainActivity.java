@@ -54,7 +54,7 @@ public class MainActivity extends Activity
 	private static String FOLDER_PATH = null;
 
 	private static final String TAG = "MainActivity";
-
+   
 	/**
 	 * アクティビティ起動時に呼び出される
 	 */
@@ -522,5 +522,5 @@ public class MainActivity extends Activity
 		getMenuInflater ().inflate (R.menu.main, menu);
 		return true;
 	}
-
+//ここにINOUT機能追加
 }
