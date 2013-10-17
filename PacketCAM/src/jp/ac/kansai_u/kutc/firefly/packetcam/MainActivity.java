@@ -53,6 +53,8 @@ public class MainActivity extends Activity
 	// 画像サイズ（height，width）
 	Size picSize = null;
 
+	// プレビューサイズ
+//	Size preSize = null;
 	
 
 	// 画像保存フォルダのパス
@@ -134,9 +136,9 @@ public class MainActivity extends Activity
 				String[] picWidth = new String[numPicItem];
 				final String[] pic = new String[numPicItem];
 				
-				String[] preHeight = new String[numPreItem];
-				String[] preWidth = new String[numPreItem];
-				final String[] pre = new String[numPreItem];
+//				String[] preHeight = new String[numPreItem];
+//				String[] preWidth = new String[numPreItem];
+//				final String[] pre = new String[numPreItem];
 				
 				
 				for (int i = 0; i <= supportedPictureSize.size(); i++)
@@ -144,7 +146,15 @@ public class MainActivity extends Activity
 					picSize = supportedPictureSize.get(i);
 					picHeight[i] = String.valueOf(picSize.height);
 					picWidth[i] = String.valueOf(picSize.width);
+					
+//					preSize = supportedPreviewSize.get(i);
+//					preHeight[i] = String.valueOf(preSize.height);
+//					preWidth[i] = String.valueOf(preSize.width);
+					
 					pic[i] = "Height: " + picHeight[i] + "Width: " + picWidth[i];
+					
+//					pic[i] = "PicHeight: " + picHeight[i] + "PicWidth: " + picWidth[i] + "\n"
+//							 + "PreHeight: " + preHeight[i] + "PreWidth: " + preWidth[i];
 				}
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -155,6 +165,8 @@ public class MainActivity extends Activity
 					{
 						Camera.Parameters parameter = camera.getParameters();
 						parameter.setPictureSize(picSize.width, picSize.height);
+						
+//						parameter.setPreviewSize(preSize.width, preSize.height);
 						
 						camera.setParameters(parameter);
 					}
