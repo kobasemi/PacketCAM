@@ -124,12 +124,20 @@ public class MainActivity extends Activity
 			public void onClick (View v)
 			{
 				List <Size> supportedPictureSize = camera.getParameters().getSupportedPictureSizes();
+				List <Size> supportedPreviewSize = camera.getParameters().getSupportedPreviewSizes();
 				
-				int numItem = supportedPictureSize.size();
+				int numPicItem = supportedPictureSize.size();
+				int numPreItem = supportedPreviewSize.size();
 				
-				String[] picHeight = new String[numItem];
-				String[] picWidth = new String[numItem];
-				final String[] pic = new String[numItem];
+				Toast.makeText(MainActivity.this, numPicItem + " : " + numPreItem, Toast.LENGTH_SHORT).show();
+				
+				String[] picHeight = new String[numPicItem];
+				String[] picWidth = new String[numPicItem];
+				final String[] pic = new String[numPicItem];
+				
+				String[] preHeight = new String[numPreItem];
+				String[] preWidth = new String[numPreItem];
+				final String[] pre = new String[numPreItem];
 				
 				
 				for (int i = 0; i <= supportedPictureSize.size(); i++)
