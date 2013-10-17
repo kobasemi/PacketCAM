@@ -175,7 +175,30 @@ public class MainActivity extends Activity
 				
 			}
 		});
-
+		
+	 /* Button INOUTBtn = (Button) findViewById(R.id.button3);
+		resolutionBtn.setOnClickListener(new OnClickListener()
+		{public void onClick(View arg0) {
+			// TODO 自動生成されたメソッド・スタブ
+			if(status==false)
+			{
+				Camera.Parameters parameters = camera.getParameters();
+				parameters.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
+				camera.setParameters(parameters);
+				status = true;
+			}
+			else
+			{
+				Camera.Parameters parameters = camera.getParameters();
+				parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+				camera.setParameters(parameters);
+				status = false;
+			}
+		}
+		
+	});*/
+			
+		
 		surfaceView.setOnTouchListener (new OnTouchListener ()
 		{
 			@Override
@@ -527,5 +550,9 @@ public class MainActivity extends Activity
 		getMenuInflater ().inflate (R.menu.main, menu);
 		return true;
 	}
-//ここにINOUT機能追加
-}
+
+	{
+		
+	}
+
+	}
