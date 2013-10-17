@@ -176,27 +176,45 @@ public class MainActivity extends Activity
 			}
 		});
 		
-	 /* Button INOUTBtn = (Button) findViewById(R.id.button3);
-		resolutionBtn.setOnClickListener(new OnClickListener()
-		{public void onClick(View arg0) {
-			// TODO 自動生成されたメソッド・スタブ
-			if(status==false)
-			{
-				Camera.Parameters parameters = camera.getParameters();
-				parameters.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
-				camera.setParameters(parameters);
-				status = true;
-			}
-			else
-			{
-				Camera.Parameters parameters = camera.getParameters();
-				parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-				camera.setParameters(parameters);
-				status = false;
-			}
+	  /*Button INOUTBtn = (Button) findViewById(R.id.button3);
+	  resolutionBtn.setOnClickListener(new OnClickListener()
+		{
+		public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+    case R.id.switch_cam:
+        // カメラが複数あるかチェック
+        if (numberOfCameras == 1) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(this.getString(R.string.camera_alert))
+                   .setNeutralButton("Close", null);
+            AlertDialog alert = builder.create();
+            alert.show();
+            return true;
+        }
+ 
+        // 現在利用しているカメラを解放
+        if (mCamera != null) {
+            mCamera.stopPreview();
+            mPreview.setCamera(null);
+            mCamera.release();
+            mCamera = null;
+        }
+ 
+        // カメラを切り替え
+        mCamera = Camera
+                .open((cameraCurrentlyLocked + 1) % numberOfCameras);
+        cameraCurrentlyLocked = (cameraCurrentlyLocked + 1)
+                % numberOfCameras;
+        mPreview.switchCamera(mCamera);
+ 
+        // プレビュー再開
+        mCamera.startPreview();
+        return true;
+    default:
+        return super.onOptionsItemSelected(item);
+    }
 		}
-		
-	});*/
+});*/
 			
 		
 		surfaceView.setOnTouchListener (new OnTouchListener ()
