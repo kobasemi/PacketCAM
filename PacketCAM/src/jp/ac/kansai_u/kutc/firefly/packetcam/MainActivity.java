@@ -49,6 +49,9 @@ public class MainActivity extends Activity
 	
 	private boolean status = false;
 	
+	Size picSize = null;
+
+	
 
 	// 画像保存フォルダのパス
 	private static String FOLDER_PATH = null;
@@ -128,7 +131,6 @@ public class MainActivity extends Activity
 				String[] picWidth = new String[numItem];
 				final String[] pic = new String[numItem];
 				
-				Size picSize;
 				
 				for (int i = 0; i <= supportedPictureSize.size(); i++)
 				{
@@ -142,9 +144,12 @@ public class MainActivity extends Activity
 				builder.setTitle("解像度を選択してください");
 				builder.setItems(pic, new DialogInterface.OnClickListener() 
 				{
-					public void onClick(DialogInterface dialog, int item) 
+					public void onClick(DialogInterface dialog, int which) 
 					{
-						Toast.makeText(getApplicationContext(), pic[item], Toast.LENGTH_SHORT).show();
+						Camera.Parameters parameter = camera.getParameters();
+						parameter.setPictureSize(picSize.width, picSize.height);
+						
+						camera.setParameters(parameter);
 					}
 				});
 				builder.show();
