@@ -47,8 +47,10 @@ public class MainActivity extends Activity
 	// 画面タッチの2度押し禁止用フラグ
 	private boolean mIsTake = false;
 	
+	// カメラFlashON・OFFフラグ
 	private boolean status = false;
 	
+	// 画像サイズ（height，width）
 	Size picSize = null;
 
 	
@@ -70,7 +72,6 @@ public class MainActivity extends Activity
 		getWindow().addFlags (WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-		Log.d(TAG, "a");
 		setContentView (R.layout.activity_main);
 
 
@@ -88,8 +89,6 @@ public class MainActivity extends Activity
 		// オーバーレイ
 		overlay = new OverLayView(this);
 		addContentView(overlay, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-
-		Log.d(TAG, "b");
 		
 		
 		Button flashBtn = (Button) findViewById(R.id.button1);
@@ -201,12 +200,10 @@ public class MainActivity extends Activity
 			camera = Camera.open ();
 			try
 			{
-				Log.d(TAG, "c");
 				camera.setPreviewDisplay (holder);
 			}
 			catch (Exception e)
 			{
-				Log.d(TAG, "d");
 				e.printStackTrace ();
 			}
 		}
@@ -217,10 +214,8 @@ public class MainActivity extends Activity
 		*/
 		public void surfaceDestroyed (SurfaceHolder holder)
 		{
-			Log.d(TAG, "e");
 			camera.release ();
 			camera = null;
-
 		}
 
 
@@ -234,16 +229,12 @@ public class MainActivity extends Activity
 			 */
 			try
 			{
-			Log.d(TAG, "f");
 			Camera.Parameters parameters = camera.getParameters ();
 
 			List <Size> previewSizes = camera.getParameters ().getSupportedPreviewSizes ();
 			Size size = previewSizes.get (0);
 
-			Log.d(TAG, "g");
-
 			parameters.setPreviewSize (size.width, size.height);
-			Log.d(TAG, "h");
 
 			camera.setParameters (parameters);
 
@@ -263,9 +254,7 @@ public class MainActivity extends Activity
 //			}
 			// ここまで
 
-			Log.d(TAG, "i");
 			camera.startPreview ();
-			Log.d(TAG, "j");
 			}
 			catch (Exception e)
 			{
@@ -294,13 +283,23 @@ public class MainActivity extends Activity
 	/**
 	 * シャッターが押された時に呼ばれるコールバック（画面タッチで撮影を行うため，コメントアウト）
 	 */
-//	private Camera.ShutterCallback shutterListener = new Camera.ShutterCallback ()
-//	{
-//		public void onShutter ()
-//		{
-//
-//		}
-//	};
+	private Camera.ShutterCallback shutterListener = new Camera.ShutterCallback ()
+	{
+		public void onShutter ()
+		{
+			if (camera != null)
+			{
+				if (!mIsTake)
+				{
+					Toast.makeText (MainActivity.this, "撮影", Toast.LENGTH_SHORT).show ();
+					mIsTake = true;
+					// オートフォーカス
+					camera.autoFocus(mAutoFocusListener);
+				}
+			}
+
+		}
+	};
 
 
 	/**
@@ -448,25 +447,6 @@ public class MainActivity extends Activity
 
 		Toast.makeText (this, "registFinish", Toast.LENGTH_SHORT).show ();
 	}
-
-
-	// // 画面タッチのイベントリスナ
-	// public boolean onTouthEvent(MotionEvent event)
-	// {
-	// Toast.makeText (this, "a", Toast.LENGTH_SHORT).show();
-	// if (event.getAction() == MotionEvent.ACTION_DOWN)
-	// {
-	// if (camera!= null)
-	// {
-	// if (!mIsTake)
-	// {
-	// mIsTake = true;
-	// camera.takePicture (shutterListener, null, pictureListener);
-	// }
-	// }
-	// }
-	// return true;
-	// }
 
 	
 	@Override
