@@ -176,13 +176,13 @@ public class MainActivity extends Activity
 			}
 		});
 		
-	  /*Button INOUTBtn = (Button) findViewById(R.id.button3);
-	  resolutionBtn.setOnClickListener(new OnClickListener()
+	 /* Button INOUTBtn = (Button) findViewById(R.id.button3);
+	  INOUTBtn.setOnClickListener(new OnClickListener()
 		{
-		public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-    case R.id.switch_cam:
+
         // カメラが複数あるかチェック
+		  int a = camera.getNumberOfCameras();
+		  Toast.makeText(MainActivity.this, "NumberOfCameras :" + numberOfCameras, Toast.LENGTH_SHORT).show();
         if (numberOfCameras == 1) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage(this.getString(R.string.camera_alert))
@@ -193,27 +193,25 @@ public class MainActivity extends Activity
         }
  
         // 現在利用しているカメラを解放
-        if (mCamera != null) {
-            mCamera.stopPreview();
-            mPreview.setCamera(null);
-            mCamera.release();
-            mCamera = null;
+        if (camera != null) {
+            camera.stopPreview();
+            preview.setCamera(null);
+            camera.release();
+            camera = null;
         }
  
         // カメラを切り替え
-        mCamera = Camera
+        camera = Camera
                 .open((cameraCurrentlyLocked + 1) % numberOfCameras);
         cameraCurrentlyLocked = (cameraCurrentlyLocked + 1)
                 % numberOfCameras;
-        mPreview.switchCamera(mCamera);
+        Preview.switchCamera(camera);
  
         // プレビュー再開
-        mCamera.startPreview();
+        camera.startPreview();
         return true;
-    default:
-        return super.onOptionsItemSelected(item);
-    }
-		}
+    
+		
 });*/
 			
 		
