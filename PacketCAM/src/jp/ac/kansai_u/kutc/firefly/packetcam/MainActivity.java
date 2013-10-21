@@ -119,6 +119,10 @@ public class MainActivity extends Activity
 			
 		});
 		
+		/************************************************************************/
+		/*******   取得した最大の画像サイズで撮影した際，アプリが強制終了するバグ発生   *******/
+		/************************************************************************/
+		// 撮影した画像のサイズが大きすぎて，メモリエラーが発生しているのかもしれない．
 		Button resolutionBtn = (Button) findViewById(R.id.button3);
 		resolutionBtn.setOnClickListener(new OnClickListener()
 		{
