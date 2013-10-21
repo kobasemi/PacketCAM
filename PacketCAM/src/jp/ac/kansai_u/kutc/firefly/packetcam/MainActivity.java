@@ -125,57 +125,58 @@ public class MainActivity extends Activity
 			@Override
 			public void onClick (View v)
 			{
-				List <Size> supportedPictureSize = camera.getParameters().getSupportedPictureSizes();
+				final List <Size> supportedPictureSize = camera.getParameters().getSupportedPictureSizes();
 				List <Size> supportedPreviewSize = camera.getParameters().getSupportedPreviewSizes();
 				
 				// リストサイズの取得
 				// 5
 				int numPicItem = supportedPictureSize.size();
 				// 9
-				int numPreItem = supportedPreviewSize.size();
+//				int numPreItem = supportedPreviewSize.size();
 				
-				Toast.makeText(MainActivity.this, numPicItem + " : " + numPreItem, Toast.LENGTH_SHORT).show();
 				
-//				String[] picHeight = new String[numPicItem];
-//				String[] picWidth = new String[numPicItem];
-//				final String[] pic = new String[numPicItem];
+				String[] picHeight = new String[numPicItem];
+				String[] picWidth = new String[numPicItem];
+				final String[] pic = new String[numPicItem];
 //				
 ////				String[] preHeight = new String[numPreItem];
 ////				String[] preWidth = new String[numPreItem];
 ////				final String[] pre = new String[numPreItem];
-//				
-//				
-//				for (int i = 0; i <= supportedPictureSize.size(); i++)
-//				{
-//					picSize = supportedPictureSize.get(i);
-//					picHeight[i] = String.valueOf(picSize.height);
-//					picWidth[i] = String.valueOf(picSize.width);
-//					
-////					preSize = supportedPreviewSize.get(i);
-////					preHeight[i] = String.valueOf(preSize.height);
-////					preWidth[i] = String.valueOf(preSize.width);
-//					
-//					pic[i] = "Height: " + picHeight[i] + "Width: " + picWidth[i];
-//					
-////					pic[i] = "PicHeight: " + picHeight[i] + "PicWidth: " + picWidth[i] + "\n"
-////							 + "PreHeight: " + preHeight[i] + "PreWidth: " + preWidth[i];
-//				}
-//				
-//				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-//				builder.setTitle("解像度を選択してください");
-//				builder.setItems(pic, new DialogInterface.OnClickListener() 
-//				{
-//					public void onClick(DialogInterface dialog, int which) 
-//					{
-//						Camera.Parameters parameter = camera.getParameters();
-//						parameter.setPictureSize(picSize.width, picSize.height);
-//						
-////						parameter.setPreviewSize(preSize.width, preSize.height);
-//						
-//						camera.setParameters(parameter);
-//					}
-//				});
-//				builder.show();
+				
+				
+				for (int i = 0; i < supportedPictureSize.size(); i++)
+				{
+					picSize = supportedPictureSize.get(i);
+					picHeight[i] = String.valueOf(picSize.height);
+					picWidth[i] = String.valueOf(picSize.width);
+					
+//					preSize = supportedPreviewSize.get(i);
+//					preHeight[i] = String.valueOf(preSize.height);
+//					preWidth[i] = String.valueOf(preSize.width);
+					
+					pic[i] = "Height: " + picHeight[i] + "Width: " + picWidth[i];
+					
+//					pic[i] = "PicHeight: " + picHeight[i] + "PicWidth: " + picWidth[i] + "\n"
+//							 + "PreHeight: " + preHeight[i] + "PreWidth: " + preWidth[i];
+				}
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+				builder.setTitle("画像サイズを選択してください");
+				builder.setItems(pic, new DialogInterface.OnClickListener() 
+				{
+					public void onClick(DialogInterface dialog, int which) 
+					{
+						Camera.Parameters parameter = camera.getParameters();
+						
+						picSize = supportedPictureSize.get(which);
+						parameter.setPictureSize(picSize.width, picSize.height);
+						
+//						parameter.setPreviewSize(preSize.width, preSize.height);
+						
+						camera.setParameters(parameter);
+					}
+				});
+				builder.show();
 				
 			}
 		});
