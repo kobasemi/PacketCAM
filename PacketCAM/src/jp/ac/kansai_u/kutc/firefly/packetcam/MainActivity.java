@@ -17,6 +17,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.hardware.Camera;
+import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
 import android.os.Build;
 import android.os.Bundle;
@@ -127,51 +128,54 @@ public class MainActivity extends Activity
 				List <Size> supportedPictureSize = camera.getParameters().getSupportedPictureSizes();
 				List <Size> supportedPreviewSize = camera.getParameters().getSupportedPreviewSizes();
 				
+				// リストサイズの取得
+				// 5
 				int numPicItem = supportedPictureSize.size();
+				// 9
 				int numPreItem = supportedPreviewSize.size();
 				
 				Toast.makeText(MainActivity.this, numPicItem + " : " + numPreItem, Toast.LENGTH_SHORT).show();
 				
-				String[] picHeight = new String[numPicItem];
-				String[] picWidth = new String[numPicItem];
-				final String[] pic = new String[numPicItem];
-				
-//				String[] preHeight = new String[numPreItem];
-//				String[] preWidth = new String[numPreItem];
-//				final String[] pre = new String[numPreItem];
-				
-				
-				for (int i = 0; i <= supportedPictureSize.size(); i++)
-				{
-					picSize = supportedPictureSize.get(i);
-					picHeight[i] = String.valueOf(picSize.height);
-					picWidth[i] = String.valueOf(picSize.width);
-					
-//					preSize = supportedPreviewSize.get(i);
-//					preHeight[i] = String.valueOf(preSize.height);
-//					preWidth[i] = String.valueOf(preSize.width);
-					
-					pic[i] = "Height: " + picHeight[i] + "Width: " + picWidth[i];
-					
-//					pic[i] = "PicHeight: " + picHeight[i] + "PicWidth: " + picWidth[i] + "\n"
-//							 + "PreHeight: " + preHeight[i] + "PreWidth: " + preWidth[i];
-				}
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-				builder.setTitle("解像度を選択してください");
-				builder.setItems(pic, new DialogInterface.OnClickListener() 
-				{
-					public void onClick(DialogInterface dialog, int which) 
-					{
-						Camera.Parameters parameter = camera.getParameters();
-						parameter.setPictureSize(picSize.width, picSize.height);
-						
-//						parameter.setPreviewSize(preSize.width, preSize.height);
-						
-						camera.setParameters(parameter);
-					}
-				});
-				builder.show();
+//				String[] picHeight = new String[numPicItem];
+//				String[] picWidth = new String[numPicItem];
+//				final String[] pic = new String[numPicItem];
+//				
+////				String[] preHeight = new String[numPreItem];
+////				String[] preWidth = new String[numPreItem];
+////				final String[] pre = new String[numPreItem];
+//				
+//				
+//				for (int i = 0; i <= supportedPictureSize.size(); i++)
+//				{
+//					picSize = supportedPictureSize.get(i);
+//					picHeight[i] = String.valueOf(picSize.height);
+//					picWidth[i] = String.valueOf(picSize.width);
+//					
+////					preSize = supportedPreviewSize.get(i);
+////					preHeight[i] = String.valueOf(preSize.height);
+////					preWidth[i] = String.valueOf(preSize.width);
+//					
+//					pic[i] = "Height: " + picHeight[i] + "Width: " + picWidth[i];
+//					
+////					pic[i] = "PicHeight: " + picHeight[i] + "PicWidth: " + picWidth[i] + "\n"
+////							 + "PreHeight: " + preHeight[i] + "PreWidth: " + preWidth[i];
+//				}
+//				
+//				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//				builder.setTitle("解像度を選択してください");
+//				builder.setItems(pic, new DialogInterface.OnClickListener() 
+//				{
+//					public void onClick(DialogInterface dialog, int which) 
+//					{
+//						Camera.Parameters parameter = camera.getParameters();
+//						parameter.setPictureSize(picSize.width, picSize.height);
+//						
+////						parameter.setPreviewSize(preSize.width, preSize.height);
+//						
+//						camera.setParameters(parameter);
+//					}
+//				});
+//				builder.show();
 				
 			}
 		});
@@ -315,6 +319,37 @@ public class MainActivity extends Activity
 			}
 		}
 	};
+	
+	
+	/**
+	 * 画面サイズに応じて最適なカメラプレビューのサイズを返すメソッド
+	 * 参考URL：http://www.seeda.jp/modules/d3blog/details.php?bid=29&cid=7
+	 * @param params CameraParameter
+	 * @return カメラプレビューサイズ
+	 */
+	private Size getOptimalPreviewSize (Parameters params)
+	{
+		Size optimalSize = null;
+		List <Size> sizes = params.getSupportedPreviewSizes();
+		float horizontalViewAngle = params.getHorizontalViewAngle();
+		float verticalViewAngle = params.getVerticalViewAngle();
+		double targetRatio = (double) horizontalViewAngle / verticalViewAngle;
+		double minDiff = Double.MAX_VALUE;
+		
+		for (Size size : sizes)
+		{
+			double ratio = (double) size.width / size.height;
+			double tempDiff = Math.abs(targetRatio - ratio);
+			// 比率の差が少ない，より小さいプレビューサイズを選ぶ
+			if (tempDiff <= minDiff)
+			{
+				minDiff = tempDiff;
+				optimalSize = size;
+			}
+		}
+		
+		return optimalSize;
+	}
 
 
 	/**
