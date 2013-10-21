@@ -285,13 +285,17 @@ public class MainActivity extends Activity
 			try
 			{
 			Camera.Parameters parameters = camera.getParameters ();
+			
+			Size size = getOptimalPreviewSize (parameters);
 
-			List <Size> previewSizes = camera.getParameters ().getSupportedPreviewSizes ();
-			Size size = previewSizes.get (0);
+//			List <Size> previewSizes = camera.getParameters ().getSupportedPreviewSizes ();
+//			Size size = previewSizes.get (0);
 
 			parameters.setPreviewSize (size.width, size.height);
 
 			camera.setParameters (parameters);
+			
+			holder.setFixedSize(size.width, size.height);
 
 			// （端末によっては以下のコードを代わりに実行する必要があるかも）
 //			List <Size> supportedSizes = Reflect.getSuportedPreviewSizes(parameters);
