@@ -51,6 +51,8 @@ public class MainActivity extends Activity
 	// カメラFlashON・OFFフラグ
 	private boolean status = false;
 	
+	//INOUTフラグ
+	private boolean inoutstatus = false;
 	// 画像サイズ（height，width）
 	Size picSize = null;
 
@@ -205,8 +207,16 @@ public class MainActivity extends Activity
             }
  
         // カメラを切り替え
+        if(inoutstatus==false){
         camera = Camera.open(1);
-        
+        inoutstatus=true;
+        }
+        else
+        {
+        	camera=Camera.open(0);
+        	inoutstatus=false;
+        	
+        }
         try
         {
         	camera.setPreviewDisplay(holder);
