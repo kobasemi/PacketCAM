@@ -79,7 +79,7 @@ public class MainActivity extends Activity
 
 
 		SurfaceView surfaceView = (SurfaceView) findViewById (R.id.surfaceView1);
-		SurfaceHolder holder = surfaceView.getHolder ();
+		final SurfaceHolder holder = surfaceView.getHolder ();
 		holder.addCallback (surfaceListener);
 
 
@@ -185,43 +185,41 @@ public class MainActivity extends Activity
 			}
 		});
 		
-	 /* Button INOUTBtn = (Button) findViewById(R.id.button3);
+	  Button INOUTBtn = (Button) findViewById(R.id.button3);
 	  INOUTBtn.setOnClickListener(new OnClickListener()
 		{
-
+		 public void onClick(View v)
+		 {
         // カメラが複数あるかチェック
-		  int a = camera.getNumberOfCameras();
+		  int numberOfCameras = camera.getNumberOfCameras();
 		  Toast.makeText(MainActivity.this, "NumberOfCameras :" + numberOfCameras, Toast.LENGTH_SHORT).show();
         if (numberOfCameras == 1) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage(this.getString(R.string.camera_alert))
-                   .setNeutralButton("Close", null);
-            AlertDialog alert = builder.create();
-            alert.show();
-            return true;
+          Toast.makeText(MainActivity.this, "Cameraが一つです", Toast.LENGTH_SHORT).show();
+          return;
+          		
         }
  
         // 現在利用しているカメラを解放
         if (camera != null) {
-            camera.stopPreview();
-            preview.setCamera(null);
             camera.release();
-            camera = null;
-        }
+            }
  
         // カメラを切り替え
-        camera = Camera
-                .open((cameraCurrentlyLocked + 1) % numberOfCameras);
-        cameraCurrentlyLocked = (cameraCurrentlyLocked + 1)
-                % numberOfCameras;
-        Preview.switchCamera(camera);
+        camera = Camera.open(1);
+        
+        try
+        {
+        	camera.setPreviewDisplay(holder);
+        }
+        catch(Exception e)
+        {
+        	e.printStackTrace();
+        }
  
         // プレビュー再開
-        camera.startPreview();
-        return true;
-    
-		
-});*/
+        camera.startPreview();    
+		 }
+		});
 			
 		
 		surfaceView.setOnTouchListener (new OnTouchListener ()
