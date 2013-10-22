@@ -187,7 +187,7 @@ public class MainActivity extends Activity
 			}
 		});
 		
-	  Button INOUTBtn = (Button) findViewById(R.id.button3);
+	  Button INOUTBtn = (Button) findViewById(R.id.button2);
 	  INOUTBtn.setOnClickListener(new OnClickListener()
 		{
 		 public void onClick(View v)
