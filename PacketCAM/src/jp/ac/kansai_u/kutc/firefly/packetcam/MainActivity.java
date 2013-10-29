@@ -470,6 +470,11 @@ public class MainActivity extends Activity
 			{
 				Toast.makeText (MainActivity.this, e.getMessage (), Toast.LENGTH_SHORT).show();
 			}
+			catch (OutOfMemoryError e)
+			{
+				Log.d(TAG, "OutOfMemory");
+				Toast.makeText(MainActivity.this, "このサイズでは撮影できません,", Toast.LENGTH_SHORT).show();
+			}
 
 			camera.startPreview ();
 
@@ -498,7 +503,6 @@ public class MainActivity extends Activity
 		// SDカードにアプリ名でフォルダを新規作成
 		FOLDER_PATH = SD_PATH + File.separator + getString(R.string.app_name);
 
-		Toast.makeText (this,  "FolderPath = " + FOLDER_PATH, Toast.LENGTH_SHORT).show ();
 
 		File file = new File (FOLDER_PATH);
 
@@ -506,14 +510,11 @@ public class MainActivity extends Activity
 		{
 			if (!file.exists())
 			{
-				Toast.makeText (this, "fileNotExists", Toast.LENGTH_SHORT).show();
 				file.mkdirs ();
 			}
 		}
 		catch (Exception e)
 		{
-			Toast.makeText (this,  "mkFileException", Toast.LENGTH_SHORT).show();
-			Toast.makeText (this, e.getMessage (), Toast.LENGTH_SHORT).show ();
 			e.printStackTrace ();
 			return false;
 		}
@@ -548,7 +549,6 @@ public class MainActivity extends Activity
 		values.put ("_data", path);
 		contentResolver.insert (MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
 
-		Toast.makeText (this, "registFinish", Toast.LENGTH_SHORT).show ();
 	}
 
 	
