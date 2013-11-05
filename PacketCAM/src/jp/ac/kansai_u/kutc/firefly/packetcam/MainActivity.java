@@ -458,7 +458,7 @@ public class MainActivity extends Activity
 				Bitmap overlayBitmap = overlay.getDrawingCache();
 
 				// 空のイメージを作成
-				Bitmap offBitmap = Bitmap.createBitmap (cameraBitmap.getWidth(), cameraBitmap.getHeight(), Bitmap.Config.ARGB_4444);
+				Bitmap offBitmap = Bitmap.createBitmap (cameraBitmap.getWidth(), cameraBitmap.getHeight(), Bitmap.Config.ARGB_8888);
 
 				Canvas offScreen = new Canvas (offBitmap);
 
