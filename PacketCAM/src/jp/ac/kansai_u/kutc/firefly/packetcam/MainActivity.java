@@ -305,10 +305,10 @@ public class MainActivity extends Activity
 			{
 			Camera.Parameters parameters = camera.getParameters ();
 			
-			Size size = getOptimalPreviewSize (parameters);
+//			Size size = getOptimalPreviewSize (parameters);
 
-//			List <Size> previewSizes = camera.getParameters ().getSupportedPreviewSizes ();
-//			Size size = previewSizes.get (0);
+			List <Size> previewSizes = camera.getParameters ().getSupportedPreviewSizes ();
+			Size size = previewSizes.get (0);
 
 			parameters.setPreviewSize (size.width, size.height);
 
