@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
-
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -190,10 +190,16 @@ public class MainActivity extends Activity
 	  Button INOUTBtn = (Button) findViewById(R.id.button2);
 	  INOUTBtn.setOnClickListener(new OnClickListener()
 		{
-		 public void onClick(View v)
+		 @TargetApi(Build.VERSION_CODES.GINGERBREAD)
+		public void onClick(View v)
 		 {
         // カメラが複数あるかチェック
-		  int numberOfCameras = camera.getNumberOfCameras();
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD)
+				{
+					return;
+				}
+
+		  int numberOfCameras = Camera.getNumberOfCameras();
 		  Toast.makeText(MainActivity.this, "NumberOfCameras :" + numberOfCameras, Toast.LENGTH_SHORT).show();
         if (numberOfCameras == 1) {
           Toast.makeText(MainActivity.this, "Cameraが一つです", Toast.LENGTH_SHORT).show();
@@ -427,6 +433,13 @@ public class MainActivity extends Activity
 				Toast.makeText (MainActivity.this, "Success", Toast.LENGTH_SHORT).show();
 			}
 
+			Toast.makeText(MainActivity.this, "totalMemory" + String.valueOf(Runtime.getRuntime().totalMemory()), Toast.LENGTH_LONG).show();
+			Toast.makeText(MainActivity.this, "maxMemory" + String.valueOf(Runtime.getRuntime().maxMemory()), Toast.LENGTH_LONG).show();
+			Toast.makeText(MainActivity.this, "freeMemory" + String.valueOf(Runtime.getRuntime().freeMemory()), Toast.LENGTH_LONG).show();
+			
+			Log.d(TAG, "totalMemory" + String.valueOf(Runtime.getRuntime().totalMemory()));
+			Log.d(TAG, "maxMemory" + String.valueOf(Runtime.getRuntime().maxMemory()));
+			Log.d(TAG, "freeMemory" + String.valueOf(Runtime.getRuntime().freeMemory()));
 
 			try
 			{
@@ -434,13 +447,18 @@ public class MainActivity extends Activity
 
 				// オーバーレイ表示された画像との合成処理を行う
 				// カメラのイメージ
-				Bitmap cameraBitmap = BitmapFactory.decodeByteArray(data, 0, data.length, null);
+				
+				BitmapFactory.Options options = new BitmapFactory.Options();
+				options.inPurgeable = true;
+				
+//				Bitmap cameraBitmap = BitmapFactory.decodeByteArray(data, 0, data.length, null);
+				Bitmap cameraBitmap = BitmapFactory.decodeByteArray(data, 0, data.length, options);
 
 				// オーバーレイイメージ viewから画像を取得
 				Bitmap overlayBitmap = overlay.getDrawingCache();
 
 				// 空のイメージを作成
-				Bitmap offBitmap = Bitmap.createBitmap (cameraBitmap.getWidth(), cameraBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+				Bitmap offBitmap = Bitmap.createBitmap (cameraBitmap.getWidth(), cameraBitmap.getHeight(), Bitmap.Config.ARGB_4444);
 
 				Canvas offScreen = new Canvas (offBitmap);
 
