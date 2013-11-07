@@ -142,8 +142,9 @@ public class MainActivity extends Activity {
 					// preHeight[i] = String.valueOf(preSize.height);
 					// preWidth[i] = String.valueOf(preSize.width);
 
-					pic[i] = "Height: " + picHeight[i] + "Width: "
-							+ picWidth[i];
+//					pic[i] = "Height: " + picHeight[i] + "Width: "
+//							+ picWidth[i];
+					pic[i] = "Width : " + picWidth[i] + "Height : " + picHeight[i];
 
 					// pic[i] = "PicHeight: " + picHeight[i] + "PicWidth: " +
 					// picWidth[i] + "\n"
@@ -572,7 +573,88 @@ public class MainActivity extends Activity {
 
 			case KeyEvent.KEYCODE_MENU:
 				// メニューボタンで解像度選択
-
+				// メニューボタンで解像度選択
+				CharSequence[] conf = {"パケットの読み込み", "解像度", "フラッシュ"};
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+				builder.setTitle("画像サイズを選択してください");
+				builder.setItems(conf, new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int which) 
+					{
+						if (which == 0)
+						{
+							// パケットの読み込み
+							CharSequence[] conf1 = {"ファイルの選択", "リアルタイム読み込み"};
+							
+							AlertDialog.Builder builder1 = new AlertDialog.Builder(MainActivity.this);
+							builder1.setTitle("パケットの読み込み");
+							builder1.setItems(conf1, new DialogInterface.OnClickListener() 
+							{
+								public void onClick(DialogInterface dialog, int which) 
+								{
+									if (which == 0)
+									{
+										// ファイルの選択ダイアログの表示
+									}
+									if (which == 1)
+									{
+										// リアルタイム読み込み処理
+									}
+								}
+							});
+							builder1.show();
+						}
+						if (which == 1)
+						{
+							// 解像度
+							CharSequence[] conf2 = {"云々"};
+							
+							AlertDialog.Builder builder2 = new AlertDialog.Builder(MainActivity.this);
+							builder2.setTitle("解像度");
+							builder2.setItems(conf2, new DialogInterface.OnClickListener()
+							{
+								public void onClick (DialogInterface dialog, int which)
+								{
+									if (which == 0)
+									{
+										
+									}
+								}
+							});
+							builder2.show();
+						}
+						if (which == 2)
+						{
+							// フラッシュ
+							CharSequence[] conf3 = {"強制発光", "自動", "OFF"};
+							
+							AlertDialog.Builder builder3 = new AlertDialog.Builder(MainActivity.this);
+							builder3.setTitle("フラッシュ");
+							builder3.setItems(conf3, new DialogInterface.OnClickListener() 
+							{
+								public void onClick(DialogInterface dialog, int which) 
+								{
+									if (which == 0)
+									{
+										// 強制発光処理
+									}
+									if (which == 1)
+									{
+										// 自動発光処理
+									}
+									if (which == 2)
+									{
+										// フラッシュOFF処理
+									}
+								}
+							});
+							builder3.show();
+						}
+					}
+				});
+				builder.show();
+				return true;
 			default:
 				break;
 			}
