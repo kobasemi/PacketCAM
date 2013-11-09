@@ -661,7 +661,13 @@ public class MainActivity extends Activity
 										picHeight[i] = String.valueOf (picSize.height);
 										picWidth[i] = String.valueOf (picSize.width);
 										
-										pic[i] = "Width : " + picWidth[i] + "Height : " + picHeight[i];
+										// 縦サイズと横サイズの最大公約数を求める
+										int gcd = GetGCD.getGCD (picSize.width, picSize.height);
+										
+										String aspWidth = String.valueOf (picSize.width / gcd);
+										String aspHeight = String.valueOf (picSize.height / gcd);
+										
+										pic[i] = picWidth[i] + " : " + picHeight[i] + "（" + aspWidth + " ： " + aspHeight + "）";
 									}
 
 
