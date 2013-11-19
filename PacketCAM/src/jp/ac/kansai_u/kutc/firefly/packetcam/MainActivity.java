@@ -37,6 +37,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 
@@ -184,7 +185,7 @@ public class MainActivity extends Activity
 			}
 		});
 
-		Button INOUTBtn = (Button) findViewById (R.id.button2);
+		ImageButton INOUTBtn = (ImageButton) findViewById (R.id.imageButton4);
 		INOUTBtn.setOnClickListener (new OnClickListener ()
 		{
 			@TargetApi (Build.VERSION_CODES.GINGERBREAD)
