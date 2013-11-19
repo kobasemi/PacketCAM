@@ -1,3 +1,4 @@
 .DS_Store
-PacketCAM/bin
-PacketCAM/gen
+*~
+PacketCAM/bin/
+PacketCAM/gen/
