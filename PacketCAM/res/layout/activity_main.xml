@@ -66,6 +66,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:contentDescription="@+string/setting"
+        android:background="@null"
         android:src="@drawable/setting" />
 
     <ImageButton
@@ -75,6 +76,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:contentDescription="@+string/inout"
+        android:background="@null"
         android:src="@drawable/in_out" />
 
     <ImageButton
@@ -84,6 +86,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:contentDescription="@+string/effectoff"
+        android:background="@null"
         android:src="@drawable/effect_off" />
 
     <ImageButton
@@ -93,6 +96,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:contentDescription="@+string/shutter"
+        android:background="@null"
         android:src="@drawable/shutter" />
 
 </RelativeLayout>
