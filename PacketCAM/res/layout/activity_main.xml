@@ -24,6 +24,14 @@
         android:layout_marginStart="0dp"
         android:layout_marginTop="0dp" />
 
+    <FrameLayout
+        android:id="@+id/frameLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentBottom="true" >
+
+    </FrameLayout>
+
     <Button
         android:id="@+id/button1"
         style="?android:attr/buttonStyleSmall"

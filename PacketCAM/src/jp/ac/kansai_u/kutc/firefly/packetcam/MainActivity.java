@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -37,6 +38,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -92,7 +94,11 @@ public class MainActivity extends Activity
 
 		// オーバーレイ
 		overlay = new OverLayView (this);
-		addContentView (overlay, new LayoutParams (LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		
+		FrameLayout flame = (FrameLayout) findViewById (R.id.frameLayout1);
+		flame.addView (overlay);
+		
+//		addContentView (overlay, new LayoutParams (LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
 		Button flashBtn = (Button) findViewById (R.id.button1);
 		flashBtn.setOnClickListener (new OnClickListener ()
