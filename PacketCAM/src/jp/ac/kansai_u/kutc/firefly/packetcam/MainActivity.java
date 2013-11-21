@@ -264,6 +264,136 @@ public class MainActivity extends Activity
 			
 		});
 		
+		
+		ImageButton settingBtn = (ImageButton) findViewById (R.id.imageButton1);
+		settingBtn.setOnClickListener (new OnClickListener()
+		{
+			@Override
+			public void onClick (View v)
+			{
+				CharSequence[] conf = { "パケットの読み込み", "解像度", "フラッシュ" };
+
+				AlertDialog.Builder builder = new AlertDialog.Builder (MainActivity.this);
+				builder.setTitle ("画像サイズを選択してください");
+				builder.setItems (conf, new DialogInterface.OnClickListener ()
+				{
+					public void onClick (DialogInterface dialog, int which)
+					{
+						if (which == 0)
+						{
+							// パケットの読み込み
+							CharSequence[] conf1 = { "ファイルの選択", "リアルタイム読み込み" };
+
+							AlertDialog.Builder builder1 = new AlertDialog.Builder (MainActivity.this);
+							builder1.setTitle ("パケットの読み込み");
+							builder1.setItems (conf1, new DialogInterface.OnClickListener ()
+							{
+								public void onClick (DialogInterface dialog, int which)
+								{
+									if (which == 0)
+									{
+										// ファイルの選択ダイアログの表示
+									}
+									if (which == 1)
+									{
+										// リアルタイム読み込み処理
+									}
+								}
+							});
+							builder1.show ();
+						}
+						if (which == 1)
+						{
+							// 解像度
+							// 対応する画像サイズのリストを取得
+							final List <Size> supportedPictureSize = camera.getParameters ().getSupportedPictureSizes ();
+							// 画像サイズの個数を取得
+							int numPicItem = supportedPictureSize.size ();
+							
+							// さきほど取得した個数をもとに配列を定義
+							String[] picHeight = new String[numPicItem];
+							String[] picWidth = new String[numPicItem];
+							final String[] pic = new String[numPicItem];
+
+							for (int i = 0; i < supportedPictureSize.size (); i++)
+							{
+								picSize = supportedPictureSize.get (i);
+								picHeight[i] = String.valueOf (picSize.height);
+								picWidth[i] = String.valueOf (picSize.width);
+								
+								// 縦サイズと横サイズの最大公約数を求める
+								int gcd = GetGCD.getGCD (picSize.width, picSize.height);
+								
+								String aspWidth = String.valueOf (picSize.width / gcd);
+								String aspHeight = String.valueOf (picSize.height / gcd);
+								
+								pic[i] = picWidth[i] + " : " + picHeight[i] + "（" + aspWidth + " ： " + aspHeight + "）";
+							}
+
+
+							AlertDialog.Builder builder2 = new AlertDialog.Builder (MainActivity.this);
+							builder2.setTitle ("解像度");
+							builder2.setItems (pic, new DialogInterface.OnClickListener ()
+							{
+								public void onClick (DialogInterface dialog, int which)
+								{
+									Camera.Parameters parameter = camera.getParameters ();
+
+									picSize = supportedPictureSize.get (which);
+									
+									Toast.makeText (MainActivity.this, "画像サイズを" + pic[which] + "に設定しました．", Toast.LENGTH_SHORT).show ();
+									
+									parameter.setPictureSize (picSize.width, picSize.height);
+									camera.setParameters (parameter);
+								}
+							});
+							builder2.show ();
+						}
+						if (which == 2)
+						{
+							// フラッシュ
+							CharSequence[] conf3 = { "強制発光", "自動", "OFF" };
+
+							AlertDialog.Builder builder3 = new AlertDialog.Builder (MainActivity.this);
+							builder3.setTitle ("フラッシュ");
+							builder3.setItems (conf3, new DialogInterface.OnClickListener ()
+							{
+								public void onClick (DialogInterface dialog, int which)
+								{
+									if (which == 0)
+									{
+										// 強制発光処理
+										Camera.Parameters parameters = camera.getParameters ();
+										parameters.setFlashMode (Camera.Parameters.FLASH_MODE_ON);
+										camera.setParameters (parameters);
+										Toast.makeText (MainActivity.this, "Flashを強制発光モードにしました", Toast.LENGTH_SHORT).show ();
+									}
+									if (which == 1)
+									{
+										// 自動発光処理
+										Camera.Parameters parameters = camera.getParameters ();
+										parameters.setFlashMode (Camera.Parameters.FLASH_MODE_AUTO);
+										camera.setParameters (parameters);
+										Toast.makeText (MainActivity.this, "Flashを自動モードにしました", Toast.LENGTH_SHORT).show();
+									}
+									if (which == 2)
+									{
+										// フラッシュOFF処理
+										Camera.Parameters parameters = camera.getParameters ();
+										parameters.setFlashMode (Camera.Parameters.FLASH_MODE_OFF);
+										camera.setParameters (parameters);
+										Toast.makeText (MainActivity.this, "FlashをOFFにしました", Toast.LENGTH_SHORT).show();
+									}
+								}
+							});
+							builder3.show ();
+						}
+					}
+				});
+				builder.show ();
+
+			}
+		});
 
 //		surfaceView.setOnTouchListener (new OnTouchListener ()
 //		{
