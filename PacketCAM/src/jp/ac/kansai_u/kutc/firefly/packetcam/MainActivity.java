@@ -394,6 +394,17 @@ public class MainActivity extends Activity
 
 			}
 		});
+		
+		
+		ImageButton effectBtn = (ImageButton) findViewById(R.id.imageButton3);
+		effectBtn.setOnClickListener (new OnClickListener()
+		{
+			@Override
+			public void onClick (View v)
+			{
+				
+			}
+		});
 
 //		surfaceView.setOnTouchListener (new OnTouchListener ()
 //		{
