@@ -68,6 +68,8 @@ public class MainActivity extends Activity
 	private static final String TAG = "MainActivity";
 
 
+	private boolean switchEffect=false;
+
 	/**
 	 * アクティビティ起動時に呼び出される
 	 */
@@ -396,13 +398,20 @@ public class MainActivity extends Activity
 		});
 		
 		
-		ImageButton effectBtn = (ImageButton) findViewById(R.id.imageButton3);
+		final ImageButton effectBtn = (ImageButton) findViewById(R.id.imageButton3);
 		effectBtn.setOnClickListener (new OnClickListener()
 		{
 			@Override
 			public void onClick (View v)
 			{
-				
+				if (switchEffect==false){
+					effectBtn.setImageResource(R.drawable.effect_on);
+					switchEffect=true;
+				}else{
+					effectBtn.setImageResource(R.drawable.effect_off);
+					switchEffect=false;
+					
+				}
 			}
 		});
 
