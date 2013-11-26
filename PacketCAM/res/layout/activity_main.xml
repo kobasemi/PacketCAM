@@ -65,19 +65,23 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:contentDescription="@+string/setting"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
         android:background="@null"
+        android:contentDescription="@+string/setting"
         android:src="@drawable/setting" />
 
     <ImageButton
-        android:id="@+id/imageButton4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/imageButton2"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:contentDescription="@+string/inout"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="10dp"
         android:background="@null"
-        android:src="@drawable/in_out" />
+        android:contentDescription="@+string/shutter"
+        android:scaleType="fitXY"
+        android:src="@drawable/shutter" />
 
     <ImageButton
         android:id="@+id/imageButton3"
@@ -85,18 +89,22 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:contentDescription="@+string/effectoff"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
         android:background="@null"
+        android:contentDescription="@+string/effectoff"
         android:src="@drawable/effect_off" />
 
     <ImageButton
-        android:id="@+id/imageButton2"
+        android:id="@+id/imageButton4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:contentDescription="@+string/shutter"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
         android:background="@null"
-        android:src="@drawable/shutter" />
+        android:contentDescription="@+string/inout"
+        android:src="@drawable/in_out" />
 
 </RelativeLayout>
