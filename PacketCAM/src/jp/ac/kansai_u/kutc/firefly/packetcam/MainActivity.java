@@ -276,7 +276,7 @@ public class MainActivity extends Activity
 				CharSequence[] conf = { "パケットの読み込み", "解像度", "フラッシュ" };
 
 				AlertDialog.Builder builder = new AlertDialog.Builder (MainActivity.this);
-				builder.setTitle ("画像サイズを選択してください");
+				builder.setTitle ("設定");
 				builder.setItems (conf, new DialogInterface.OnClickListener ()
 				{
 					public void onClick (DialogInterface dialog, int which)
