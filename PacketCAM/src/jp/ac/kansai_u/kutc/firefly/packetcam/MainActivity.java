@@ -193,7 +193,7 @@ public class MainActivity extends Activity
 //			}
 //		});
 
-		ImageButton INOUTBtn = (ImageButton) findViewById (R.id.imageButton4);
+		ImageButton INOUTBtn = (ImageButton) findViewById (R.id.inout);
 		INOUTBtn.setOnClickListener (new OnClickListener ()
 		{
 			@TargetApi (Build.VERSION_CODES.GINGERBREAD)
@@ -247,7 +247,7 @@ public class MainActivity extends Activity
 		});
 		
 		
-		ImageButton shutterBtn = (ImageButton) findViewById(R.id.imageButton2);
+		ImageButton shutterBtn = (ImageButton) findViewById(R.id.shutter);
 		shutterBtn.setOnClickListener (new OnClickListener()
 		{
 			@Override
@@ -267,7 +267,7 @@ public class MainActivity extends Activity
 		});
 		
 		
-		ImageButton settingBtn = (ImageButton) findViewById (R.id.imageButton1);
+		ImageButton settingBtn = (ImageButton) findViewById (R.id.setting);
 		settingBtn.setOnClickListener (new OnClickListener()
 		{
 			@Override
@@ -398,7 +398,7 @@ public class MainActivity extends Activity
 		});
 		
 		
-		final ImageButton effectBtn = (ImageButton) findViewById(R.id.imageButton3);
+		final ImageButton effectBtn = (ImageButton) findViewById(R.id.effect);
 		effectBtn.setOnClickListener (new OnClickListener()
 		{
 			@Override
