@@ -266,7 +266,7 @@ public class MainActivity extends Activity
 			
 		});
 		
-		
+		// TODO: 物理メニューボタンと処理が重複している 重要度B 優先度Z
 		ImageButton settingBtn = (ImageButton) findViewById (R.id.setting);
 		settingBtn.setOnClickListener (new OnClickListener()
 		{
@@ -275,7 +275,7 @@ public class MainActivity extends Activity
 			{
 				CharSequence[] conf = { "パケットの読み込み", "解像度", "フラッシュ" };
 
-				AlertDialog.Builder builder = new AlertDialog.Builder (MainActivity.this);
+				final AlertDialog.Builder builder = new AlertDialog.Builder (MainActivity.this);
 				builder.setTitle ("設定");
 				builder.setItems (conf, new DialogInterface.OnClickListener ()
 				{
@@ -302,6 +302,13 @@ public class MainActivity extends Activity
 									}
 								}
 							});
+                            builder1.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    //To change body of implemented methods use File | Settings | File Templates.
+                                    builder.show();
+                                }
+                            });
 							builder1.show ();
 						}
 						if (which == 1)
@@ -349,7 +356,14 @@ public class MainActivity extends Activity
 									camera.setParameters (parameter);
 								}
 							});
-							builder2.show ();
+                            builder2.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    //To change body of implemented methods use File | Settings | File Templates.
+                                    builder.show();
+                                }
+                            });
+							builder2.show();
 						}
 						if (which == 2)
 						{
@@ -388,6 +402,13 @@ public class MainActivity extends Activity
 									}
 								}
 							});
+                            builder3.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                @Override
+                                public void onCancel(DialogInterface dialog) {
+                                    //To change body of implemented methods use File | Settings | File Templates.
+                                    builder.show();
+                                }
+                            });
 							builder3.show ();
 						}
 					}
@@ -746,7 +767,7 @@ public class MainActivity extends Activity
 
 	}
 
-
+    // TODO: 物理メニューボタンにおいて，設定ボタンと処理が重複している 重要度B 優先度Z
 	@Override
 	public boolean dispatchKeyEvent (KeyEvent event)
 	{
