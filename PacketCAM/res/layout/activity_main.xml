@@ -28,6 +28,7 @@
 
     </FrameLayout>
 
+    <!--
     <Button
         android:id="@+id/button1"
         style="?android:attr/buttonStyleSmall"
@@ -35,8 +36,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="@string/flash" />
+        android:text="@string/flash" /> -->
 
+    <!--
     <Button
         android:id="@+id/button2"
         style="?android:attr/buttonStyleSmall"
@@ -45,15 +47,16 @@
         android:layout_alignBaseline="@+id/button1"
         android:layout_alignBottom="@+id/button1"
         android:layout_toRightOf="@+id/button1"
-        android:text="@string/INOUT" />
+        android:text="@string/INOUT" /> -->
 
+     <!--
     <Button
         android:id="@+id/button3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@+id/button1"
-        android:text="@string/resolution" />
+        android:text="@string/resolution" /> -->
 
     <ImageButton
         android:id="@+id/setting"
