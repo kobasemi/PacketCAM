@@ -221,7 +221,7 @@ public class MainActivity extends Activity
 				}
 
 				// カメラを切り替え
-				if (inoutstatus == false)
+				if (!inoutstatus)
 				{
 					camera = Camera.open (1);
 					inoutstatus = true;
@@ -404,7 +404,7 @@ public class MainActivity extends Activity
 			@Override
 			public void onClick (View v)
 			{
-				if (switchEffect==false){
+				if (!switchEffect){
 					effectBtn.setImageResource(R.drawable.effect_on);
 					switchEffect=true;
 				}else{
@@ -726,11 +726,7 @@ public class MainActivity extends Activity
 	 */
 	private boolean isSdCardMounted (String status)
 	{
-		if (status.equals (Environment.MEDIA_MOUNTED))
-		{
-			return true;
-		}
-		return false;
+		return status.equals (Environment.MEDIA_MOUNTED);
 	}
 
 
