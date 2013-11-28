@@ -776,7 +776,7 @@ public class MainActivity extends Activity
 
 	}
 
-    // TODO: 物理メニューボタンにおいて，設定ボタンと処理が重複している 重要度B 優先度Z
+    // TODO: 物理メニューボタンにおけるコンテンツを変える（クレジットなどに）
 	@Override
 	public boolean dispatchKeyEvent (KeyEvent event)
 	{
