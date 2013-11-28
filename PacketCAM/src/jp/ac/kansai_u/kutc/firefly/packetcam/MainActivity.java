@@ -235,12 +235,21 @@ public class MainActivity extends Activity
 				try
 				{
 					camera.setPreviewDisplay (holder);
+					
+					Camera.Parameters param = camera.getParameters();
+					List <Size> previewSizes = camera.getParameters().getSupportedPreviewSizes();
+					Size size = previewSizes.get (0);
+					
+					param.setPreviewSize (size.width, size.height);
+					camera.setParameters (param);
+					holder.setFixedSize (size.width, size.height);
 				}
 				catch (Exception e)
 				{
 					e.printStackTrace ();
 				}
-
+				
+				
 				// プレビュー再開
 				camera.startPreview ();
 			}
