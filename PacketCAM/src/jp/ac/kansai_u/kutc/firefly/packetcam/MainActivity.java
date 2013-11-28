@@ -182,8 +182,7 @@ public class MainActivity extends Activity
 			}
 			
 		});
-		
-		// TODO: 物理メニューボタンと処理が重複している 重要度B 優先度Z
+
 		ImageButton settingBtn = (ImageButton) findViewById (R.id.setting);
 		settingBtn.setOnClickListener (new OnClickListener()
 		{
