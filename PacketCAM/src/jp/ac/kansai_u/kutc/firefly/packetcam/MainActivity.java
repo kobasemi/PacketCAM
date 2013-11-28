@@ -1,11 +1,5 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.List;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -27,21 +21,17 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.View;
+import android.view.*;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
-import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.List;
 
 
 public class MainActivity extends Activity
@@ -100,6 +90,12 @@ public class MainActivity extends Activity
 		
 		FrameLayout flame = (FrameLayout) findViewById (R.id.frameLayout1);
 		flame.addView (overlay);
+
+		// res/rawにあるファイルをSDカードにコピーする
+		if (!cpFile())
+		{
+
+		}
 
 		ImageButton INOUTBtn = (ImageButton) findViewById (R.id.inout);
 		INOUTBtn.setOnClickListener (new OnClickListener ()
@@ -405,7 +401,15 @@ public class MainActivity extends Activity
 //			}
 //
 //		});
+
 	}
+
+
+	private boolean cpFile()
+	{
+		return true;
+	}
+
 
 	private SurfaceHolder.Callback surfaceListener = new SurfaceHolder.Callback ()
 	{
