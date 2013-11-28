@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnKeyListener;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -311,13 +312,23 @@ public class MainActivity extends Activity
 									}
 								}
 							});
-                            builder1.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                @Override
-                                public void onCancel(DialogInterface dialog) {
-                                    //To change body of implemented methods use File | Settings | File Templates.
-                                    builder.show();
-                                }
-                            });
+							builder1.setOnKeyListener (new OnKeyListener()
+							{
+								@Override
+								public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event)
+								{
+									// TODO 自動生成されたメソッド・スタブ
+									if (keyCode == KeyEvent.KEYCODE_BACK)
+									{
+										dialog.dismiss ();
+										builder.show ();
+										return true;
+									}
+									return false;
+								}
+								
+							});
+
 							builder1.show ();
 						}
 						if (which == 1)
@@ -365,13 +376,22 @@ public class MainActivity extends Activity
 									camera.setParameters (parameter);
 								}
 							});
-                            builder2.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                @Override
-                                public void onCancel(DialogInterface dialog) {
-                                    //To change body of implemented methods use File | Settings | File Templates.
-                                    builder.show();
-                                }
-                            });
+							builder2.setOnKeyListener (new OnKeyListener()
+							{
+
+								@Override
+								public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event)
+								{
+									// TODO 自動生成されたメソッド・スタブ
+									if (keyCode == KeyEvent.KEYCODE_BACK)
+									{
+										dialog.dismiss ();
+										builder.show();
+										return true;
+									}
+									return false;
+								}
+							});
 							builder2.show();
 						}
 						if (which == 2)
@@ -411,13 +431,23 @@ public class MainActivity extends Activity
 									}
 								}
 							});
-                            builder3.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                @Override
-                                public void onCancel(DialogInterface dialog) {
-                                    //To change body of implemented methods use File | Settings | File Templates.
-                                    builder.show();
-                                }
-                            });
+							builder3.setOnKeyListener (new OnKeyListener()
+							{
+
+								@Override
+								public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event)
+								{
+									// TODO 自動生成されたメソッド・スタブ
+									if (keyCode == KeyEvent.KEYCODE_BACK)
+									{
+										dialog.dismiss();
+										builder.show();
+										return true;
+									}
+									return false;
+								}
+								
+							});
 							builder3.show ();
 						}
 					}
@@ -776,7 +806,7 @@ public class MainActivity extends Activity
 
 	}
 
-    // TODO: 物理メニューボタンにおいて，設定ボタンと処理が重複している 重要度B 優先度Z
+    // TODO: 物理メニューボタンにおけるコンテンツを変える（クレジットなどに）
 	@Override
 	public boolean dispatchKeyEvent (KeyEvent event)
 	{
