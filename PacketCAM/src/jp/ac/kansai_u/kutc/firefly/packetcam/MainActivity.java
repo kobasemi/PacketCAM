@@ -312,6 +312,7 @@ public class MainActivity extends Activity
 									}
 								}
 							});
+							// Backキーを押した際に前のダイアログに戻る
 							builder1.setOnKeyListener (new OnKeyListener()
 							{
 								@Override
