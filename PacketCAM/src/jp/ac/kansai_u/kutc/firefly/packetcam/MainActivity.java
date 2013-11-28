@@ -92,10 +92,10 @@ public class MainActivity extends Activity
 		flame.addView (overlay);
 
 		// res/rawにあるファイルをSDカードにコピーする
-		if (!cpFile())
-		{
-
-		}
+//		if (!cpFile())
+//		{
+//
+//		}
 
 		ImageButton INOUTBtn = (ImageButton) findViewById (R.id.inout);
 		INOUTBtn.setOnClickListener (new OnClickListener ()
