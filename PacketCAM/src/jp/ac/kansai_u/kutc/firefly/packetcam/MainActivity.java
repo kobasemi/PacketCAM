@@ -5,8 +5,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -29,6 +31,8 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -54,7 +58,10 @@ public class MainActivity extends Activity
 	// Size preSize = null;
 
 	// 画像保存フォルダのパス
-	private static String FOLDER_PATH = null;
+	private static String PICFOLDER_PATH = null;
+
+    // Packetデータ保存フォルダのパス
+    private static String PACKETFOLDER_PATH = null;
 
 	private static final String TAG = "MainActivity";
 
@@ -91,11 +98,21 @@ public class MainActivity extends Activity
 		FrameLayout flame = (FrameLayout) findViewById (R.id.frameLayout1);
 		flame.addView (overlay);
 
-		// res/rawにあるファイルをSDカードにコピーする
-//		if (!cpFile())
-//		{
-//
-//		}
+        // フォルダの作成を行う
+        if (!createFolder ())
+        {
+            Toast.makeText (MainActivity.this, "failure", Toast.LENGTH_SHORT).show ();
+        }
+        else
+        {
+            Toast.makeText (MainActivity.this, "Success", Toast.LENGTH_SHORT).show ();
+        }
+
+        // res/rawにあるファイルをSDカードにコピーする
+		if (!copyRawFileToSd(R.raw.k, "k.cap"))
+		{
+			Toast.makeText(this, "コピーに失敗しました", Toast.LENGTH_SHORT);
+		}
 
 		ImageButton INOUTBtn = (ImageButton) findViewById (R.id.inout);
 		INOUTBtn.setOnClickListener (new OnClickListener ()
@@ -405,8 +422,45 @@ public class MainActivity extends Activity
 	}
 
 
-	private boolean cpFile()
+	private boolean copyRawFileToSd(int resourceId, String fileName)
 	{
+		File copyFile = new File (PACKETFOLDER_PATH + File.separator + fileName);
+		Resources res = this.getResources();
+		InputStream input = res.openRawResource(resourceId);
+
+		OutputStream output = null;
+
+		try
+		{
+			output = new FileOutputStream (copyFile);
+			byte[] buff = new byte[1024];
+			int size = 0;
+			while ((size = input.read(buff)) >= 0)
+			{
+				output.write(buff);
+			}
+
+			output.flush();
+			output.close();
+			input.close();
+			output = null;
+			input = null;
+		}
+		catch (Exception e)
+		{
+			try
+			{
+				if (output != null) output.close();
+				if (input != null) input.close();
+
+				return false;
+			}
+			catch (Exception ee)
+			{
+				return false;
+			}
+		}
+
 		return true;
 	}
 
@@ -570,15 +624,6 @@ public class MainActivity extends Activity
 				return;
 			}
 
-			// フォルダの作成を行う
-			if (!createFolder ())
-			{
-				Toast.makeText (MainActivity.this, "failure", Toast.LENGTH_SHORT).show ();
-			}
-			else
-			{
-				Toast.makeText (MainActivity.this, "Success", Toast.LENGTH_SHORT).show ();
-			}
 
 			Toast.makeText (MainActivity.this, "totalMemory" + String.valueOf (Runtime.getRuntime ().totalMemory ()), Toast.LENGTH_LONG).show ();
 			Toast.makeText (MainActivity.this, "maxMemory" + String.valueOf (Runtime.getRuntime ().maxMemory ()), Toast.LENGTH_LONG).show ();
@@ -619,7 +664,7 @@ public class MainActivity extends Activity
 				// ファイル名を設定
 				Calendar cal = Calendar.getInstance ();
 				SimpleDateFormat sf = new SimpleDateFormat ("yyyyMMdd_HHmmss");
-				String imgPath = FOLDER_PATH + File.separator + sf.format (cal.getTime ()) + ".jpg";
+				String imgPath = PICFOLDER_PATH + File.separator + sf.format (cal.getTime ()) + ".jpg";
 
 				FileOutputStream fos;
 				fos = new FileOutputStream (imgPath, true);
@@ -668,15 +713,22 @@ public class MainActivity extends Activity
 		String SD_PATH = Environment.getExternalStorageDirectory ().getPath ();
 
 		// SDカードにアプリ名でフォルダを新規作成
-		FOLDER_PATH = SD_PATH + File.separator + getString (R.string.app_name);
+		PICFOLDER_PATH = SD_PATH + File.separator + getString (R.string.app_name) + File.separator + "Pictures";
+        PACKETFOLDER_PATH = SD_PATH + File.separator + getString(R.string.app_name) + File.separator + "Packet";
 
-		File file = new File (FOLDER_PATH);
+
+        File picFile = new File (PICFOLDER_PATH);
+		File pacFile = new File (PACKETFOLDER_PATH);
 
 		try
 		{
-			if (!file.exists ())
+			if (!picFile.exists ())
 			{
-				file.mkdirs ();
+				picFile.mkdirs ();
+			}
+			if (!pacFile.exists())
+			{
+				pacFile.mkdirs();
 			}
 		}
 		catch (Exception e)
