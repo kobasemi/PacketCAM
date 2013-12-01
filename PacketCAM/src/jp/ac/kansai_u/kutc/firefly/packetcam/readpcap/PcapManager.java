@@ -15,7 +15,7 @@ import org.jnetstream.capture.FilePacket;
 public class PcapManager {
 
     FileCapture<? extends FilePacket> capture;
-    PcapManager(){
+    public PcapManager(){
         capture = null;
     }
 
@@ -25,9 +25,11 @@ public class PcapManager {
      * @return b    ファイルオープン可否
      */
     public boolean openPcapFile(String path){
-        if(capture != null)
+        if(capture != null){
             // 既にPcapFileが開かれていた場合
-            return false;
+            closePcapFile();
+            capture = null;
+        }
 
         try {
             capture = Captures.openFile(new File(path));
