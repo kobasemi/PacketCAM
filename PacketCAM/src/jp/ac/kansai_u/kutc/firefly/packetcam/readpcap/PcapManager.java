@@ -14,15 +14,26 @@ import org.jnetstream.capture.FilePacket;
  */
 public class PcapManager {
 
+    // シングルトン♪ シングルトン♪ 鈴が鳴る〜♪
+    private static PcapManager instance = new PcapManager();
+    File pcapFile = null;
+    /**
+     * シングルトンのインスタンスを返す
+     * @return インスタンス
+     */
+    public static PcapManager getInstance(){
+        return instance;
+    }
+
     FileCapture<? extends FilePacket> capture;
-    public PcapManager(){
+    private PcapManager(){
         capture = null;
     }
 
     /**
      * PcapFileを開く
      * @param  path ファイルの完全パス
-     * @return b    ファイルオープン可否
+     * @return b    オープン成功・失敗
      */
     public boolean openPcapFile(String path){
         if(capture != null){
