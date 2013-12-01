@@ -17,6 +17,7 @@ public class PcapManager {
     // シングルトン♪ シングルトン♪ 鈴が鳴る〜♪
     private static PcapManager instance = new PcapManager();
     File pcapFile = null;
+
     /**
      * シングルトンのインスタンスを返す
      * @return インスタンス
@@ -42,8 +43,9 @@ public class PcapManager {
             capture = null;
         }
 
+        pcapFile = new File(path);
         try {
-            capture = Captures.openFile(new File(path));
+            capture = Captures.openFile(pcapFile);
         } catch (IOException e) {
             Log.d("OPEN FAILED", "PcapManager.java: FAILED TO OPEN");
         }
@@ -60,5 +62,13 @@ public class PcapManager {
         } catch (IOException e) {
             Log.d("CLOSE FAILED", "PcapManager.java: FAILED TO CLOSE");
         }
+    }
+
+    /**
+     * 開いているPcapFileを返す．開いていない場合は，nullを返す
+     * @return PcapFile またはnull
+     */
+    public File getPcapFile(){
+        return pcapFile;
     }
 }
