@@ -98,6 +98,7 @@ public class OverLayView extends View
 		canvas.drawColor (Color.TRANSPARENT);
 		
 		// 位置の調整
-		canvas.drawBitmap (bitmap, width-400, 0, null);
+//		canvas.drawBitmap (bitmap, width-400, 0, null);
+		canvas.drawBitmap(bitmap, 0, 0, null);
 	}
 }
