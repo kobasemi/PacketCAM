@@ -65,7 +65,7 @@ public class MainActivity extends Activity
 
 	private static final String TAG = "MainActivity";
 
-
+	// エフェクトボタンアイコンの切り替え用
 	private boolean switchEffect=false;
 
 	// アラートの飛び対策
@@ -86,6 +86,7 @@ public class MainActivity extends Activity
 
 		setContentView (R.layout.activity_main);
 
+		// カメラプレビュー用のViewを準備
 		SurfaceView surfaceView = (SurfaceView) findViewById (R.id.surfaceView1);
 		final SurfaceHolder holder = surfaceView.getHolder ();
 		holder.addCallback (surfaceListener);
@@ -96,11 +97,10 @@ public class MainActivity extends Activity
 			holder.setType (SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		}
 
-		// オーバーレイ
+		// オーバーレイ画面をFrameLayoutに追加
 		overlay = new OverLayView (this);
-		
-		FrameLayout flame = (FrameLayout) findViewById (R.id.frameLayout1);
-		flame.addView (overlay);
+		FrameLayout frame = (FrameLayout) findViewById (R.id.frameLayout1);
+		frame.addView (overlay);
 
         // フォルダの作成を行う
         if (!createFolder ())
@@ -118,6 +118,7 @@ public class MainActivity extends Activity
 			Toast.makeText(this, "コピーに失敗しました", Toast.LENGTH_SHORT);
 		}
 
+		// カメラ切り替えボタン
 		ImageButton INOUTBtn = (ImageButton) findViewById (R.id.inout);
 		INOUTBtn.setOnClickListener (new OnClickListener ()
 		{
@@ -173,14 +174,13 @@ public class MainActivity extends Activity
 				{
 					e.printStackTrace ();
 				}
-				
-				
+
 				// プレビュー再開
 				camera.startPreview ();
 			}
 		});
 		
-		
+		// シャッターボタン
 		ImageButton shutterBtn = (ImageButton) findViewById(R.id.shutter);
 		shutterBtn.setOnClickListener (new OnClickListener()
 		{
@@ -200,6 +200,7 @@ public class MainActivity extends Activity
 			
 		});
 
+		// 設定ボタン
 		ImageButton settingBtn = (ImageButton) findViewById (R.id.setting);
 		settingBtn.setOnClickListener (new OnClickListener()
 		{
@@ -431,7 +432,8 @@ public class MainActivity extends Activity
 			}
 		});
 		
-		
+
+		// エフェクトボタン
 		final ImageButton effectBtn = (ImageButton) findViewById(R.id.effect);
 		effectBtn.setOnClickListener (new OnClickListener()
 		{
@@ -448,36 +450,18 @@ public class MainActivity extends Activity
 				}
 			}
 		});
-
-//		surfaceView.setOnTouchListener (new OnTouchListener ()
-//		{
-//			@Override
-//			public boolean onTouch (View v, MotionEvent event)
-//			{
-//				if (event.getAction () == MotionEvent.ACTION_DOWN)
-//				{
-//					if (camera != null)
-//					{
-//						if (!mIsTake)
-//						{
-//
-//							Toast.makeText (MainActivity.this, "撮影", Toast.LENGTH_SHORT).show ();
-//							mIsTake = true;
-//							// オートフォーカス
-//							camera.autoFocus (mAutoFocusListener);
-//						}
-//					}
-//				}
-//				return true;
-//			}
-//
-//		});
-
 	}
 
 
+	/**
+	 * res/rawにあるファイルをSDカードのPacketフォルダにコピーする
+	 * @param resourceId res/rawにあるコピー元のファイル（R.raw.hogeで指定）
+	 * @param fileName 保存先のファイル名（任意）
+	 * @return コピーが正常に完了したかをbooleanで返す
+	 */
 	private boolean copyRawFileToSd(int resourceId, String fileName)
 	{
+		// コピー先のファイルパスを指定
 		File copyFile = new File (PACKETFOLDER_PATH + File.separator + fileName);
 		Resources res = this.getResources();
 		InputStream input = res.openRawResource(resourceId);

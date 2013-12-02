@@ -1,7 +1,16 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam;
 
+/**
+ * 与えられた2数からユークリッド互除法を用いて最大公約数を求める
+ */
 public class GetGCD
 {
+	/**
+	 * 与えられた2数から最大公約数を求め，結果を返す
+	 * @param x 1つ目の数
+	 * @param y 2つ目の数
+	 * @return 最大公約数
+	 */
 	public static int getGCD(int x, int y)
 	{
 		int tmp = 0;
