@@ -68,6 +68,9 @@ public class MainActivity extends Activity
 
 	private boolean switchEffect=false;
 
+	// アラートの飛び対策
+	private boolean alert1_1 = false;
+
 	/**
 	 * アクティビティ起動時に呼び出される
 	 */
@@ -75,6 +78,7 @@ public class MainActivity extends Activity
 	protected void onCreate (Bundle savedInstanceState)
 	{
 		super.onCreate (savedInstanceState);
+
 
 		// フルスクリーン化と，タイトルバーの非表示化
 		getWindow ().addFlags (WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -262,6 +266,8 @@ public class MainActivity extends Activity
 											{
 												if (keyCode == KeyEvent.KEYCODE_BACK)
 												{
+													// アラートの飛び対策
+													alert1_1 = true;
 													dialog.dismiss();
 													builder1.show();
 													return true;
@@ -270,8 +276,6 @@ public class MainActivity extends Activity
 											}
 										});
 										builder1_1.show();
-
-
 									}
 									if (which == 1)
 									{
@@ -286,17 +290,19 @@ public class MainActivity extends Activity
 								public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event)
 								{
 									// TODO 自動生成されたメソッド・スタブ
-									if (keyCode == KeyEvent.KEYCODE_BACK)
+									// alert1_1を噛ませているのは，ファイル選択画面からBackキーを押すと，
+									// builder1を飛ばして一気にbuilder（最初のアラート）に戻ってしまうため
+									if (keyCode == KeyEvent.KEYCODE_BACK && alert1_1 == false)
 									{
 										dialog.dismiss ();
 										builder.show ();
 										return true;
 									}
+									alert1_1 = false;
 									return false;
 								}
-								
-							});
 
+							});
 							builder1.show ();
 						}
 						if (which == 1)
@@ -414,7 +420,7 @@ public class MainActivity extends Activity
 									}
 									return false;
 								}
-								
+
 							});
 							builder3.show ();
 						}
