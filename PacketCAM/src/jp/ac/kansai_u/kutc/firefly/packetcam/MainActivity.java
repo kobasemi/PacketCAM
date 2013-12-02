@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.content.res.Resources;
@@ -28,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -215,7 +215,7 @@ public class MainActivity extends Activity
 							// パケットの読み込み
 							CharSequence[] conf1 = { "ファイルの選択", "リアルタイム読み込み" };
 
-							AlertDialog.Builder builder1 = new AlertDialog.Builder (MainActivity.this);
+							final AlertDialog.Builder builder1 = new AlertDialog.Builder (MainActivity.this);
 							builder1.setTitle ("パケットの読み込み");
 							builder1.setItems (conf1, new DialogInterface.OnClickListener ()
 							{
@@ -224,6 +224,54 @@ public class MainActivity extends Activity
 									if (which == 0)
 									{
 										// ファイルの選択ダイアログの表示
+										// リストにするディレクトリの指定
+										File dir = new File (PACKETFOLDER_PATH);
+
+										// 指定されたディレクトリ内のファイル名をすべて取得
+										final File[] files = dir.listFiles();
+										final String[] str_items;
+										str_items = new String[files.length];
+
+										for (int i = 0; i < files.length; i++)
+										{
+											File file = files[i];
+											str_items[i] = file.getName();
+										}
+
+										// ファイルリストダイアログの表示
+										AlertDialog.Builder builder1_1 = new AlertDialog.Builder(MainActivity.this);
+										builder1_1.setTitle("パケットファイルを選択してください");
+										builder1_1.setItems(str_items, new DialogInterface.OnClickListener()
+										{
+											@Override
+											public void onClick(DialogInterface dialog, int which)
+											{
+												// 選択されたパケットファイルのパス
+												String filePath = PACKETFOLDER_PATH + File.separator + str_items[which];
+												Log.d(TAG, "filePath = " + filePath);
+
+												// PcapManagerのopenPcapFileにファイルパスを渡す
+												PcapManager pcap = PcapManager.getInstance();
+												pcap.openPcapFile(filePath);
+											}
+										});
+										builder1_1.setOnKeyListener(new OnKeyListener()
+										{
+											@Override
+											public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent keyEvent)
+											{
+												if (keyCode == KeyEvent.KEYCODE_BACK)
+												{
+													dialog.dismiss();
+													builder1.show();
+													return true;
+												}
+												return false;
+											}
+										});
+										builder1_1.show();
+
+
 									}
 									if (which == 1)
 									{
