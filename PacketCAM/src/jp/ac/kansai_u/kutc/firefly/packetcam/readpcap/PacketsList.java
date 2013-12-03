@@ -10,7 +10,7 @@ import java.util.List;
  * ファイルからロード時はこちらを使用する
  * @author akasaka
  */
-public class PacketList {
+public class PacketsList {
     /**
      * パケット格納リスト
      * イテレータなどを使うことも考えたが
@@ -44,7 +44,7 @@ public class PacketList {
             // パケットがない場合
 
         }
-        idx++;
+        idx++; //TODO: 0番目にアクセスできねえｗｗｗ
         return packets.get(idx);
     }
 

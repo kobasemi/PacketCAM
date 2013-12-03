@@ -5,6 +5,6 @@ package jp.ac.kansai_u.kutc.firefly.packetcam.readpcap;
  * リアルタイムキャプチャ時はこちらを使用する
  * @author akasaka
  */
-public class PacketQueue {
+public class PacketsQueue {
 
 }
