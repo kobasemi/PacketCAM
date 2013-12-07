@@ -7,7 +7,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -28,15 +27,15 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CopyAllRawFieldToSd;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CreateDirectory;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Path;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
-
 
 public class MainActivity extends Activity
 {
@@ -57,12 +56,6 @@ public class MainActivity extends Activity
 	// プレビューサイズ
 	// Size preSize = null;
 
-	// 画像保存フォルダのパス
-	private static String PICFOLDER_PATH = null;
-
-    // Packetデータ保存フォルダのパス
-    private static String PACKETFOLDER_PATH = null;
-
 	private static final String TAG = "MainActivity";
 
 	// エフェクトボタンアイコンの切り替え用
@@ -78,7 +71,6 @@ public class MainActivity extends Activity
 	protected void onCreate (Bundle savedInstanceState)
 	{
 		super.onCreate (savedInstanceState);
-
 
 		// フルスクリーン化と，タイトルバーの非表示化
 		getWindow ().addFlags (WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -102,21 +94,16 @@ public class MainActivity extends Activity
 		FrameLayout frame = (FrameLayout) findViewById (R.id.frameLayout1);
 		frame.addView (overlay);
 
-        // フォルダの作成を行う
-        if (!createFolder ())
-        {
-            Toast.makeText (MainActivity.this, "failure", Toast.LENGTH_SHORT).show ();
-        }
-        else
-        {
-            Toast.makeText (MainActivity.this, "Success", Toast.LENGTH_SHORT).show ();
+        // 各ディレクトリの作成
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+            // SDカードがマウントされているならば
+            new CreateDirectory(getResources());
+        }else{
+            Toast.makeText(this, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show ();
         }
 
         // res/rawにあるファイルをSDカードにコピーする
-		if (!copyRawFileToSd(R.raw.k, "k.cap"))
-		{
-			Toast.makeText(this, "コピーに失敗しました", Toast.LENGTH_SHORT);
-		}
+        new CopyAllRawFieldToSd(this.getResources(), this.getPackageName());
 
 		// カメラ切り替えボタン
 		ImageButton INOUTBtn = (ImageButton) findViewById (R.id.inout);
@@ -201,6 +188,7 @@ public class MainActivity extends Activity
 		});
 
 		// 設定ボタン
+        //TODO: いつぞクラスに分ける
 		ImageButton settingBtn = (ImageButton) findViewById (R.id.setting);
 		settingBtn.setOnClickListener (new OnClickListener()
 		{
@@ -230,7 +218,7 @@ public class MainActivity extends Activity
 									{
 										// ファイルの選択ダイアログの表示
 										// リストにするディレクトリの指定
-										File dir = new File (PACKETFOLDER_PATH);
+										File dir = new File (Path.PACKETFOLDER_PATH);
 
 										// 指定されたディレクトリ内のファイル名をすべて取得
 										final File[] files = dir.listFiles();
@@ -252,13 +240,13 @@ public class MainActivity extends Activity
 											public void onClick(DialogInterface dialog, int which)
 											{
 												// 選択されたパケットファイルのパス
-												String filePath = PACKETFOLDER_PATH + File.separator + str_items[which];
+												String filePath = Path.PACKETFOLDER_PATH + File.separator + str_items[which];
 												Log.d(TAG, "filePath = " + filePath);
 
 												// PcapManagerのopenPcapFileにファイルパスを渡す
 												PcapManager pcap = PcapManager.getInstance();
 												pcap.openPcapFile(filePath);
-											}
+                                            }
 										});
 										builder1_1.setOnKeyListener(new OnKeyListener()
 										{
@@ -431,7 +419,6 @@ public class MainActivity extends Activity
 
 			}
 		});
-		
 
 		// エフェクトボタン
 		final ImageButton effectBtn = (ImageButton) findViewById(R.id.effect);
@@ -451,57 +438,6 @@ public class MainActivity extends Activity
 			}
 		});
 	}
-
-
-	/**
-	 * res/rawにあるファイルをSDカードのPacketフォルダにコピーする
-	 * @param resourceId res/rawにあるコピー元のファイル（R.raw.hogeで指定）
-	 * @param fileName 保存先のファイル名（任意）
-	 * @return コピーが正常に完了したかをbooleanで返す
-	 */
-	private boolean copyRawFileToSd(int resourceId, String fileName)
-	{
-		// コピー先のファイルパスを指定
-		File copyFile = new File (PACKETFOLDER_PATH + File.separator + fileName);
-		Resources res = this.getResources();
-		InputStream input = res.openRawResource(resourceId);
-
-		OutputStream output = null;
-
-		try
-		{
-			output = new FileOutputStream (copyFile);
-			byte[] buff = new byte[1024];
-			int size = 0;
-			while ((size = input.read(buff)) >= 0)
-			{
-				output.write(buff);
-			}
-
-			output.flush();
-			output.close();
-			input.close();
-			output = null;
-			input = null;
-		}
-		catch (Exception e)
-		{
-			try
-			{
-				if (output != null) output.close();
-				if (input != null) input.close();
-
-				return false;
-			}
-			catch (Exception ee)
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
 
 	private SurfaceHolder.Callback surfaceListener = new SurfaceHolder.Callback ()
 	{
@@ -702,7 +638,7 @@ public class MainActivity extends Activity
 				// ファイル名を設定
 				Calendar cal = Calendar.getInstance ();
 				SimpleDateFormat sf = new SimpleDateFormat ("yyyyMMdd_HHmmss");
-				String imgPath = PICFOLDER_PATH + File.separator + sf.format (cal.getTime ()) + ".jpg";
+				String imgPath = Path.PICFOLDER_PATH + File.separator + sf.format (cal.getTime ()) + ".jpg";
 
 				FileOutputStream fos;
 				fos = new FileOutputStream (imgPath, true);
@@ -731,66 +667,6 @@ public class MainActivity extends Activity
 		}
 	};
 
-
-	/**
-	 * 画像保存フォルダの作成
-	 * 
-	 * @return 正常に作成できればtrue，できなければfalseを返す
-	 */
-	private boolean createFolder ()
-	{
-		String status = Environment.getExternalStorageState ();
-
-		if (!isSdCardMounted (status))
-		{
-			Toast.makeText (this, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show ();
-			return false;
-		}
-
-		// SDカードのフォルダパスの取得
-		String SD_PATH = Environment.getExternalStorageDirectory ().getPath ();
-
-		// SDカードにアプリ名でフォルダを新規作成
-		PICFOLDER_PATH = SD_PATH + File.separator + getString (R.string.app_name) + File.separator + "Pictures";
-        PACKETFOLDER_PATH = SD_PATH + File.separator + getString(R.string.app_name) + File.separator + "Packet";
-
-
-        File picFile = new File (PICFOLDER_PATH);
-		File pacFile = new File (PACKETFOLDER_PATH);
-
-		try
-		{
-			if (!picFile.exists ())
-			{
-				picFile.mkdirs ();
-			}
-			if (!pacFile.exists())
-			{
-				pacFile.mkdirs();
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace ();
-			return false;
-		}
-		return true;
-	}
-
-
-	/**
-	 * SDカードが端末にマウントされているか確認するメソッド
-	 * 
-	 * @param status
-	 *        Environment.getExternalStorageStateメソッドで取得したString型の値
-	 * @return マウントされていればtrue, マウントされていなければfalseが返される
-	 */
-	private boolean isSdCardMounted (String status)
-	{
-		return status.equals (Environment.MEDIA_MOUNTED);
-	}
-
-
 	/**
 	 * Androidのギャラリーに画像を登録する
 	 * 
@@ -807,7 +683,6 @@ public class MainActivity extends Activity
 
 	}
 
-    // TODO: 物理メニューボタンにおけるコンテンツを変える（クレジットなどに）
 	@Override
 	public boolean dispatchKeyEvent (KeyEvent event)
 	{
@@ -844,6 +719,8 @@ public class MainActivity extends Activity
 						return true;
 
 					case KeyEvent.KEYCODE_MENU:
+                        // TODO: 物理メニューボタンにおけるコンテンツを変える（クレジットなどに）
+                        // TODO: いつぞクラスに分ける
 						// メニューボタンで解像度選択
 						// メニューボタンで解像度選択
 						CharSequence[] conf = { "パケットの読み込み", "解像度", "フラッシュ" };
