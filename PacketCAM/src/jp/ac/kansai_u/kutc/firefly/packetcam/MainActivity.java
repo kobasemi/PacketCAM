@@ -7,11 +7,8 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
-import android.graphics.Bitmap;
+import android.graphics.*;
 import android.graphics.Bitmap.CompressFormat;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
@@ -26,6 +23,7 @@ import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.GLView;
 import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CopyAllRawFieldToSd;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CreateDirectory;
@@ -89,10 +87,11 @@ public class MainActivity extends Activity
 			holder.setType (SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		}
 
-		// オーバーレイ画面をFrameLayoutに追加
-		overlay = new OverLayView (this);
-		FrameLayout frame = (FrameLayout) findViewById (R.id.frameLayout1);
-		frame.addView (overlay);
+//		// オーバーレイ画面をFrameLayoutに追加
+//		overlay = new OverLayView (this);
+//		FrameLayout frame = (FrameLayout) findViewById (R.id.frameLayout1);
+//		frame.addView (overlay);
+
 
         // 各ディレクトリの作成
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
@@ -430,10 +429,18 @@ public class MainActivity extends Activity
 				if (!switchEffect){
 					effectBtn.setImageResource(R.drawable.effect_on);
 					switchEffect=true;
+
+					GLView mGLView = new GLView(MainActivity.this);
+					FrameLayout frame = (FrameLayout) findViewById(R.id.frameLayout1);
+
+					frame.addView(mGLView);
+
 				}else{
 					effectBtn.setImageResource(R.drawable.effect_off);
 					switchEffect=false;
-					
+
+					FrameLayout frame = (FrameLayout) findViewById(R.id.frameLayout1);
+					frame.removeAllViews();
 				}
 			}
 		});

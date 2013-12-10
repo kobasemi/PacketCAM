@@ -39,7 +39,7 @@ public class GLView extends GLSurfaceView implements GLSurfaceView.Renderer
 
 		// 背景色を設定
 		// GL10.glClearColor (Red, Green, Blue, Alpha）
-		gl.glClearColor(0, 0, 1, 1.0f);
+//		gl.glClearColor(0, 0, 1, 1.0f);
 
 		// 背景色を描画
 		// 背景の初期化を行う．初期化された際に，上で設定された値が反映される．
@@ -52,7 +52,7 @@ public class GLView extends GLSurfaceView implements GLSurfaceView.Renderer
 		gl.glLoadIdentity();
 
 		// 図形の移動
-		gl.glTranslatef(200, 200 + i, 0);
+		gl.glTranslatef(i, i, 0);
 
 		mDraw2D.draw(gl);
 
