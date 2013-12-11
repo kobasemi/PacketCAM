@@ -1,5 +1,6 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.utils;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
 import jp.ac.kansai_u.kutc.firefly.packetcam.R;
@@ -19,11 +20,10 @@ public class CopyAllRawFieldToSd{
 
     /**
      * res/raw/ディレクトリ配下にある全てのファイルをSDカードにコピーする
-     * @param res getResources();
-     * @param packageName getPackageName();
+     * @param context MainActivity.this
      */
-    public CopyAllRawFieldToSd(Resources res, String packageName){
-        this.res = res;
+    public CopyAllRawFieldToSd(Context context){
+        this.res = context.getResources();
 
         // res/rawディレクトリ配下にある全フィールドを取得
         Field[] fields = R.raw.class.getFields();
@@ -32,7 +32,7 @@ public class CopyAllRawFieldToSd{
             // Field Name
             String fname = f.getName();
             // ResourceID <= (FieldName, DirectoryName, PackageName)
-            int id = res.getIdentifier(fname, "raw", packageName);
+            int id = res.getIdentifier(fname, "raw", context.getPackageName());
 
             if(copyRawFileToSd(id, fname + ".cap")){
                 Log.d("CopyAllRawFieldToSd.java", "File Copy Success: " + fname + ".cap");

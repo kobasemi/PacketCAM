@@ -102,7 +102,7 @@ public class MainActivity extends Activity
         }
 
         // res/rawにあるファイルをSDカードにコピーする
-        new CopyAllRawFieldToSd(this.getResources(), this.getPackageName());
+        new CopyAllRawFieldToSd(getApplicationContext());
 
 		// カメラ切り替えボタン
 		ImageButton INOUTBtn = (ImageButton) findViewById (R.id.inout);
