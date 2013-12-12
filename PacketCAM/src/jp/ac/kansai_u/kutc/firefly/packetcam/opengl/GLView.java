@@ -21,7 +21,7 @@ public class GLView extends GLSurfaceView implements GLSurfaceView.Renderer
 	// Draw2D
 	private Draw2D mDraw2D;
 	float i = 0;
-	boolean stat = false;
+	public static boolean STAT = false;
 
 	/**
 	 * エフェクトボタンを押した時に呼び出されるやつ
@@ -52,11 +52,24 @@ public class GLView extends GLSurfaceView implements GLSurfaceView.Renderer
 
 	private void Init()
 	{
+		// DrawCacheを取れるようにする
+
 		// 描画処理を設定（これをすることで，onDrawFrame()が定期的に呼ばれる
 		this.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
 		this.setRenderer(this);
 		this.getHolder().setFormat(PixelFormat.TRANSLUCENT);
 
+//		if (STAT == false)
+//		{
+//			this.setVisibility(INVISIBLE);
+//			this.onPause();
+//		}
+//		else
+//		{
+//			onAttachedToWindow();
+//			this.setVisibility(VISIBLE);
+//			this.onResume();
+//		}
 	}
 
 
@@ -82,12 +95,16 @@ public class GLView extends GLSurfaceView implements GLSurfaceView.Renderer
 		// モデル座標の初期化
 		gl.glLoadIdentity();
 
+		if (STAT == false)
+		{
+			Log.d(TAG, "stat");
 			// 図形の移動
 			gl.glTranslatef(i, i, 0);
 
 			mDraw2D.draw(gl);
 
 			i = i + 1;
+		}
 	}
 
 

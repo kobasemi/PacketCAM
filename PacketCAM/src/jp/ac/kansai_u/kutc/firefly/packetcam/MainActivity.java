@@ -42,6 +42,7 @@ public class MainActivity extends Activity
 	private Camera camera;
 
 	private OverLayView overlay;
+	private GLView glView;
 	// 画面タッチの2度押し禁止用フラグ
 	private boolean mIsTake = false;
 
@@ -77,6 +78,8 @@ public class MainActivity extends Activity
 		requestWindowFeature (Window.FEATURE_NO_TITLE);
 
 		setContentView (R.layout.activity_main);
+
+		glView = new GLView(MainActivity.this);
 
 		// カメラプレビュー用のViewを準備
 		SurfaceView surfaceView = (SurfaceView) findViewById (R.id.surfaceView1);
@@ -431,11 +434,11 @@ public class MainActivity extends Activity
 				if (!switchEffect){
 					effectBtn.setImageResource(R.drawable.effect_on);
 					switchEffect=true;
-
-					GLView mGLView = new GLView(MainActivity.this);
+					glView.STAT = true;
 				}else{
 					effectBtn.setImageResource(R.drawable.effect_off);
 					switchEffect=false;
+					glView.STAT = false;
 				}
 			}
 		});
@@ -611,6 +614,7 @@ public class MainActivity extends Activity
 
 			try
 			{
+				Log.d(TAG, "tryIn");
 				// createBitmapより，画像データを生成
 
 				// オーバーレイ表示された画像との合成処理を行う
@@ -624,7 +628,15 @@ public class MainActivity extends Activity
 				Bitmap cameraBitmap = BitmapFactory.decodeByteArray (data, 0, data.length, options);
 
 				// オーバーレイイメージ viewから画像を取得
-				Bitmap overlayBitmap = overlay.getDrawingCache ();
+				Bitmap overlayBitmap = glView.getDrawingCache ();
+
+				//TODO OpenGLの画面キャッシュが取得できていない．GLViewクラスにて，OpenGLのglReadPixelsで取得する
+				if (overlayBitmap == null)
+				{
+					Log.d(TAG, "null");
+				}
+
+				Log.d(TAG, "getCache");
 
 				// 空のイメージを作成
 				Bitmap offBitmap = Bitmap.createBitmap (cameraBitmap.getWidth (), cameraBitmap.getHeight (), Bitmap.Config.ARGB_8888);
@@ -637,6 +649,8 @@ public class MainActivity extends Activity
 
 				// 合成した画像：offBitmap
 
+				Log.d(TAG, "mix");
+
 				// ファイル名を設定
 				Calendar cal = Calendar.getInstance ();
 				SimpleDateFormat sf = new SimpleDateFormat ("yyyyMMdd_HHmmss");
@@ -646,12 +660,16 @@ public class MainActivity extends Activity
 				fos = new FileOutputStream (imgPath, true);
 				// fos.write (data);
 
+				Log.d(TAG, "output");
+
 				offBitmap.compress (CompressFormat.JPEG, 100, fos);
 				fos.close ();
 
 				// Androidのデータベースへ登録
 				// 登録しないとギャラリーなどにすぐに反映されないらしい
 				registAndroidDB (imgPath);
+
+				Log.d(TAG, "tryEnd");
 			}
 			catch (Exception e)
 			{
