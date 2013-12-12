@@ -9,6 +9,10 @@
     android:layout_marginTop="0dp"
     tools:context=".MainActivity" >
 
+    <jp.ac.kansai_u.kutc.firefly.packetcam.opengl.GLView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"/>
+
     <SurfaceView
         android:id="@+id/surfaceView1"
         android:layout_width="match_parent"
@@ -20,13 +24,14 @@
         android:layout_marginRight="0dp"
         android:layout_marginTop="0dp" />
 
-    <FrameLayout
-        android:id="@+id/frameLayout1"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentBottom="true" >
+    <!--<FrameLayout-->
+        <!--android:id="@+id/frameLayout1"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="fill_parent"-->
+        <!--android:layout_alignParentBottom="true" >-->
 
-    </FrameLayout>
+    <!--</FrameLayout>-->
+
 
     <ImageButton
         android:id="@+id/setting"

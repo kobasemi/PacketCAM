@@ -1,8 +1,10 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.opengl;
 
 import android.content.Context;
+import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
+import android.util.AttributeSet;
 import android.util.Log;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -19,13 +21,42 @@ public class GLView extends GLSurfaceView implements GLSurfaceView.Renderer
 	// Draw2D
 	private Draw2D mDraw2D;
 	float i = 0;
+	boolean stat = false;
 
+	/**
+	 * エフェクトボタンを押した時に呼び出されるやつ
+	 * @param context
+	 */
 	public GLView (Context context)
 	{
 		super(context);
 
+		Log.d(TAG, "A");
+
+		Init();
+	}
+
+	/**
+	 * 起動してレイアウトを設定する際に呼び出されるやつ
+	 * @param context
+	 * @param attrs
+	 */
+	public GLView (Context context, AttributeSet attrs)
+	{
+		super (context, attrs);
+
+		Log.d(TAG, "B");
+		Init();
+	}
+
+
+	private void Init()
+	{
 		// 描画処理を設定（これをすることで，onDrawFrame()が定期的に呼ばれる
-		setRenderer(this);
+		this.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+		this.setRenderer(this);
+		this.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+
 	}
 
 
@@ -51,12 +82,12 @@ public class GLView extends GLSurfaceView implements GLSurfaceView.Renderer
 		// モデル座標の初期化
 		gl.glLoadIdentity();
 
-		// 図形の移動
-		gl.glTranslatef(i, i, 0);
+			// 図形の移動
+			gl.glTranslatef(i, i, 0);
 
-		mDraw2D.draw(gl);
+			mDraw2D.draw(gl);
 
-		i = i + 1;
+			i = i + 1;
 	}
 
 

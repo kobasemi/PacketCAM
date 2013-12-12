@@ -7,8 +7,11 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
-import android.graphics.*;
+import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
@@ -20,7 +23,6 @@ import android.provider.MediaStore.Images;
 import android.util.Log;
 import android.view.*;
 import android.view.View.OnClickListener;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.GLView;
@@ -431,16 +433,9 @@ public class MainActivity extends Activity
 					switchEffect=true;
 
 					GLView mGLView = new GLView(MainActivity.this);
-					FrameLayout frame = (FrameLayout) findViewById(R.id.frameLayout1);
-
-					frame.addView(mGLView);
-
 				}else{
 					effectBtn.setImageResource(R.drawable.effect_off);
 					switchEffect=false;
-
-					FrameLayout frame = (FrameLayout) findViewById(R.id.frameLayout1);
-					frame.removeAllViews();
 				}
 			}
 		});
