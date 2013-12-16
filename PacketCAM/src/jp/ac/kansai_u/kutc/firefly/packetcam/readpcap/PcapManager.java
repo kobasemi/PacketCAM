@@ -36,7 +36,7 @@ public class PcapManager {
      * @return b    オープン成功・失敗
      */
     public boolean openPcapFile(String path){
-        if(pcapFile.isOpen()){
+        if(pcapFile != null){
             // 既にPcapFileが開かれていた場合
             closePcapFile();
             pcapFile = null;
