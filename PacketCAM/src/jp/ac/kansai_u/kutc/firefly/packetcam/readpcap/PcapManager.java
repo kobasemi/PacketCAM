@@ -5,8 +5,8 @@ import java.io.IOException;
 
 import android.util.Log;
 import org.jnetstream.capture.Captures;
-import org.jnetstream.capture.FileCapture;
-import org.jnetstream.capture.FilePacket;
+import org.jnetstream.capture.FileMode;
+import org.jnetstream.capture.file.pcap.PcapFile;
 
 /**
  * readpcapパッケージ内の全ての親となるクラス
@@ -14,10 +14,10 @@ import org.jnetstream.capture.FilePacket;
  */
 public class PcapManager {
 
-    // シングルトン♪ シングルトン♪ 鈴が鳴る〜♪
+    /** シングルトン♪ シングルトン♪ 鈴が鳴る〜♪ */
     private static PcapManager instance = new PcapManager();
-    File pcapFile = null;
 
+    private PcapFile pcapFile;
     /**
      * シングルトンのインスタンスを返す
      * @return インスタンス
@@ -26,9 +26,8 @@ public class PcapManager {
         return instance;
     }
 
-    FileCapture<? extends FilePacket> capture;
     private PcapManager(){
-        capture = null;
+        pcapFile = null;
     }
 
     /**
@@ -37,17 +36,17 @@ public class PcapManager {
      * @return b    オープン成功・失敗
      */
     public boolean openPcapFile(String path){
-        if(capture != null){
+        if(pcapFile.isOpen()){
             // 既にPcapFileが開かれていた場合
             closePcapFile();
-            capture = null;
+            pcapFile = null;
         }
 
-        pcapFile = new File(path);
         try {
-            capture = Captures.openFile(pcapFile);
+            pcapFile = Captures.openFile(PcapFile.class, new File(path), FileMode.ReadOnly);
         } catch (IOException e) {
-            Log.d("OPEN FAILED", "PcapManager.java: FAILED TO OPEN");
+            Log.d("PcapManager.java", "FAILED TO OPEN");
+            return false;
         }
         return true;
     }
@@ -58,9 +57,9 @@ public class PcapManager {
      */
     public void closePcapFile(){
         try {
-            capture.close();
+            pcapFile.close();
         } catch (IOException e) {
-            Log.d("CLOSE FAILED", "PcapManager.java: FAILED TO CLOSE");
+            Log.d("PcapManager.java", "FAILED TO CLOSE");
         }
     }
 
@@ -68,7 +67,7 @@ public class PcapManager {
      * 開いているPcapFileを返す．開いていない場合は，nullを返す
      * @return PcapFile またはnull
      */
-    public File getPcapFile(){
+    public PcapFile getPcapFile(){
         return pcapFile;
     }
 }
