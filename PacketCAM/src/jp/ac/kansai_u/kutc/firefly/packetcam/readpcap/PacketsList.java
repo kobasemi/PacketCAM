@@ -1,68 +1,53 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.readpcap;
 
 import org.jnetstream.capture.FilePacket;
+import org.jnetstream.capture.PacketIterator;
+import org.jnetstream.capture.file.pcap.PcapPacket;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * ロードしたパケットを保持するリスト
  * ファイルからロード時はこちらを使用する
+ * パケットをリストに入れただけの単純なもの
+ * ！！！恐らく必要ない！！！
  * @author akasaka
  */
 public class PacketsList {
     /**
      * パケット格納リスト
-     * イテレータなどを使うことも考えたが
-     * どうせならループさせたいのでリストを使用し，
-     * インデックスで取得できるようにする．再考の余地はあり
+     * ループさせるのを考慮して，リストを使用
+     * 再考の余地はあり
      */
-    List<FilePacket> packets = new ArrayList<FilePacket>();
-
+    public List<PcapPacket> packets = new ArrayList<PcapPacket>();
     /** リスト中の要素番号 */
     int idx = 0;
-    /** リストの最大要素数 */
-    int size = 0;
+
+    public PacketsList(){
+        init();
+    }
 
     /**
      * 初期化メソッド
      * ファイルからロードしたパケットを格納する
      */
     public void init(){
-        for(FilePacket p: PcapManager.getInstance().capture){
-            packets.add(p);
+        try {
+            while(PcapManager.getInstance().getPcapFile().getPacketIterator().hasNext()){
+                packets.add(PcapManager.getInstance().getPcapFile().getPacketIterator().next());
+            }
+        } catch(IOException e) {
+            e.printStackTrace();
         }
-        size = packets.size();
     }
 
     /**
      * パケットがあれば返す
-     * @return 次のパケット
+     * @return パケット，またはnull
      */
-    public FilePacket next(){
-        if(!hasPacket()){
-            // パケットがない場合
-
-        }
-        idx++; //TODO: 0番目にアクセスできねえｗｗｗ
-        return packets.get(idx);
-    }
-
-    /**
-     * パケットが残っているか
-     * @return 有無
-     */
-    public boolean hasPacket(){
-        if (packets.get(idx) instanceof FilePacket) return true;
-        else return false;
-    }
-
-    /**
-     * クラス破棄
-     * @throws Throwable
-     */
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();    //To change body of overridden methods use File | Settings | File Templates.
+    public PcapPacket next(){
+        return packets.get(idx++);
     }
 }
