@@ -2,11 +2,8 @@ package jp.ac.kansai_u.kutc.firefly.packetcam;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnKeyListener;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -528,14 +525,4 @@ public class MainActivity extends Activity
 		}
 		return super.dispatchKeyEvent (event);
 	}
-
-/*
-	@Override
-	public boolean onCreateOptionsMenu (Menu menu)
-	{
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater ().inflate (R.menu.main, menu);
-		return true;
-	}
-*/
 }
