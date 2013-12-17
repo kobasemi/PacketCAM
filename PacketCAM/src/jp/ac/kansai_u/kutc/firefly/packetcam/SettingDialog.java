@@ -34,7 +34,7 @@ public class SettingDialog{
         CharSequence[] conf = { "パケットの読み込み", "解像度", "フラッシュ" };
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("Setting");
+        builder.setTitle("設定");
         builder.setItems(conf, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -67,7 +67,7 @@ public class SettingDialog{
                                     public void onClick(DialogInterface dialog, int which) {
                                         // 選択されたパケットファイルのパス
                                         String filePath = Path.PACKETFOLDER_PATH + File.separator + str_items[which];
-                                        Log.d("SettingDialogClickListener.java", "filePath = " + filePath);
+                                        Log.d("SettingDialog.java", "filePath = " + filePath);
 
                                         // PcapManagerのopenPcapFileにファイルパスを渡す
                                         PcapManager pcap = PcapManager.getInstance();
@@ -102,7 +102,7 @@ public class SettingDialog{
                         {
                             // alert1_1を噛ませているのは，ファイル選択画面からBackキーを押すと，
                             // builder1を飛ばして一気にbuilder（最初のアラート）に戻ってしまうため
-                            if (keyCode == KeyEvent.KEYCODE_BACK && alert1_1 == false)
+                            if (keyCode == KeyEvent.KEYCODE_BACK && !alert1_1)
                             {
                                 dialog.dismiss ();
                                 builder.show ();
@@ -166,7 +166,6 @@ public class SettingDialog{
                         @Override
                         public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event)
                         {
-                            // TODO 自動生成されたメソッド・スタブ
                             if (keyCode == KeyEvent.KEYCODE_BACK)
                             {
                                 dialog.dismiss ();
@@ -219,7 +218,6 @@ public class SettingDialog{
                         @Override
                         public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event)
                         {
-                            // TODO 自動生成されたメソッド・スタブ
                             if (keyCode == KeyEvent.KEYCODE_BACK)
                             {
                                 dialog.dismiss();
