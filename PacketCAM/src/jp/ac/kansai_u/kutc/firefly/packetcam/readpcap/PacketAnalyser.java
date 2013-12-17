@@ -26,12 +26,12 @@ public class PacketAnalyser {
      * 空のコンストラクタ
      * 後からパケットをセットすること
      */
-    PacketAnalyser(){}
+    public PacketAnalyser(){}
     /**
      * 初期化時にパケットをセット
      * @param p セットするパケット
      */
-    PacketAnalyser(PcapPacket p){
+    public PacketAnalyser(PcapPacket p){
         setPacket(p);
     }
 
@@ -52,34 +52,74 @@ public class PacketAnalyser {
         return packet.getAllHeaders();
     }
 
+    /**
+     * @return Ethernetヘッダの有無
+     * @throws IOException
+     * @throws CodecCreateException
+     */
     public boolean hasEthernet() throws IOException, CodecCreateException {
         return packet != null & packet.hasHeader(Ethernet2.class);
     }
 
+    /**
+     * @return IEEE802.3ヘッダの有無
+     * @throws IOException
+     * @throws CodecCreateException
+     */
     public boolean hasIeee802dot3() throws IOException, CodecCreateException {
         return packet != null & packet.hasHeader(IEEE802dot3.class);
     }
 
+    /**
+     * @return IPv4ヘッダの有無
+     * @throws IOException
+     * @throws CodecCreateException
+     */
     public boolean hasIp4() throws IOException, CodecCreateException{
         return packet != null & packet.hasHeader(Ip4.class);
     }
 
+    /**
+     * @return TCPヘッダの有無
+     * @throws IOException
+     * @throws CodecCreateException
+     */
     public boolean hasTcp() throws IOException, CodecCreateException{
         return packet != null & packet.hasHeader(Tcp.class);
     }
 
+    /**
+     * @return UDPヘッダの有無
+     * @throws IOException
+     * @throws CodecCreateException
+     */
     public boolean hasUdp() throws IOException, CodecCreateException{
         return packet != null & packet.hasHeader(Udp.class);
     }
 
+    /**
+     * @return ICMPヘッダの有無
+     * @throws IOException
+     * @throws CodecCreateException
+     */
     public boolean hasIcmp() throws IOException, CodecCreateException{
         return packet != null & packet.hasHeader(Icmp.class);
     }
 
+    /**
+     * @return ARPヘッダの有無
+     * @throws IOException
+     * @throws CodecCreateException
+     */
     public boolean hasArp() throws IOException, CodecCreateException {
         return packet != null & packet.hasHeader(Arp.class);
     }
 
+    /**
+     * @return Ethernetヘッダ
+     * @throws IOException
+     * @throws CodecCreateException
+     */
     public Ethernet2 getEthernet() throws IOException, CodecCreateException {
         if(packet != null && packet.hasHeader(Ethernet2.class)){
             return packet.getHeader(Ethernet2.class);
@@ -87,6 +127,11 @@ public class PacketAnalyser {
         return null;
     }
 
+    /**
+     * @return IEEE802.3ヘッダ
+     * @throws IOException
+     * @throws CodecCreateException
+     */
     public IEEE802dot3 getIeee802dot3() throws IOException, CodecCreateException {
         if(packet != null && packet.hasHeader(IEEE802dot3.class)){
             return packet.getHeader(IEEE802dot3.class);
@@ -94,6 +139,11 @@ public class PacketAnalyser {
         return null;
     }
 
+    /**
+     * @return IPv4ヘッダ
+     * @throws IOException
+     * @throws CodecCreateException
+     */
     public Ip4 getIp4() throws IOException, CodecCreateException{
         if(packet != null && packet.hasHeader(Ip4.class)){
             return packet.getHeader(Ip4.class);
@@ -101,6 +151,11 @@ public class PacketAnalyser {
         return null;
     }
 
+    /**
+     * @return TCPヘッダ
+     * @throws IOException
+     * @throws CodecCreateException
+     */
     public Tcp getTcp() throws IOException, CodecCreateException{
         if(packet != null && packet.hasHeader(Tcp.class)){
             return packet.getHeader(Tcp.class);
@@ -108,6 +163,11 @@ public class PacketAnalyser {
         return null;
     }
 
+    /**
+     * @return UDPヘッダ
+     * @throws IOException
+     * @throws CodecCreateException
+     */
     public Udp getUdp() throws IOException, CodecCreateException{
         if(packet != null && packet.hasHeader(Udp.class)){
             return packet.getHeader(Udp.class);
@@ -115,6 +175,11 @@ public class PacketAnalyser {
         return null;
     }
 
+    /**¥
+     * @return ICMPヘッダ
+     * @throws IOException
+     * @throws CodecCreateException
+     */
     public Icmp getIcmp() throws IOException, CodecCreateException{
         if(packet != null && packet.hasHeader(Icmp.class)){
             return packet.getHeader(Icmp.class);
@@ -122,6 +187,11 @@ public class PacketAnalyser {
         return null;
     }
 
+    /**
+     * @return ARPヘッダ
+     * @throws IOException
+     * @throws CodecCreateException
+     */
     public Arp getArp() throws IOException, CodecCreateException {
         if(packet != null && packet.hasHeader(Arp.class)){
             return packet.getHeader(Arp.class);
