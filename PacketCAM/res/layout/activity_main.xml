@@ -42,7 +42,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="10dp"
         android:background="@null"
-        android:contentDescription="@+string/setting"
+        android:contentDescription="@string/setting"
         android:src="@drawable/setting" />
 
     <ImageButton
@@ -53,7 +53,7 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="10dp"
         android:background="@null"
-        android:contentDescription="@+string/shutter"
+        android:contentDescription="@string/shutter"
         android:scaleType="fitXY"
         android:src="@drawable/shutter" />
 
@@ -66,7 +66,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginRight="10dp"
         android:background="@null"
-        android:contentDescription="@+string/effect"
+        android:contentDescription="@string/effect"
         android:src="@drawable/effect_off" />
 
     <ImageButton
@@ -78,7 +78,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
         android:background="@null"
-        android:contentDescription="@+string/inout"
+        android:contentDescription="@string/inout"
         android:src="@drawable/in_out" />
 
 </RelativeLayout>
