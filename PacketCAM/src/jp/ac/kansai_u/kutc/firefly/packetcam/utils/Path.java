@@ -2,6 +2,7 @@ package jp.ac.kansai_u.kutc.firefly.packetcam.utils;
 
 /**
  * アプリ内で使用するPATHの一覧
+ * TODO: とりあえず書いておいて，後々考える
  * @author akasaka
  */
 public class Path {
