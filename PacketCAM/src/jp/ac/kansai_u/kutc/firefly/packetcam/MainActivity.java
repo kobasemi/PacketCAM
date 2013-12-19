@@ -23,6 +23,7 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.GLView;
+import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingButtonClickListener;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CopyAllRawFieldToSd;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CreateDirectory;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Path;
@@ -525,4 +526,12 @@ public class MainActivity extends Activity
 		}
 		return super.dispatchKeyEvent (event);
 	}
+
+    @Override
+    public boolean onCreateOptionsMenu (Menu menu)
+    {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater ().inflate (R.menu.main, menu);
+        return true;
+    }
 }

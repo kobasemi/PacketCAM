@@ -1,4 +1,4 @@
-package jp.ac.kansai_u.kutc.firefly.packetcam;
+package jp.ac.kansai_u.kutc.firefly.packetcam.setting;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -7,6 +7,8 @@ import android.hardware.Camera;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
+import jp.ac.kansai_u.kutc.firefly.packetcam.GetGCD;
+import jp.ac.kansai_u.kutc.firefly.packetcam.MainActivity;
 import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Path;
 
@@ -135,7 +137,7 @@ public class SettingDialog{
                         picWidth[i] = String.valueOf (picSize.width);
 
                         // 縦サイズと横サイズの最大公約数を求める
-                        int gcd = GetGCD.getGCD (picSize.width, picSize.height);
+                        int gcd = GetGCD.getGCD(picSize.width, picSize.height);
 
                         String aspWidth = String.valueOf (picSize.width / gcd);
                         String aspHeight = String.valueOf (picSize.height / gcd);

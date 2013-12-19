@@ -1,4 +1,4 @@
-package jp.ac.kansai_u.kutc.firefly.packetcam;
+package jp.ac.kansai_u.kutc.firefly.packetcam.setting;
 
 import android.app.Activity;
 import android.view.View;
@@ -9,7 +9,7 @@ import android.view.View.OnClickListener;
  */
 public class SettingButtonClickListener implements OnClickListener{
     Activity activity;
-    SettingButtonClickListener(Activity a){
+    public SettingButtonClickListener(Activity a){
         activity = a;
     }
 
