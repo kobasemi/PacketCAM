@@ -5,7 +5,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 
 /**
- * Created by akasaka on 2013/12/17.
+ * 設定ボタンのリスナー
+ * TODO: 簡単なコードで済みそうなら，クラスを抹殺する
+ * @author akasaka
  */
 public class SettingButtonClickListener implements OnClickListener{
     Activity activity;
