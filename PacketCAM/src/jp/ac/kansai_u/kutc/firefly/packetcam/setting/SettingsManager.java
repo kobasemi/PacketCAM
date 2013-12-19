@@ -60,4 +60,20 @@ public class SettingsManager {
     public int[] getResolution(){
         return new int[]{sp.getInt("ResW", -1), sp.getInt("ResH", -1)};
     }
+
+    public void removeFlash(){
+        editor.remove("FLASH");
+        editor.commit();
+    }
+
+    public void removeResolution(){
+        editor.remove("ResW");
+        editor.remove("ResH");
+        editor.commit();
+    }
+
+    public void removeAll(){
+        editor.clear();
+        editor.commit();
+    }
 }
