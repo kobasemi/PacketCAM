@@ -2,6 +2,9 @@
 <resources>
 
     <string name="app_name">PacketCAM</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_setting">Settings</string>
+
     <string name="flash">Flash</string>
     <string name="inout">INOUT</string>
     <string name="resolution">解像度</string>
