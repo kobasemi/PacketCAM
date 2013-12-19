@@ -24,6 +24,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.GLView;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingButtonClickListener;
+import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingsManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CopyAllRawFieldToSd;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CreateDirectory;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Path;
@@ -94,14 +95,15 @@ public class MainActivity extends Activity
 //		FrameLayout frame = (FrameLayout) findViewById (R.id.frameLayout1);
 //		frame.addView (overlay);
 
+        // 設定マネージャにアクティビティをセット + 初期処理
+        SettingsManager.getInstance().setActivity(MainActivity.this);
+        SettingsManager.getInstance().setSharedPreferences();
 
-        // 各ディレクトリの作成
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-            // SDカードがマウントされているならば
-            new CreateDirectory(getResources());
-        }else{
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+            // SDカードがマウントされているならば，ディレクトリを作成する
+            new CreateDirectory(this.getResources());
+        else
             Toast.makeText(this, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show ();
-        }
 
         // res/rawにあるファイルをSDカードにコピーする
         new CopyAllRawFieldToSd(getApplicationContext());

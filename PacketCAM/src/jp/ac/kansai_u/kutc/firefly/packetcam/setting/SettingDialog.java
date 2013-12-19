@@ -18,6 +18,7 @@ import java.util.List;
 /**
  * 設定ダイアログに関するクラス
  * TODO: とりあえず，これでいい
+ * TODO: トーストを削除して，選択されてるものを分かりやすいようにする
  * @author akasaka
  */
 public class SettingDialog{
@@ -160,6 +161,8 @@ public class SettingDialog{
 
                             parameter.setPictureSize (picSize.width, picSize.height);
                             MainActivity.getCamera().setParameters(parameter);
+                            // 設定ファイルに保存
+                            SettingsManager.getInstance().setResolution(picSize.width, picSize.height);
                         }
                     });
                     builder2.setOnKeyListener (new DialogInterface.OnKeyListener()
@@ -197,6 +200,8 @@ public class SettingDialog{
                                 parameters.setFlashMode (Camera.Parameters.FLASH_MODE_ON);
                                 MainActivity.getCamera().setParameters (parameters);
                                 Toast.makeText (activity, "Flashを強制発光モードにしました", Toast.LENGTH_SHORT).show ();
+                                // 設定ファイルに保存
+                                SettingsManager.getInstance().setFlash(Camera.Parameters.FLASH_MODE_ON);
                             }
                             if (which == 1)
                             {
@@ -205,6 +210,8 @@ public class SettingDialog{
                                 parameters.setFlashMode (Camera.Parameters.FLASH_MODE_AUTO);
                                 MainActivity.getCamera().setParameters (parameters);
                                 Toast.makeText (activity, "Flashを自動モードにしました", Toast.LENGTH_SHORT).show();
+                                // 設定ファイルに保存
+                                SettingsManager.getInstance().setFlash(Camera.Parameters.FLASH_MODE_AUTO);
                             }
                             if (which == 2)
                             {
@@ -213,6 +220,8 @@ public class SettingDialog{
                                 parameters.setFlashMode (Camera.Parameters.FLASH_MODE_OFF);
                                 MainActivity.getCamera().setParameters (parameters);
                                 Toast.makeText (activity, "FlashをOFFにしました", Toast.LENGTH_SHORT).show();
+                                // 設定ファイルに保存
+                                SettingsManager.getInstance().setFlash(Camera.Parameters.FLASH_MODE_OFF);
                             }
                         }
                     });
