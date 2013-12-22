@@ -21,7 +21,7 @@ public class GLView extends GLSurfaceView
 {
 	private static final String TAG = "GLVIEW";
 
-	public static volatile Enum.VISIBILITY visibility = Enum.VISIBILITY.INVISIBLE;
+	public static volatile Enum.VISIBILITY visibility = Enum.VISIBILITY.VISIBLE;
 	public static volatile boolean shutter = false;
 
 	private ClearRenderer mRenderer;
@@ -162,8 +162,6 @@ class ClearRenderer implements GLSurfaceView.Renderer
 	 */
 	public void onDrawFrame (GL10 gl)
 	{
-		Log.i(TAG, "onDrawFrame()");
-
 		// 背景色を設定
 		// GL10.glClearColor (Red, Green, Blue, Alpha）
 //		gl.glClearColor(0, 0, 1, 1.0f);

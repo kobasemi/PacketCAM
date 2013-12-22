@@ -25,9 +25,8 @@ import android.widget.Toast;
 import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.GLView;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingButtonClickListener;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingsManager;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CopyAllRawFieldToSd;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CreateDirectory;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Path;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.*;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -55,9 +54,6 @@ public class MainActivity extends Activity
 	// Size preSize = null;
 
 	private static final String TAG = "MainActivity";
-
-	// エフェクトボタンアイコンの切り替え用
-	private boolean switchEffect=false;
 
 	// アラートの飛び対策
 	private boolean alert1_1 = false;
@@ -200,15 +196,13 @@ public class MainActivity extends Activity
 			@Override
 			public void onClick (View v)
 			{
-				if (!switchEffect){
+				if (glView.visibility == Enum.VISIBILITY.INVISIBLE){
 					effectBtn.setImageResource(R.drawable.effect_on);
-					switchEffect=true;
 
 					// エフェクトを表示
 					glView.setTransparent();
-				}else{
+				}else if (glView.visibility == Enum.VISIBILITY.VISIBLE){
 					effectBtn.setImageResource(R.drawable.effect_off);
-					switchEffect=false;
 
 					// エフェクトを非表示
 					glView.setTransparent();
