@@ -6,22 +6,25 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+import java.util.ArrayList;
 
 /**
- * Created by kousaka on 2013/12/10.
+ * Created by Kousaka on 2013/12/10.
  * https://sites.google.com/a/gclue.jp/android-docs-2009/openglno-kiso
  */
-public class GLView extends GLSurfaceView implements GLSurfaceView.Renderer
+public class GLView extends GLSurfaceView
 {
 	private static final String TAG = "GLVIEW";
 
-	// Draw2D
-	private Draw2D mDraw2D;
-	float i = 0;
-	public static boolean STAT = false;
+	public static volatile Enum.VISIBILITY visibility = Enum.VISIBILITY.INVISIBLE;
+	public static volatile boolean shutter = false;
+
+	private ClearRenderer mRenderer;
 
 	/**
 	 * エフェクトボタンを押した時に呼び出されるやつ
@@ -30,9 +33,6 @@ public class GLView extends GLSurfaceView implements GLSurfaceView.Renderer
 	public GLView (Context context)
 	{
 		super(context);
-
-		Log.d(TAG, "A");
-
 		Init();
 	}
 
@@ -44,67 +44,79 @@ public class GLView extends GLSurfaceView implements GLSurfaceView.Renderer
 	public GLView (Context context, AttributeSet attrs)
 	{
 		super (context, attrs);
-
-		Log.d(TAG, "B");
 		Init();
 	}
 
 
 	private void Init()
 	{
-		// DrawCacheを取れるようにする
-
-		// 描画処理を設定（これをすることで，onDrawFrame()が定期的に呼ばれる
+		mRenderer = new ClearRenderer();
 		this.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-		this.setRenderer(this);
+		// 描画処理を設定（これをすることで，onDrawFrame()が定期的に呼ばれる
+		this.setRenderer(mRenderer);
 		this.getHolder().setFormat(PixelFormat.TRANSLUCENT);
-
-//		if (STAT == false)
-//		{
-//			this.setVisibility(INVISIBLE);
-//			this.onPause();
-//		}
-//		else
-//		{
-//			onAttachedToWindow();
-//			this.setVisibility(VISIBLE);
-//			this.onResume();
-//		}
 	}
 
 
 	/**
-	 * 描画処理のループ
-	 * @param gl
+	 * エフェクトの表示・非表示を切り替える
 	 */
-	public void onDrawFrame (GL10 gl)
+	public void setTransparent()
 	{
-		Log.i(TAG, "onDrawFrame()");
-
-		// 背景色を設定
-		// GL10.glClearColor (Red, Green, Blue, Alpha）
-//		gl.glClearColor(0, 0, 1, 1.0f);
-
-		// 背景色を描画
-		// 背景の初期化を行う．初期化された際に，上で設定された値が反映される．
-		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-
-		// モデルビューモードに設定
-		gl.glMatrixMode(GL10.GL_MODELVIEW);
-
-		// モデル座標の初期化
-		gl.glLoadIdentity();
-
-		if (STAT == false)
+		if (visibility == Enum.VISIBILITY.VISIBLE)
 		{
-			Log.d(TAG, "stat");
-			// 図形の移動
-			gl.glTranslatef(i, i, 0);
-
-			mDraw2D.draw(gl);
-
-			i = i + 1;
+			this.setVisibility(View.GONE);
+			visibility = Enum.VISIBILITY.INVISIBLE;
 		}
+		else if (visibility == Enum.VISIBILITY.INVISIBLE)
+		{
+			this.setVisibility(View.VISIBLE);
+			visibility = Enum.VISIBILITY.VISIBLE;
+		}
+	}
+
+
+	/**
+	 * シャッターボタンが押された際に呼び出す
+	 * エフェクト画面のフレームバッファをBitmap形式にしてMainActivityに送るフラグをONにする
+	 */
+	public void setShutter()
+	{
+		Log.d(TAG, "setShutter()");
+		if (shutter == false)
+		{
+			shutter = true;
+			Log.d(TAG, "shutterStateChanged = " + shutter);
+		}
+	}
+
+}
+
+
+/**
+ * OpenGLの描画を行う
+ */
+class ClearRenderer implements GLSurfaceView.Renderer
+{
+	private static final String TAG = "Renderer";
+
+	float j = 0;
+
+	ArrayList<Draw2D> Draw2DList = new ArrayList<Draw2D>();
+
+	int mWidth = 0, mHeight = 0;
+
+
+	/**
+	 * GLSurfaceViewのRendererが生成された際に呼ばれる
+	 * @param arg0
+	 * @param arg1
+	 */
+	public void onSurfaceCreated (GL10 arg0, EGLConfig arg1)
+	{
+		Log.i(TAG, "onSurfaceCreated()");
+
+		newGraphic();
 	}
 
 
@@ -119,6 +131,7 @@ public class GLView extends GLSurfaceView implements GLSurfaceView.Renderer
 	public void onSurfaceChanged (GL10 gl, int width, int height)
 	{
 		Log.i(TAG, "onSurfaceChanged()");
+		mWidth = width; mHeight = height;
 
 		// ビューモードの設定
 		// GL上で扱うスクリーンをどこにどれくらいの大きさで表示するのかを設定する
@@ -144,25 +157,62 @@ public class GLView extends GLSurfaceView implements GLSurfaceView.Renderer
 
 
 	/**
-	 * GLSurfaceViewのRendererが生成された際に呼ばれる
-	 * @param arg0
-	 * @param arg1
+	 * 描画処理のループ
+	 * @param gl
 	 */
-	public void onSurfaceCreated (GL10 arg0, EGLConfig arg1)
+	public void onDrawFrame (GL10 gl)
 	{
-		Log.i(TAG, "onSurfaceCreated()");
+		Log.i(TAG, "onDrawFrame()");
 
-		// Draw2Dのインスタンスを生成
-		mDraw2D = new Draw2D();
+		// 背景色を設定
+		// GL10.glClearColor (Red, Green, Blue, Alpha）
+//		gl.glClearColor(0, 0, 1, 1.0f);
+
+		// 背景色を描画
+		// 背景の初期化を行う．初期化された際に，上で設定された値が反映される．
+		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+
+		// モデルビューモードに設定
+		gl.glMatrixMode(GL10.GL_MODELVIEW);
+
+		// モデル座標の初期化
+		gl.glLoadIdentity();
+
+		for (int i = 0; i < this.Draw2DList.size(); i++)
+		{
+			// GLViewクラスのvisibility変数をいじることで、描画のON・OFFが可能
+			if (GLView.visibility == Enum.VISIBILITY.VISIBLE)
+			{
+				if (i == 0)
+				{
+					gl.glTranslatef(j, 0, 0);
+				}
+				if (i == 1)
+				{
+					gl.glTranslatef(0, j, 0);
+				}
+
+				Draw2DList.get(i).draw(gl);
+			}
+		}
+
+		// OpenGLで描画したフレームバッファからbitmapを生成する
+		if (GLView.shutter == true)
+		{
+			Log.d(TAG, "callCreateBitmap");
+			CreateEffectBitmap.createOpenglBitmap(gl, mWidth, mHeight);
+			GLView.shutter = false;
+		}
+		j++;
 	}
 
 
-	/**
-	 * GLSurfaceViewのRendererが破棄された際に呼ばれる
-	 */
-	protected void onDetachedFromWindow()
+	public void newGraphic()
 	{
-		super.onDetachedFromWindow();
-		Log.i(TAG, "onDetachedFromWindow()");
+		Draw2D draw2D_1 = new Draw2D(Enum.POSITION.A);
+		Draw2DList.add(draw2D_1);
+
+		Draw2D draw2D_2 = new Draw2D(Enum.POSITION.B);
+		Draw2DList.add(draw2D_2);
 	}
 }

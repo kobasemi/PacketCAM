@@ -39,7 +39,6 @@ public class MainActivity extends Activity
 {
 	private static Camera camera;
 
-	private OverLayView overlay;
 	private GLView glView;
 	// 画面タッチの2度押し禁止用フラグ
 	private boolean mIsTake = false;
@@ -62,6 +61,8 @@ public class MainActivity extends Activity
 
 	// アラートの飛び対策
 	private boolean alert1_1 = false;
+
+	public static Bitmap effectBitmap = null;
 
 	/**
 	 * アクティビティ起動時に呼び出される
@@ -89,11 +90,6 @@ public class MainActivity extends Activity
 		{
 			holder.setType (SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		}
-
-//		// オーバーレイ画面をFrameLayoutに追加
-//		overlay = new OverLayView (this);
-//		FrameLayout frame = (FrameLayout) findViewById (R.id.frameLayout1);
-//		frame.addView (overlay);
 
         // 設定マネージャにアクティビティをセット + 初期処理
         SettingsManager.getInstance().setActivity(MainActivity.this);
@@ -184,6 +180,9 @@ public class MainActivity extends Activity
 						Toast.makeText (MainActivity.this, "撮影", Toast.LENGTH_SHORT).show();
 						mIsTake = true;
 						camera.autoFocus (mAutoFocusListener);
+
+						// エフェクト画面の合成素材Bitmapを作成し、本クラスのeffectBitmapに格納
+						glView.setShutter();
 					}
 				}
 			}
@@ -204,11 +203,15 @@ public class MainActivity extends Activity
 				if (!switchEffect){
 					effectBtn.setImageResource(R.drawable.effect_on);
 					switchEffect=true;
-					glView.STAT = true;
+
+					// エフェクトを表示
+					glView.setTransparent();
 				}else{
 					effectBtn.setImageResource(R.drawable.effect_off);
 					switchEffect=false;
-					glView.STAT = false;
+
+					// エフェクトを非表示
+					glView.setTransparent();
 				}
 			}
 		});
@@ -370,19 +373,12 @@ public class MainActivity extends Activity
 	{
 		public void onPictureTaken (byte[] data, Camera camera)
 		{
-			if (data == null)
+			if (data == null || effectBitmap == null)
 			{
+				effectBitmap = null;
 				return;
 			}
 
-
-			Toast.makeText (MainActivity.this, "totalMemory" + String.valueOf (Runtime.getRuntime ().totalMemory ()), Toast.LENGTH_LONG).show ();
-			Toast.makeText (MainActivity.this, "maxMemory" + String.valueOf (Runtime.getRuntime ().maxMemory ()), Toast.LENGTH_LONG).show ();
-			Toast.makeText (MainActivity.this, "freeMemory" + String.valueOf (Runtime.getRuntime ().freeMemory ()), Toast.LENGTH_LONG).show ();
-
-			Log.d (TAG, "totalMemory" + String.valueOf (Runtime.getRuntime ().totalMemory ()));
-			Log.d (TAG, "maxMemory" + String.valueOf (Runtime.getRuntime ().maxMemory ()));
-			Log.d (TAG, "freeMemory" + String.valueOf (Runtime.getRuntime ().freeMemory ()));
 
 			try
 			{
@@ -395,20 +391,7 @@ public class MainActivity extends Activity
 				BitmapFactory.Options options = new BitmapFactory.Options ();
 				options.inPurgeable = true;
 
-				// Bitmap cameraBitmap = BitmapFactory.decodeByteArray(data, 0,
-				// data.length, null);
 				Bitmap cameraBitmap = BitmapFactory.decodeByteArray (data, 0, data.length, options);
-
-				// オーバーレイイメージ viewから画像を取得
-				Bitmap overlayBitmap = glView.getDrawingCache ();
-
-				//TODO OpenGLの画面キャッシュが取得できていない．GLViewクラスにて，OpenGLのglReadPixelsで取得する
-				if (overlayBitmap == null)
-				{
-					Log.d(TAG, "null");
-				}
-
-				Log.d(TAG, "getCache");
 
 				// 空のイメージを作成
 				Bitmap offBitmap = Bitmap.createBitmap (cameraBitmap.getWidth (), cameraBitmap.getHeight (), Bitmap.Config.ARGB_8888);
@@ -417,11 +400,9 @@ public class MainActivity extends Activity
 
 				// 画像の合成処理
 				offScreen.drawBitmap (cameraBitmap, null, new Rect (0, 0, cameraBitmap.getWidth (), cameraBitmap.getHeight ()), null);
-				offScreen.drawBitmap (overlayBitmap, null, new Rect (0, 0, cameraBitmap.getWidth (), cameraBitmap.getHeight ()), null);
+				offScreen.drawBitmap (effectBitmap, null, new Rect (0, 0, cameraBitmap.getWidth (), cameraBitmap.getHeight ()), null);
 
 				// 合成した画像：offBitmap
-
-				Log.d(TAG, "mix");
 
 				// ファイル名を設定
 				Calendar cal = Calendar.getInstance ();

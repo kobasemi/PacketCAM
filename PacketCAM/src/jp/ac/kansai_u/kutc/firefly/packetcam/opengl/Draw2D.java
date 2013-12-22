@@ -1,5 +1,8 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.opengl;
 
+import android.util.Log;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.POSITION;
+
 import javax.microedition.khronos.opengles.GL10;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -7,7 +10,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 /**
- * Created by kousaka on 2013/12/10.
+ * Created by Kousaka on 2013/12/10.
  * このクラスの中で様々な図形の描画メソッドを定義し，GLViewにおいて適宜
  * 該当メソッドを指定して描画させればいい感じかもしれない
  */
@@ -20,34 +23,57 @@ public class Draw2D
 	// 色バッファ
 	private FloatBuffer mColorBuffer;
 
-	// 図形の頂点の配列，色の配列を定義
-	// 頂点情報の配列（x,y）＝（200f, 200f）
-	// OpenGLの座標系は，左下が（0, 0）になっている
-	private float vertices[] = {
-			200f, 200f,
-			250f, 250f,
-			100f, 300f,
-	};
-
-	// 色情報の配列（Red, Green, Blue, Alpha）
-	private float colors[] = {
-			1f, 1f, 1f, 1f,
-			1f, 1f, 1f, 1f,
-			1f, 1f, 1f, 1f,
-	};
 
 	/**
 	 * コンストラクタ
 	 */
-	public Draw2D()
+	public Draw2D(POSITION position)
 	{
-		mVertexBuffer = makeFloatBuffer (vertices);
-		mColorBuffer = makeFloatBuffer (colors);
+		if (position == POSITION.A)
+		{
+			Log.d("Draw2D", "makeFloatBufferA");
+
+			// 図形の頂点の配列，色の配列を定義
+			// 頂点情報の配列（x,y）＝（200f, 200f）
+			// OpenGLの座標系は，左下が（0, 0）になっている
+			float vertices[] = {
+					200f, 200f,
+					250f, 250f,
+					100f, 300f
+			};
+
+			// 色情報の配列（Red, Green, Blue, Alpha）
+			float colors[] = {
+					1f, 1f, 1f, 1f,
+					1f, 1f, 1f, 1f,
+					1f, 1f, 1f, 1f,
+			};
+
+			mVertexBuffer = makeFloatBuffer(vertices);
+			mColorBuffer = makeFloatBuffer(colors);
+		}
+		else if (position == POSITION.B)
+		{
+			Log.d("Draw2D", "makeFloatBufferB");
+			float vertices[] = {
+					500f, 500f,
+					550f, 550f,
+					400f, 600f,
+			};
+			float colors[] = {
+					1f, 1f, 1f, 1f,
+					1f, 1f, 1f, 1f,
+					1f, 1f, 1f, 1f,
+			};
+
+			mVertexBuffer = makeFloatBuffer(vertices);
+			mColorBuffer = makeFloatBuffer(colors);
+		}
 	}
 
 
 	/**
-	 * オブジェクトの描画設定メソッド（図形の場所や形状などを設定）
+	 * オブジェクトの描画設定メソッド
 	 * @param gl
 	 */
 	public void draw (GL10 gl)
