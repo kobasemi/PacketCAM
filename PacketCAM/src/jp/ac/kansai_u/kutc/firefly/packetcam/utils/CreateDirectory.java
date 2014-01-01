@@ -17,43 +17,40 @@ public class CreateDirectory {
 
     public CreateDirectory(Resources res){
         this.res = res;
-        if(createFolder())
+        if(createDirectory())
             Log.d("CreateDirectory.java", "Create Directory Success");
         else
             Log.d("CreateDirectory.java", "Create Directory Filed...");
     }
 
     /**
-     * 画像保存フォルダの作成
-     *
+     * 画像保存用及びパケットファイル用ディレクトリの作成
      * @return 正常に作成できればtrue，できなければfalseを返す
      */
-    private boolean createFolder ()
+    private boolean createDirectory ()
     {
+        return createDirectory("Pictures") && createDirectory("Packet");
+    }
 
-        // SDカードのフォルダパスの取得
+    /**
+     * ディレクトリの作成
+     * @param dirname 作成したいディレクトリ名
+     * @return 正常に作成できればtrue，できなければfalseを返す
+     */
+    private boolean createDirectory (String dirname)
+    {
+        // SDカードのディレクトリパスの取得
         Path.SD_PATH = Environment.getExternalStorageDirectory ().getPath ();
+        // SDカードにアプリ名でディレクトリを新規作成
+        String dirpath = Path.SD_PATH + File.separator + res.getString(R.string.app_name) + File.separator + dirname;
 
-        // SDカードにアプリ名でフォルダを新規作成
-        Path.PICFOLDER_PATH = Path.SD_PATH + File.separator + res.getString(R.string.app_name) + File.separator + "Pictures";
-        Path.PACKETFOLDER_PATH = Path.SD_PATH + File.separator + res.getString(R.string.app_name) + File.separator + "Packet";
+        File dirFile = new File(dirpath);
 
-        File picFile = new File (Path.PICFOLDER_PATH);
-        File pacFile = new File (Path.PACKETFOLDER_PATH);
-
-        try
-        {
-            if (!picFile.exists ())
-            {
-                picFile.mkdirs ();
+        try{
+            if (!dirFile.exists ()){
+                dirFile.mkdirs ();
             }
-            if (!pacFile.exists())
-            {
-                pacFile.mkdirs();
-            }
-        }
-        catch (Exception e)
-        {
+        }catch (Exception e){
             e.printStackTrace ();
             return false;
         }
