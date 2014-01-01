@@ -15,22 +15,18 @@ public class CreateDirectory {
      */
     public static boolean createDirectory ()
     {
-        return createDirectory("Pictures") && createDirectory("Packet");
+        return createDirectory("Pictures", Path.APPROOT_PATH) && createDirectory("Packet", Path.APPROOT_PATH);
     }
 
     /**
      * ディレクトリの作成
-     * @param dirname 作成したいディレクトリ名
+     * @param fullpath 作成したいディレクトリのフルパス
      * @return 正常に作成できればtrue，できなければfalseを返す
      */
-    public static boolean createDirectory (String dirname)
+    //TODO: ディレクトリ作成時にPathクラスにパス名を追加とかしたほうがいいかも？
+    public static boolean createDirectory (String fullpath)
     {
-        // SDカードにアプリ名でディレクトリを新規作成
-        // TODO: メソッドをstaticにするため，アプリケーション名を直接書いた，アプリケーション名なんて変えないよね？
-//        String dirpath = Path.SD_PATH + File.separator + res.getString(R.string.app_name) + File.separator + dirname;
-        String dirpath = Path.APPROOT_PATH + File.separator + dirname;
-
-        File dirFile = new File(dirpath);
+        File dirFile = new File(fullpath);
 
         try{
             if (!dirFile.exists ()){
@@ -41,5 +37,16 @@ public class CreateDirectory {
             return false;
         }
         return true;
+    }
+
+    /**
+     * ディレクトリの作成
+     * @param dirname ディレクトリ名
+     * @param parentPath 作成したいディレクトリの親ディレクトリのパス
+     * @return 正常に作成できればtrue，できなければfalseを返す
+     */
+    public static boolean createDirectory (String dirname, String parentPath)
+    {
+        return createDirectory(parentPath + File.separator + dirname);
     }
 }

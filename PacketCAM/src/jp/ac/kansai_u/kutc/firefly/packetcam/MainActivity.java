@@ -103,9 +103,9 @@ public class MainActivity extends Activity
             Toast.makeText(this, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show ();
 
         // res/rawにあるファイルをSDカードにコピーする
-        new CopyAllRawFieldToSd(getApplicationContext());
-        // assetsディレクトリ以下のファイルを全てSDカードにコピーする
-//        new CopyAllPcapFileToSd(getApplicationContext());
+//        new CopyAllRawFieldToSd(getApplicationContext());
+        // assets/cap ディレクトリ以下の構造をそのままSDカードにコピーする
+        new CopyAllPcapFileToSd(getApplicationContext());
 
 		// カメラ切り替えボタン
 		ImageButton INOUTBtn = (ImageButton) findViewById (R.id.inout);
