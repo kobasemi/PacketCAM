@@ -1,7 +1,5 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.utils;
 
-import android.os.Environment;
-
 import java.io.File;
 
 /**
@@ -27,12 +25,10 @@ public class CreateDirectory {
      */
     public static boolean createDirectory (String dirname)
     {
-        // SDカードのディレクトリパスの取得
-        Path.SD_PATH = Environment.getExternalStorageDirectory ().getPath ();
         // SDカードにアプリ名でディレクトリを新規作成
         // TODO: メソッドをstaticにするため，アプリケーション名を直接書いた，アプリケーション名なんて変えないよね？
 //        String dirpath = Path.SD_PATH + File.separator + res.getString(R.string.app_name) + File.separator + dirname;
-        String dirpath = Path.SD_PATH + File.separator + "PacketCAM" + File.separator + dirname;
+        String dirpath = Path.APPROOT_PATH + File.separator + dirname;
 
         File dirFile = new File(dirpath);
 

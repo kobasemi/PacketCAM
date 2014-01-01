@@ -91,14 +91,21 @@ public class MainActivity extends Activity
         SettingsManager.getInstance().setActivity(MainActivity.this);
         SettingsManager.getInstance().setSharedPreferences();
 
+        Path.init();
+
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
             // SDカードがマウントされているならば，ディレクトリを作成する
-            new CreateDirectory(this.getResources());
+            if(CreateDirectory.createDirectory())
+                Log.d(TAG, "Create Directory Success");
+            else
+                Log.d(TAG, "Create Directory Filed...");
         else
             Toast.makeText(this, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show ();
 
         // res/rawにあるファイルをSDカードにコピーする
         new CopyAllRawFieldToSd(getApplicationContext());
+        // assetsディレクトリ以下のファイルを全てSDカードにコピーする
+//        new CopyAllPcapFileToSd(getApplicationContext());
 
 		// カメラ切り替えボタン
 		ImageButton INOUTBtn = (ImageButton) findViewById (R.id.inout);
