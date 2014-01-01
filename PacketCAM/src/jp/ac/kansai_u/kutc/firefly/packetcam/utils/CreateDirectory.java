@@ -1,9 +1,6 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.utils;
 
-import android.content.res.Resources;
 import android.os.Environment;
-import android.util.Log;
-import jp.ac.kansai_u.kutc.firefly.packetcam.R;
 
 import java.io.File;
 
@@ -13,21 +10,12 @@ import java.io.File;
  */
 public class CreateDirectory {
 
-    Resources res;
-
-    public CreateDirectory(Resources res){
-        this.res = res;
-        if(createDirectory())
-            Log.d("CreateDirectory.java", "Create Directory Success");
-        else
-            Log.d("CreateDirectory.java", "Create Directory Filed...");
-    }
-
     /**
      * 画像保存用及びパケットファイル用ディレクトリの作成
      * @return 正常に作成できればtrue，できなければfalseを返す
+     * TODO: 今はこのまま放置しておくけど，こんな訳わからんメソッドはいつか消す，またはメソッド名変える
      */
-    private boolean createDirectory ()
+    public static boolean createDirectory ()
     {
         return createDirectory("Pictures") && createDirectory("Packet");
     }
@@ -37,12 +25,14 @@ public class CreateDirectory {
      * @param dirname 作成したいディレクトリ名
      * @return 正常に作成できればtrue，できなければfalseを返す
      */
-    private boolean createDirectory (String dirname)
+    public static boolean createDirectory (String dirname)
     {
         // SDカードのディレクトリパスの取得
         Path.SD_PATH = Environment.getExternalStorageDirectory ().getPath ();
         // SDカードにアプリ名でディレクトリを新規作成
-        String dirpath = Path.SD_PATH + File.separator + res.getString(R.string.app_name) + File.separator + dirname;
+        // TODO: メソッドをstaticにするため，アプリケーション名を直接書いた，アプリケーション名なんて変えないよね？
+//        String dirpath = Path.SD_PATH + File.separator + res.getString(R.string.app_name) + File.separator + dirname;
+        String dirpath = Path.SD_PATH + File.separator + "PacketCAM" + File.separator + dirname;
 
         File dirFile = new File(dirpath);
 
@@ -55,18 +45,5 @@ public class CreateDirectory {
             return false;
         }
         return true;
-    }
-
-    /**
-     * SDカードが端末にマウントされているか確認するメソッド
-     *
-     * @param status
-     *        Environment.getExternalStorageStateメソッドで取得したString型の値
-     * @return マウントされていればtrue, マウントされていなければfalseが返される
-     */
-    //TODO: SDカードがマウントされているか，都度都度確認しないなら不必要
-    private boolean isSdCardMounted (String status)
-    {
-        return status.equals (Environment.MEDIA_MOUNTED);
     }
 }
