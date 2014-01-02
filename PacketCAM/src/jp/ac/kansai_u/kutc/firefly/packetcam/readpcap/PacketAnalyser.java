@@ -27,13 +27,6 @@ public class PacketAnalyser {
      * 後からパケットをセットすること
      */
     public PacketAnalyser(){}
-    /**
-     * 初期化時にパケットをセット
-     * @param p セットするパケット
-     */
-    public PacketAnalyser(PcapPacket p){
-        setPacket(p);
-    }
 
     /**
      * パケットをセットする
@@ -84,7 +77,11 @@ public class PacketAnalyser {
      * @throws CodecCreateException
      */
     public boolean hasEthernet() throws IOException, CodecCreateException {
-        return hasPacket() && packet.hasHeader(Ethernet2.class);
+        try{
+            return hasPacket() && packet.hasHeader(Ethernet2.class);
+        }catch(IllegalArgumentException e){
+            return false;
+        }
     }
 
     /**
@@ -94,7 +91,11 @@ public class PacketAnalyser {
      * @throws CodecCreateException
      */
     public boolean hasIeee802dot3() throws IOException, CodecCreateException {
-        return hasPacket() && packet.hasHeader(IEEE802dot3.class);
+        try{
+            return hasPacket() && packet.hasHeader(IEEE802dot3.class);
+        }catch(IllegalArgumentException e){
+            return false;
+        }
     }
 
     /**
@@ -103,8 +104,12 @@ public class PacketAnalyser {
      * @throws IOException
      * @throws CodecCreateException
      */
-    public boolean hasIp4() throws IOException, CodecCreateException{
-        return hasPacket() && packet.hasHeader(Ip4.class);
+    public boolean hasIp4() throws IOException, CodecCreateException {
+        try{
+            return hasPacket() && packet.hasHeader(Ip4.class);
+        }catch(IllegalArgumentException e){
+            return false;
+        }
     }
 
     /**
@@ -113,8 +118,12 @@ public class PacketAnalyser {
      * @throws IOException
      * @throws CodecCreateException
      */
-    public boolean hasTcp() throws IOException, CodecCreateException{
-        return hasPacket() && packet.hasHeader(Tcp.class);
+    public boolean hasTcp() throws IOException, CodecCreateException {
+        try{
+            return hasPacket() && packet.hasHeader(Tcp.class);
+        }catch(IllegalArgumentException e){
+            return false;
+        }
     }
 
     /**
@@ -123,8 +132,13 @@ public class PacketAnalyser {
      * @throws IOException
      * @throws CodecCreateException
      */
-    public boolean hasUdp() throws IOException, CodecCreateException{
-        return hasPacket() && packet.hasHeader(Udp.class);
+    public boolean hasUdp() throws IOException, CodecCreateException {
+        try{
+            return hasPacket() && packet.hasHeader(Udp.class);
+        }catch(IllegalArgumentException e){
+            return false;
+        }
+
     }
 
     /**
@@ -133,8 +147,12 @@ public class PacketAnalyser {
      * @throws IOException
      * @throws CodecCreateException
      */
-    public boolean hasIcmp() throws IOException, CodecCreateException{
-        return hasPacket() && packet.hasHeader(Icmp.class);
+    public boolean hasIcmp() throws IOException, CodecCreateException {
+        try{
+            return hasPacket() && packet.hasHeader(Icmp.class);
+        }catch(IllegalArgumentException e){
+            return false;
+        }
     }
 
     /**
@@ -144,7 +162,11 @@ public class PacketAnalyser {
      * @throws CodecCreateException
      */
     public boolean hasArp() throws IOException, CodecCreateException {
-        return hasPacket() && packet.hasHeader(Arp.class);
+        try{
+            return hasPacket() && packet.hasHeader(Arp.class);
+        }catch(IllegalArgumentException e){
+            return false;
+        }
     }
 
     /**
@@ -173,7 +195,7 @@ public class PacketAnalyser {
      * @throws IOException
      * @throws CodecCreateException
      */
-    public Ip4 getIp4() throws IOException, CodecCreateException{
+    public Ip4 getIp4() throws IOException, CodecCreateException {
         return hasIp4()? packet.getHeader(Ip4.class): null;
     }
 
@@ -183,7 +205,7 @@ public class PacketAnalyser {
      * @throws IOException
      * @throws CodecCreateException
      */
-    public Tcp getTcp() throws IOException, CodecCreateException{
+    public Tcp getTcp() throws IOException, CodecCreateException {
         return hasTcp()? packet.getHeader(Tcp.class): null;
     }
 
@@ -193,7 +215,7 @@ public class PacketAnalyser {
      * @throws IOException
      * @throws CodecCreateException
      */
-    public Udp getUdp() throws IOException, CodecCreateException{
+    public Udp getUdp() throws IOException, CodecCreateException {
         return hasUdp()? packet.getHeader(Udp.class): null;
     }
 
@@ -203,7 +225,7 @@ public class PacketAnalyser {
      * @throws IOException
      * @throws CodecCreateException
      */
-    public Icmp getIcmp() throws IOException, CodecCreateException{
+    public Icmp getIcmp() throws IOException, CodecCreateException {
         return hasIcmp()? packet.getHeader(Icmp.class): null;
     }
 
