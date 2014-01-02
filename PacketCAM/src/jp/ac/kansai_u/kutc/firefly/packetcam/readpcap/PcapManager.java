@@ -45,10 +45,10 @@ public class PcapManager extends Thread{
 
     /**
      * PcapFileを開き，イテレータにパケットをセットする
-     * @param  path ファイルの完全パス
-     * @return b    オープン成功・失敗
+     * @param file ファイルオブジェクト
+     * @return b   オープン成功・失敗
      */
-    public boolean openPcapFile(String path){
+    public boolean openPcapFile(File file){
         if(pcapFile != null){
             // 既にPcapFileが開かれていた場合
             closePcapFile();
@@ -56,13 +56,22 @@ public class PcapManager extends Thread{
         }
 
         try {
-            pcapFile = Captures.openFile(PcapFile.class, new File(path), FileMode.ReadOnly);
+            pcapFile = Captures.openFile(PcapFile.class, file, FileMode.ReadOnly);
             setPacketsToPacketIterator();  // Set Packets from pcapFile
         } catch (IOException e) {
-            Log.d("PcapManager.java", "FAILED TO OPEN");
+            Log.d(TAG, "FAILED TO OPEN");
             return false;
         }
         return true;
+    }
+
+    /**
+     * 絶対パスからファイルオブジェクトをインスタンス化し，openPcapFileを呼び出す
+     * @param  path ファイルの絶対パス
+     * @return b    オープン成功・失敗
+     */
+    public boolean openPcapFile(String path){
+        return openPcapFile(new File(path));
     }
 
     /**
@@ -132,7 +141,6 @@ public class PcapManager extends Thread{
     public PcapPacket getPacket() throws IOException {
         return packetIterator.next();
     }
-
 
     /**
      * ファイルからロードしたパケットの数を返す
