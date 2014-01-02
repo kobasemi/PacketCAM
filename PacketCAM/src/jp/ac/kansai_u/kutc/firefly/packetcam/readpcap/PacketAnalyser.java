@@ -39,6 +39,7 @@ public class PacketAnalyser {
     /**
      * パケットをゲットする
      * @return パケット
+     * @deprecated ヘッダのゲッターを使ってね
      */
     public PcapPacket getPacket(){
         return packet;

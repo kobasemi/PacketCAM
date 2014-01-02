@@ -3,7 +3,8 @@ package jp.ac.kansai_u.kutc.firefly.packetcam.readpcap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * ファイルからロードしたパケットを保持するサイズ制限有りキュー
+ * パケットを保持するサイズ制限有りのスレッドセーフなキュー
+ * 本来ConcurrentLinkedQueueはunbound（サイズ制限のない）キューであるが，それを拡張しサイズ制限をつけている
  * Ref: http://stackoverflow.com/questions/5498865/size-limited-queue-that-holds-last-n-elements-in-java
  * @author akasaka
  */
