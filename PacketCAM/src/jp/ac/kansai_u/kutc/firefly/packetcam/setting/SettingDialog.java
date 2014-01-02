@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.hardware.Camera;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.widget.Toast;
 import jp.ac.kansai_u.kutc.firefly.packetcam.GetGCD;
 import jp.ac.kansai_u.kutc.firefly.packetcam.MainActivity;
@@ -22,8 +21,8 @@ import java.util.List;
  * @author akasaka
  */
 public class SettingDialog{
+    final String TAG = "SettingDialog.java";
     Activity activity;
-    private boolean alert1_1 = false;
     // 画像サイズ（height，width）
     Camera.Size picSize = null;
 
@@ -42,84 +41,49 @@ public class SettingDialog{
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if(which == 0) {
-                    // パケットの読み込み
-                    CharSequence[] conf1 = {"ファイルの選択", "リアルタイム読み込み"};
+                    // パケットの読み込みダイアログ
                     final AlertDialog.Builder builder1 = new AlertDialog.Builder(activity);
-                    builder1.setTitle("設定");
-                    builder1.setItems(conf1, new DialogInterface.OnClickListener() {
+                    builder1.setTitle("ファイルの選択");
+
+                    // リストにするディレクトリの指定
+                    File dir = new File(Path.PACKETFOLDER_PATH);
+
+                    // 指定されたディレクトリ内のファイル名をすべて取得
+                    final File[] files = dir.listFiles();
+                    final String[] str_items = new String[files.length];
+                    for(int i = 0; i < files.length; i++) {
+                        File file = files[i];
+                        str_items[i] = file.getName();
+                    }
+
+                    // ファイルリストダイアログの表示
+                    builder1.setItems(str_items, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            if(which == 0) {
-                                // ファイルの選択ダイアログの表示
-                                // リストにするディレクトリの指定
-                                File dir = new File(Path.PACKETFOLDER_PATH);
+                            // 選択されたパケットファイルのパス
+                            String filePath = Path.PACKETFOLDER_PATH + File.separator + str_items[which];
+                            // ファイルを開く
+                            File file = new File(filePath);
+                            Log.d(TAG, "filePath = " + filePath);
+                            // PcapManagerインスタンスを取得
+                            PcapManager pcap = PcapManager.getInstance();
 
-                                // 指定されたディレクトリ内のファイル名をすべて取得
-                                final File[] files = dir.listFiles();
-                                final String[] str_items;
-                                str_items = new String[files.length];
-
-                                for(int i = 0; i < files.length; i++) {
-                                    File file = files[i];
-                                    str_items[i] = file.getName();
+                            if(file.isDirectory()){
+                                // ディレクトリの場合
+                                // ディレクトリ内のファイルを読み込む
+                                for(File f: file.listFiles()){
+                                    if(pcap.openPcapFile(f))
+                                        Log.d(TAG, "FILE OPEN SUCCESS: " + f.getName());
                                 }
-                                // ファイルリストダイアログの表示
-                                final AlertDialog.Builder builder1_1 = new AlertDialog.Builder(activity);
-                                builder1_1.setTitle("パケットファイルを選択してください");
-                                builder1_1.setItems(str_items, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        // 選択されたパケットファイルのパス
-                                        String filePath = Path.PACKETFOLDER_PATH + File.separator + str_items[which];
-                                        Log.d("SettingDialog.java", "filePath = " + filePath);
-
-                                        // PcapManagerのopenPcapFileにファイルパスを渡す
-                                        PcapManager pcap = PcapManager.getInstance();
-                                        pcap.openPcapFile(filePath);
-                                    }
-                                });
-                                builder1_1.setOnKeyListener(new DialogInterface.OnKeyListener() {
-                                    @Override
-                                    public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent keyEvent) {
-                                        if(keyCode == KeyEvent.KEYCODE_BACK) {
-                                            // アラートの飛び対策
-                                            alert1_1 = true;
-                                            dialog.dismiss();
-                                            builder1.show();
-                                            return true;
-                                        }
-                                        return false;
-                                    }
-                                });
-                                builder1_1.show();
-                            }
-                            if (which == 1)
-                            {
-                                // リアルタイム読み込み処理
+                            }else{
+                                // PcapManagerのopenPcapFileにファイルパスを渡す
+                                pcap.openPcapFile(file);
+                                Log.d(TAG, "FILE OPEN SUCCESS: " + file.getName());
                             }
                         }
-                    });
-                    builder1.setOnKeyListener (new DialogInterface.OnKeyListener()
-                    {
-                        @Override
-                        public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event)
-                        {
-                            // alert1_1を噛ませているのは，ファイル選択画面からBackキーを押すと，
-                            // builder1を飛ばして一気にbuilder（最初のアラート）に戻ってしまうため
-                            if (keyCode == KeyEvent.KEYCODE_BACK && !alert1_1)
-                            {
-                                dialog.dismiss ();
-                                builder.show ();
-                                return true;
-                            }
-                            alert1_1 = false;
-                            return false;
-                        }
-
                     });
                     builder1.show();
                 }
-                if (which == 1)
-                {
+                if (which == 1) {
                     // 解像度
                     // 対応する画像サイズのリストを取得
                     final List<Camera.Size> supportedPictureSize = MainActivity.getCamera().getParameters().getSupportedPictureSizes ();
@@ -165,25 +129,9 @@ public class SettingDialog{
                             SettingsManager.getInstance().setResolution(picSize.width, picSize.height);
                         }
                     });
-                    builder2.setOnKeyListener (new DialogInterface.OnKeyListener()
-                    {
-
-                        @Override
-                        public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event)
-                        {
-                            if (keyCode == KeyEvent.KEYCODE_BACK)
-                            {
-                                dialog.dismiss ();
-                                builder.show();
-                                return true;
-                            }
-                            return false;
-                        }
-                    });
                     builder2.show();
                 }
-                if (which == 2)
-                {
+                if (which == 2) {
                     // フラッシュ
                     CharSequence[] conf3 = { "強制発光", "自動", "OFF" };
 
@@ -225,25 +173,10 @@ public class SettingDialog{
                             }
                         }
                     });
-                    builder3.setOnKeyListener (new DialogInterface.OnKeyListener(){
-                        @Override
-                        public boolean onKey (DialogInterface dialog, int keyCode, KeyEvent event)
-                        {
-                            if (keyCode == KeyEvent.KEYCODE_BACK)
-                            {
-                                dialog.dismiss();
-                                builder.show();
-                                return true;
-                            }
-                            return false;
-                        }
-
-                    });
                     builder3.show ();
                 }
             }
         });
-
         builder.show();
     }
 }
