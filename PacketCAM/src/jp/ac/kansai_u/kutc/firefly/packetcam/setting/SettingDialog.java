@@ -12,7 +12,6 @@ import java.util.List;
 
 /**
  * 設定ダイアログに関するクラス
- * TODO: とりあえず，これでいい
  * TODO: トーストを削除して，選択されてるものを分かりやすいようにする
  * @author akasaka
  */

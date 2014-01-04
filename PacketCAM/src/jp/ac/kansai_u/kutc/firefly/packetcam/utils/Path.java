@@ -25,8 +25,7 @@ public class Path {
      */
     public static void init(){
         SD_PATH           = Environment.getExternalStorageDirectory().getPath ();
-        // R.string.app_name = PacketCAM
-        APPROOT_PATH      = SD_PATH + File.separator + "PacketCAM";
+        APPROOT_PATH      = SD_PATH + File.separator + Name.APP_NAME;
         PICFOLDER_PATH    = APPROOT_PATH + File.separator + "Pictures";
         PACKETFOLDER_PATH = APPROOT_PATH + File.separator + "Packet";
     }

@@ -8,16 +8,14 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="18" />
 
-    <uses-permission android:name="android.permission.CAMERA"></uses-permission>
-<!--     Playストアで，カメラ機能の無い端末からダウンロードできないようにする -->
-    <uses-feature android:name="android.hardware.camera"></uses-feature>
+    <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <!--  Playストアで，以下のカメラ機能が無い端末からのダウンロードをできないようにする -->
+    <uses-feature android:name="android.hardware.camera"/>
+    <uses-feature android:name="android.hardware.camera.autofocus"/>
+    <uses-feature android:name="android.hardware.camera.flash"/>
 
-    <!-- android:largeHeap解像度の高い画像で撮影する際のOutOfMemoryError対策（暫定的対策） -->
-    
     <application
-        
-        
         android:debuggable="true"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
