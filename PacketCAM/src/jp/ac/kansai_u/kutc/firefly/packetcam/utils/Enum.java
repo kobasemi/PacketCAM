@@ -21,4 +21,8 @@ public class Enum
 
 	// 描画方法 http://atelier-yoka.com/dev_android/p_main.php?file=apigl10gldrawarrays
 	public static enum SHAPE {POINT, LINE, LINE_STRIP, LINE_LOOP, TRIANGLE, TRIANGLE_STRIP, TRIANGLE_FAN}
+
+	public static enum COLOR {RED, GREEN, BLUE, BLACK, WHITE}
+
+	public static enum DRAWSTATE {PREPARATION, READY}
 }
