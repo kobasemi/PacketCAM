@@ -76,6 +76,7 @@ public class MainActivity extends Activity
 
 		glView = new GLView(MainActivity.this);
 
+		// TODO SurfaceViewを使わないので，以下を削除
 		// カメラプレビュー用のViewを準備
 		SurfaceView surfaceView = (SurfaceView) findViewById (R.id.surfaceView1);
 		final SurfaceHolder holder = surfaceView.getHolder ();
@@ -107,6 +108,8 @@ public class MainActivity extends Activity
         // assets/cap ディレクトリ以下の構造をそのままSDカードにコピーする
         new CopyAllPcapFileToSd(getApplicationContext());
 
+
+		// TODO ボタンイベントだけ拾っておいて，処理は別クラスで行うようにする（Switchを利用）
 		// カメラ切り替えボタン
 		ImageButton INOUTBtn = (ImageButton) findViewById (R.id.inout);
 		INOUTBtn.setOnClickListener (new OnClickListener ()
