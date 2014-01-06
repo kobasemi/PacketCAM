@@ -19,7 +19,7 @@ import java.util.ArrayList;
  */
 public class GLView extends GLSurfaceView
 {
-	private static final String TAG = "GLVIEW";
+	private static final String TAG = GLView.class.getSimpleName();
 
 	public static volatile Enum.VISIBILITY visibility = Enum.VISIBILITY.VISIBLE;
 	public static volatile boolean shutter = false;
