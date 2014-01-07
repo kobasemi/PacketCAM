@@ -51,16 +51,16 @@ public class SettingsManager {
         editor.commit();
     }
 
-    /**
-     * カメラの解像度を保存する
-     * @param w 解像度の幅
-     * @param h 解像度の高さ
-     */
-    public void setResolution(int w, int h){
-        editor.putInt("ResW", w);
-        editor.putInt("ResH", h);
-        editor.commit();
-    }
+//    /**
+//     * カメラの解像度を保存する
+//     * @param w 解像度の幅
+//     * @param h 解像度の高さ
+//     */
+//    public void setResolution(int w, int h){
+//        editor.putInt("ResW", w);
+//        editor.putInt("ResH", h);
+//        editor.commit();
+//    }
 
     /**
      * フラッシュの設定を取得する

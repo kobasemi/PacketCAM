@@ -25,4 +25,6 @@ public class Enum
 	public static enum COLOR {RED, GREEN, BLUE, BLACK, WHITE}
 
 	public static enum DRAWSTATE {PREPARATION, READY}
+
+	public static enum ZOOM {ZOOMUP, ZOOMDOWN}
 }

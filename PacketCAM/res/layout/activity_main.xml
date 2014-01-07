@@ -15,16 +15,16 @@
 		    android:keepScreenOn="true"/>
 
     <!--SurfaceViewは削除する-->
-    <SurfaceView
-        android:id="@+id/surfaceView1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginBottom="0dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginTop="0dp" />
+    <!--<SurfaceView-->
+        <!--android:id="@+id/surfaceView1"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:layout_marginBottom="0dp"-->
+        <!--android:layout_marginLeft="0dp"-->
+        <!--android:layout_marginRight="0dp"-->
+        <!--android:layout_marginTop="0dp" />-->
 
     <!--<FrameLayout-->
         <!--android:id="@+id/frameLayout1"-->

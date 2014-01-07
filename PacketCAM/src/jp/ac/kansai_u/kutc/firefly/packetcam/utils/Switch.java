@@ -17,6 +17,7 @@ public class Switch {
 	private DRAWSTATE drawstate = DRAWSTATE.PREPARATION;
 
 	private boolean shutter = false;
+	private boolean inoutStatus = false;
 
 	public VISIBILITY getVisibility()
 	{
@@ -86,6 +87,23 @@ public class Switch {
 		else
 		{
 			status = STATUS.STOP;
+		}
+	}
+
+	public boolean getCameraInOut()
+	{
+		return inoutStatus;
+	}
+
+	public void switchCameraInOut()
+	{
+		if (!inoutStatus)
+		{
+			inoutStatus = true;
+		}
+		else
+		{
+			inoutStatus = false;
 		}
 	}
 }

@@ -1,7 +1,8 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.opengl;
 
+import android.opengl.GLU;
 import android.util.Log;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.POSITION;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.*;
 
 import javax.microedition.khronos.opengles.GL10;
 import java.nio.ByteBuffer;
@@ -14,8 +15,7 @@ import java.nio.IntBuffer;
  * このクラスの中で様々な図形の描画メソッドを定義し，GLViewにおいて適宜
  * 該当メソッドを指定して描画させればいい感じかもしれない
  */
-public class Draw2D
-{
+public class Draw2D {
 	// Java NIOに転送した頂点バッファや色バッファを格納する変数を定義
 	// 頂点バッファ
 	private FloatBuffer mVertexBuffer;
@@ -23,61 +23,106 @@ public class Draw2D
 	// 色バッファ
 	private FloatBuffer mColorBuffer;
 
+	private float colors[] = {};
+
+	private static int mWidth = 0, mHeight = 0;
+
 
 	/**
-	 * コンストラクタ
+	 * 図形オブジェクトの描画位置と描画カラーを設定する
+	 * @param x x座標
+	 * @param y y座標
+	 * @param w 幅
+	 * @param h 高さ
+	 * @param color EnumクラスのCOLORで指定できる色
 	 */
-	public Draw2D(POSITION position)
+	public Draw2D (int x, int y, int w, int h, COLOR color)
 	{
-		if (position == POSITION.A)
+		float left = (float)x;
+		float right = (float)x + (float)w;
+		float bottom = (float)y;
+		float top = (float)y + (float)h;
+
+
+		// 最初の描画で上３つ，次の描画で下の３つが使われ，２個の三角形で四角形を描画する
+		float positions[] = {
+				//x, y
+				left, bottom, // 左下
+				right, bottom, // 右下
+				left, top, // 左上
+				right, top, // 右上
+		};
+
+		if (color == COLOR.RED)
 		{
-			Log.d("Draw2D", "makeFloatBufferA");
-
-			// 図形の頂点の配列，色の配列を定義
-			// 頂点情報の配列（x,y）＝（200f, 200f）
-			// OpenGLの座標系は，左下が（0, 0）になっている
-			float vertices[] = {
-					200f, 200f,
-					250f, 250f,
-					100f, 300f
-			};
-
-			// 色情報の配列（Red, Green, Blue, Alpha）
 			float colors[] = {
-					1f, 1f, 1f, 1f,
-					1f, 1f, 1f, 1f,
-					1f, 1f, 1f, 1f,
+					1f, 0f, 0f, 0.75f,
+					1f, 0f, 0f, 0.75f,
+					1f, 0f, 0f, 0.75f,
+					1f, 0f, 0f, 0.75f,
 			};
-
-			mVertexBuffer = makeFloatBuffer(vertices);
-			mColorBuffer = makeFloatBuffer(colors);
+			this.colors = colors;
 		}
-		else if (position == POSITION.B)
+		if (color == COLOR.GREEN)
 		{
-			Log.d("Draw2D", "makeFloatBufferB");
-			float vertices[] = {
-					500f, 500f,
-					550f, 550f,
-					400f, 600f,
-			};
 			float colors[] = {
-					1f, 1f, 1f, 1f,
-					1f, 1f, 1f, 1f,
-					1f, 1f, 1f, 1f,
+					0f, 1f, 0f, 0.75f,
+					0f, 1f, 0f, 0.75f,
+					0f, 1f, 0f, 0.75f,
+					0f, 1f, 0f, 0.75f,
 			};
-
-			mVertexBuffer = makeFloatBuffer(vertices);
-			mColorBuffer = makeFloatBuffer(colors);
+			this.colors = colors;
 		}
+		if (color == COLOR.BLUE)
+		{
+			float colors[] = {
+					0f, 0f, 1f, 0.75f,
+					0f, 0f, 1f, 0.75f,
+					0f, 0f, 1f, 0.75f,
+					0f, 0f, 1f, 0.75f,
+			};
+			this.colors = colors;
+		}
+		if (color == COLOR.BLACK)
+		{
+			float colors[] = {
+					0f, 0f, 0f, 0.75f,
+					0f, 0f, 0f, 0.75f,
+					0f, 0f, 0f, 0.75f,
+					0f, 0f, 0f, 0.75f,
+			};
+			this.colors = colors;
+		}
+
+		mVertexBuffer = makeFloatBuffer(positions);
+		mColorBuffer = makeFloatBuffer(colors);
+	}
+
+
+	public void setSize(int width, int height)
+	{
+		mWidth = width; mHeight = height;
 	}
 
 
 	/**
-	 * オブジェクトの描画設定メソッド
+	 * オブジェクトの描画メソッド
 	 * @param gl
 	 */
 	public void draw (GL10 gl)
 	{
+		gl.glMatrixMode(GL10.GL_PROJECTION);
+		gl.glLoadIdentity();
+
+		GLU.gluOrtho2D(gl, 0.0f, mWidth, 0.0f, mHeight);
+
+		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+
+		gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
+
+		gl.glMatrixMode(GL10.GL_MODELVIEW);
+
+		gl.glLoadIdentity();
 		// 点のサイズ
 		gl.glPointSize(10);
 
@@ -88,7 +133,9 @@ public class Draw2D
 		gl.glColorPointer(4, GL10.GL_FLOAT, 0, mColorBuffer);
 
 		// 描画モード（点とか線とかいろいろ）を設定
-		gl.glDrawArrays(GL10.GL_TRIANGLES, 0, 3);
+		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+		gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 	}
 
 

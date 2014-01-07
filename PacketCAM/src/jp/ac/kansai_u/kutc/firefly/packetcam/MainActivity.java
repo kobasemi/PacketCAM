@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
@@ -22,11 +23,12 @@ import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.DrawCamera;
 import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.GLView;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingButtonClickListener;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingsManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.*;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,29 +38,21 @@ import java.util.List;
 
 public class MainActivity extends Activity
 {
-	private static Camera camera;
+	private static final String TAG = MainActivity.class.getSimpleName();
 
-	private GLView glView;
-	// 画面タッチの2度押し禁止用フラグ
-	private boolean mIsTake = false;
+	private GLView mGLView;
+	private Switch mSwitch = Switch.getInstance();
 
-	// カメラFlashON・OFFフラグ
-	private boolean status = false;
 
 	// INOUTフラグ
 	private boolean inoutstatus = false;
-	// 画像サイズ（height，width）
-	Size picSize = null;
-
-	// プレビューサイズ
-	// Size preSize = null;
-
-	private static final String TAG = "MainActivity";
 
 	// アラートの飛び対策
 	private boolean alert1_1 = false;
 
-	public static Bitmap effectBitmap = null;
+	private DrawCamera mDrawCamera;
+
+	private Context context = this;
 
 	/**
 	 * アクティビティ起動時に呼び出される
@@ -74,19 +68,9 @@ public class MainActivity extends Activity
 
 		setContentView (R.layout.activity_main);
 
-		glView = new GLView(MainActivity.this);
+		mGLView = new GLView(this);
+		mDrawCamera = new DrawCamera();
 
-		// TODO SurfaceViewを使わないので，以下を削除
-		// カメラプレビュー用のViewを準備
-		SurfaceView surfaceView = (SurfaceView) findViewById (R.id.surfaceView1);
-		final SurfaceHolder holder = surfaceView.getHolder ();
-		holder.addCallback (surfaceListener);
-
-		// 非推奨だが，3.0以前のAndroidバージョンでは必要らしい
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB)
-		{
-			holder.setType (SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		}
 
         // 設定マネージャにアクティビティをセット + 初期処理
         SettingsManager.getInstance().setActivity(MainActivity.this);
@@ -117,58 +101,60 @@ public class MainActivity extends Activity
 			@TargetApi (Build.VERSION_CODES.GINGERBREAD)
 			public void onClick (View v)
 			{
+				mDrawCamera.inoutChange(context);
+
 				// カメラが複数あるかチェック
-				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD)
-				{
-					return;
-				}
-
-				int numberOfCameras = Camera.getNumberOfCameras ();
-				Toast.makeText (MainActivity.this, "NumberOfCameras :" + numberOfCameras, Toast.LENGTH_SHORT).show ();
-				if (numberOfCameras == 1)
-				{
-					Toast.makeText (MainActivity.this, "Cameraが一つです", Toast.LENGTH_SHORT).show ();
-					return;
-
-				}
-
-				// 現在利用しているカメラを解放
-				if (camera != null)
-				{
-					camera.release ();
-				}
-
-				// カメラを切り替え
-				if (!inoutstatus)
-				{
-					camera = Camera.open (1);
-					inoutstatus = true;
-				}
-				else
-				{
-					camera = Camera.open (0);
-					inoutstatus = false;
-
-				}
-				try
-				{
-					camera.setPreviewDisplay (holder);
-					
-					Camera.Parameters param = camera.getParameters();
-					List <Size> previewSizes = camera.getParameters().getSupportedPreviewSizes();
-					Size size = previewSizes.get (0);
-					
-					param.setPreviewSize (size.width, size.height);
-					camera.setParameters (param);
-					holder.setFixedSize (size.width, size.height);
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace ();
-				}
-
-				// プレビュー再開
-				camera.startPreview ();
+//				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD)
+//				{
+//					return;
+//				}
+//
+//				int numberOfCameras = Camera.getNumberOfCameras ();
+//				Toast.makeText (MainActivity.this, "NumberOfCameras :" + numberOfCameras, Toast.LENGTH_SHORT).show ();
+//				if (numberOfCameras == 1)
+//				{
+//					Toast.makeText (MainActivity.this, "Cameraが一つです", Toast.LENGTH_SHORT).show ();
+//					return;
+//
+//				}
+//
+//				// 現在利用しているカメラを解放
+//				if (camera != null)
+//				{
+//					camera.release ();
+//				}
+//
+//				// カメラを切り替え
+//				if (!inoutstatus)
+//				{
+//					camera = Camera.open (1);
+//					inoutstatus = true;
+//				}
+//				else
+//				{
+//					camera = Camera.open (0);
+//					inoutstatus = false;
+//
+//				}
+//				try
+//				{
+//					camera.setPreviewDisplay (holder);
+//
+//					Camera.Parameters param = camera.getParameters();
+//					List <Size> previewSizes = camera.getParameters().getSupportedPreviewSizes();
+//					Size size = previewSizes.get (0);
+//
+//					param.setPreviewSize (size.width, size.height);
+//					camera.setParameters (param);
+//					holder.setFixedSize (size.width, size.height);
+//				}
+//				catch (Exception e)
+//				{
+//					e.printStackTrace ();
+//				}
+//
+//				// プレビュー再開
+//				camera.startPreview ();
 			}
 		});
 		
@@ -179,18 +165,20 @@ public class MainActivity extends Activity
 			@Override
 			public void onClick (View v)
 			{
-				if (camera != null)
-				{
-					if (!mIsTake)
-					{
-						Toast.makeText (MainActivity.this, "撮影", Toast.LENGTH_SHORT).show();
-						mIsTake = true;
-						camera.autoFocus (mAutoFocusListener);
-
-						// エフェクト画面の合成素材Bitmapを作成し、本クラスのeffectBitmapに格納
-						glView.setShutter();
-					}
-				}
+//				if (camera != null)
+//				{
+//					if (!mIsTake)
+//					{
+//						Toast.makeText (MainActivity.this, "撮影", Toast.LENGTH_SHORT).show();
+//						mIsTake = true;
+//						camera.autoFocus (mAutoFocusListener);
+//
+//						// エフェクト画面の合成素材Bitmapを作成し、本クラスのeffectBitmapに格納
+//						glView.setShutter();
+//					}
+//				}
+				Toast.makeText(MainActivity.this, "パシャッ", Toast.LENGTH_SHORT).show();
+				mGLView.setShutter();
 			}
 			
 		});
@@ -206,103 +194,106 @@ public class MainActivity extends Activity
 			@Override
 			public void onClick (View v)
 			{
-				if (glView.visibility == Enum.VISIBILITY.INVISIBLE){
+				if (mSwitch.getVisibility() == VISIBILITY.INVISIBLE)
+				{
 					effectBtn.setImageResource(R.drawable.effect_on);
 
 					// エフェクトを表示
-					glView.setTransparent();
-				}else if (glView.visibility == Enum.VISIBILITY.VISIBLE){
+					mGLView.setTransparent();
+				}
+				else if (mSwitch.getVisibility() == VISIBILITY.VISIBLE)
+				{
 					effectBtn.setImageResource(R.drawable.effect_off);
 
 					// エフェクトを非表示
-					glView.setTransparent();
+					mGLView.setTransparent();
 				}
 			}
 		});
 	}
 
-    public static Camera getCamera(){ return camera; }
+//    public static Camera getCamera(){ return camera; }
 
-	private SurfaceHolder.Callback surfaceListener = new SurfaceHolder.Callback ()
-	{
-		/**
-		 * SurfaceViewが生成されたらカメラをオープンする
-		 */
-		public void surfaceCreated (SurfaceHolder holder)
-		{
-			camera = Camera.open ();
-			try
-			{
-				camera.setPreviewDisplay (holder);
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace ();
-			}
-		}
-
-
-		/**
-		 * SurfaceViewが破棄されたらカメラを解放する
-		 */
-		public void surfaceDestroyed (SurfaceHolder holder)
-		{
-			camera.release ();
-			camera = null;
-		}
-
-
-		/**
-		 * SurfaceViewの大きさやフォーマットが変わったらプレビューの大きさを設定する
-		 */
-		public void surfaceChanged (SurfaceHolder holder, int format, int width, int height)
-		{
-			/**
-			 * 古い端末ではstartPreviewが正常に開始されない
-			 */
-			try
-			{
-				Camera.Parameters parameters = camera.getParameters ();
-
-				// Size size = getOptimalPreviewSize (parameters);
-
-				List <Size> previewSizes = camera.getParameters ().getSupportedPreviewSizes ();
-				Size size = previewSizes.get (0);
-
-				parameters.setPreviewSize (size.width, size.height);
-
-				camera.setParameters (parameters);
-
-				holder.setFixedSize (size.width, size.height);
-
-				// （端末によっては以下のコードを代わりに実行する必要があるかも）
-				// List <Size> supportedSizes =
-				// Reflect.getSuportedPreviewSizes(parameters);
-				//
-				// if (supportedSizes != null && supportedSizes.size() > 0)
-				// {
-				// Log.d(TAG, "supportedSizeIsNotNull");
-				// Size size = supportedSizes.get(0);
-				//
-				// Log.d(TAG, "sizeHeight = " + size.height + "sizeWidth = " +
-				// size.width);
-				//
-				//
-				// parameters.setPreviewSize(size.width, size.height);
-				// camera.setParameters(parameters);
-				// }
-				// ここまで
-
-				camera.startPreview ();
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace ();
-				String a = e.getMessage ();
-				Log.d (TAG, a);
-			}
-		}
-	};
+//	private SurfaceHolder.Callback surfaceListener = new SurfaceHolder.Callback ()
+//	{
+//		/**
+//		 * SurfaceViewが生成されたらカメラをオープンする
+//		 */
+//		public void surfaceCreated (SurfaceHolder holder)
+//		{
+//			camera = Camera.open ();
+//			try
+//			{
+//				camera.setPreviewDisplay (holder);
+//			}
+//			catch (Exception e)
+//			{
+//				e.printStackTrace ();
+//			}
+//		}
+//
+//
+//		/**
+//		 * SurfaceViewが破棄されたらカメラを解放する
+//		 */
+//		public void surfaceDestroyed (SurfaceHolder holder)
+//		{
+//			camera.release ();
+//			camera = null;
+//		}
+//
+//
+//		/**
+//		 * SurfaceViewの大きさやフォーマットが変わったらプレビューの大きさを設定する
+//		 */
+//		public void surfaceChanged (SurfaceHolder holder, int format, int width, int height)
+//		{
+//			/**
+//			 * 古い端末ではstartPreviewが正常に開始されない
+//			 */
+//			try
+//			{
+//				Camera.Parameters parameters = camera.getParameters ();
+//
+//				// Size size = getOptimalPreviewSize (parameters);
+//
+//				List <Size> previewSizes = camera.getParameters ().getSupportedPreviewSizes ();
+//				Size size = previewSizes.get (0);
+//
+//				parameters.setPreviewSize (size.width, size.height);
+//
+//				camera.setParameters (parameters);
+//
+//				holder.setFixedSize (size.width, size.height);
+//
+//				// （端末によっては以下のコードを代わりに実行する必要があるかも）
+//				// List <Size> supportedSizes =
+//				// Reflect.getSuportedPreviewSizes(parameters);
+//				//
+//				// if (supportedSizes != null && supportedSizes.size() > 0)
+//				// {
+//				// Log.d(TAG, "supportedSizeIsNotNull");
+//				// Size size = supportedSizes.get(0);
+//				//
+//				// Log.d(TAG, "sizeHeight = " + size.height + "sizeWidth = " +
+//				// size.width);
+//				//
+//				//
+//				// parameters.setPreviewSize(size.width, size.height);
+//				// camera.setParameters(parameters);
+//				// }
+//				// ここまで
+//
+//				camera.startPreview ();
+//			}
+//			catch (Exception e)
+//			{
+//				e.printStackTrace ();
+//				String a = e.getMessage ();
+//				Log.d (TAG, a);
+//			}
+//		}
+//	};
 
 
 	/**
@@ -336,168 +327,167 @@ public class MainActivity extends Activity
 		return optimalSize;
 	}
 
-	/**
-	 * オートフォーカス完了のコールバック
-	 */
-	private Camera.AutoFocusCallback mAutoFocusListener = new Camera.AutoFocusCallback ()
-	{
-
-		@Override
-		public void onAutoFocus (boolean success, Camera camera)
-		{
-			camera.takePicture (null, null, pictureListener);
-		}
-	};
-
-	/**
-	 * シャッターが押された時に呼ばれるコールバック（画面タッチで撮影を行うため，コメントアウト）
-	 */
-	private Camera.ShutterCallback shutterListener = new Camera.ShutterCallback ()
-	{
-		public void onShutter ()
-		{
-			if (camera != null)
-			{
-				if (!mIsTake)
-				{
-					Toast.makeText (MainActivity.this, "撮影", Toast.LENGTH_SHORT).show ();
-					mIsTake = true;
-					// オートフォーカス
-					camera.autoFocus (mAutoFocusListener);
-				}
-			}
-
-		}
-	};
-
-	/**
-	 * イメージデータ生成後に呼ばれるコールバック
-	 */
-	private Camera.PictureCallback pictureListener = new Camera.PictureCallback ()
-	{
-		public void onPictureTaken (byte[] data, Camera camera)
-		{
-			if (data == null || effectBitmap == null)
-			{
-				effectBitmap = null;
-				return;
-			}
-
-
-			try
-			{
-				Log.d(TAG, "tryIn");
-				// createBitmapより，画像データを生成
-
-				// オーバーレイ表示された画像との合成処理を行う
-				// カメラのイメージ
-
-				BitmapFactory.Options options = new BitmapFactory.Options ();
-				options.inPurgeable = true;
-
-				Bitmap cameraBitmap = BitmapFactory.decodeByteArray (data, 0, data.length, options);
-
-				// 空のイメージを作成
-				Bitmap offBitmap = Bitmap.createBitmap (cameraBitmap.getWidth (), cameraBitmap.getHeight (), Bitmap.Config.ARGB_8888);
-
-				Canvas offScreen = new Canvas (offBitmap);
-
-				// 画像の合成処理
-				offScreen.drawBitmap (cameraBitmap, null, new Rect (0, 0, cameraBitmap.getWidth (), cameraBitmap.getHeight ()), null);
-				offScreen.drawBitmap (effectBitmap, null, new Rect (0, 0, cameraBitmap.getWidth (), cameraBitmap.getHeight ()), null);
-
-				// 合成した画像：offBitmap
-
-				// ファイル名を設定
-				Calendar cal = Calendar.getInstance ();
-				SimpleDateFormat sf = new SimpleDateFormat ("yyyyMMdd_HHmmss");
-				String imgPath = Path.PICFOLDER_PATH + File.separator + sf.format (cal.getTime ()) + ".jpg";
-
-				FileOutputStream fos;
-				fos = new FileOutputStream (imgPath, true);
-				// fos.write (data);
-
-				Log.d(TAG, "output");
-
-				offBitmap.compress (CompressFormat.JPEG, 100, fos);
-				fos.close ();
-
-				// Androidのデータベースへ登録
-				// 登録しないとギャラリーなどにすぐに反映されないらしい
-				registAndroidDB (imgPath);
-
-				Log.d(TAG, "tryEnd");
-			}
-			catch (Exception e)
-			{
-				Toast.makeText (MainActivity.this, e.getMessage (), Toast.LENGTH_SHORT).show ();
-			}
-			catch (OutOfMemoryError e)
-			{
-				Log.d (TAG, "OutOfMemory");
-				Toast.makeText (MainActivity.this, "このサイズでは撮影できません,", Toast.LENGTH_SHORT).show ();
-			}
-
-			camera.startPreview ();
-
-			mIsTake = false;
-		}
-	};
-
-	/**
-	 * Androidのギャラリーに画像を登録する
-	 * 
-	 * @param path
-	 *        画像の保存パス
-	 */
-	private void registAndroidDB (String path)
-	{
-		ContentValues values = new ContentValues ();
-		ContentResolver contentResolver = MainActivity.this.getContentResolver ();
-		values.put (Images.Media.MIME_TYPE, "image/jpeg");
-		values.put ("_data", path);
-		contentResolver.insert (MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-	}
+//	/**
+//	 * オートフォーカス完了のコールバック
+//	 */
+//	private Camera.AutoFocusCallback mAutoFocusListener = new Camera.AutoFocusCallback ()
+//	{
+//
+//		@Override
+//		public void onAutoFocus (boolean success, Camera camera)
+//		{
+//			camera.takePicture (null, null, pictureListener);
+//		}
+//	};
+//
+//	/**
+//	 * シャッターが押された時に呼ばれるコールバック（画面タッチで撮影を行うため，コメントアウト）
+//	 */
+//	private Camera.ShutterCallback shutterListener = new Camera.ShutterCallback ()
+//	{
+//		public void onShutter ()
+//		{
+//			if (camera != null)
+//			{
+//				if (!mIsTake)
+//				{
+//					Toast.makeText (MainActivity.this, "撮影", Toast.LENGTH_SHORT).show ();
+//					mIsTake = true;
+//					// オートフォーカス
+//					camera.autoFocus (mAutoFocusListener);
+//				}
+//			}
+//
+//		}
+//	};
+//
+//	/**
+//	 * イメージデータ生成後に呼ばれるコールバック
+//	 */
+//	private Camera.PictureCallback pictureListener = new Camera.PictureCallback ()
+//	{
+//		public void onPictureTaken (byte[] data, Camera camera)
+//		{
+//			if (data == null || effectBitmap == null)
+//			{
+//				effectBitmap = null;
+//				return;
+//			}
+//
+//
+//			try
+//			{
+//				Log.d(TAG, "tryIn");
+//				// createBitmapより，画像データを生成
+//
+//				// オーバーレイ表示された画像との合成処理を行う
+//				// カメラのイメージ
+//
+//				BitmapFactory.Options options = new BitmapFactory.Options ();
+//				options.inPurgeable = true;
+//
+//				Bitmap cameraBitmap = BitmapFactory.decodeByteArray (data, 0, data.length, options);
+//
+//				// 空のイメージを作成
+//				Bitmap offBitmap = Bitmap.createBitmap (cameraBitmap.getWidth (), cameraBitmap.getHeight (), Bitmap.Config.ARGB_8888);
+//
+//				Canvas offScreen = new Canvas (offBitmap);
+//
+//				// 画像の合成処理
+//				offScreen.drawBitmap (cameraBitmap, null, new Rect (0, 0, cameraBitmap.getWidth (), cameraBitmap.getHeight ()), null);
+//				offScreen.drawBitmap (effectBitmap, null, new Rect (0, 0, cameraBitmap.getWidth (), cameraBitmap.getHeight ()), null);
+//
+//				// 合成した画像：offBitmap
+//
+//				// ファイル名を設定
+//				Calendar cal = Calendar.getInstance ();
+//				SimpleDateFormat sf = new SimpleDateFormat ("yyyyMMdd_HHmmss");
+//				String imgPath = Path.PICFOLDER_PATH + File.separator + sf.format (cal.getTime ()) + ".jpg";
+//
+//				FileOutputStream fos;
+//				fos = new FileOutputStream (imgPath, true);
+//				// fos.write (data);
+//
+//				Log.d(TAG, "output");
+//
+//				offBitmap.compress (CompressFormat.JPEG, 100, fos);
+//				fos.close ();
+//
+//				// Androidのデータベースへ登録
+//				// 登録しないとギャラリーなどにすぐに反映されないらしい
+//				registAndroidDB (imgPath);
+//
+//				Log.d(TAG, "tryEnd");
+//			}
+//			catch (Exception e)
+//			{
+//				Toast.makeText (MainActivity.this, e.getMessage (), Toast.LENGTH_SHORT).show ();
+//			}
+//			catch (OutOfMemoryError e)
+//			{
+//				Log.d (TAG, "OutOfMemory");
+//				Toast.makeText (MainActivity.this, "このサイズでは撮影できません,", Toast.LENGTH_SHORT).show ();
+//			}
+//
+//			camera.startPreview ();
+//
+//			mIsTake = false;
+//		}
+//	};
+//
+//	/**
+//	 * Androidのギャラリーに画像を登録する
+//	 *
+//	 * @param path
+//	 *        画像の保存パス
+//	 */
+//	private void registAndroidDB (String path)
+//	{
+//		ContentValues values = new ContentValues ();
+//		ContentResolver contentResolver = MainActivity.this.getContentResolver ();
+//		values.put (Images.Media.MIME_TYPE, "image/jpeg");
+//		values.put ("_data", path);
+//		contentResolver.insert (MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+//
+//	}
 
 	@Override
 	public boolean dispatchKeyEvent (KeyEvent event)
 	{
-		int nowZoom;
-		Camera.Parameters parameter;
-		List <Size> previewSizes = camera.getParameters ().getSupportedPreviewSizes ();
+//		int nowZoom;
+//		Camera.Parameters parameter;
 
 		switch (event.getAction ())
 		{
-			case KeyEvent.ACTION_DOWN:
-				switch (event.getKeyCode ())
-				{
-					case KeyEvent.KEYCODE_VOLUME_UP:
-						// ズームイン機能
-						parameter = camera.getParameters ();
-						nowZoom = parameter.getZoom ();
-
-						if (nowZoom < parameter.getMaxZoom ())
-						{
-							parameter.setZoom (nowZoom + 1);
-						}
-						camera.setParameters (parameter);
-						return true;
-					case KeyEvent.KEYCODE_VOLUME_DOWN:
-						// ズームアウト機能
-						parameter = camera.getParameters ();
-						nowZoom = parameter.getZoom ();
-
-						if (nowZoom > 0)
-						{
-							parameter.setZoom (nowZoom - 1);
-						}
-						camera.setParameters (parameter);
-						return true;
-					default:
-						break;
-				}
-				break;
+//			case KeyEvent.ACTION_DOWN:
+//				switch (event.getKeyCode ())
+//				{
+//					case KeyEvent.KEYCODE_VOLUME_UP:
+//						// ズームイン機能
+//						parameter = camera.getParameters ();
+//						nowZoom = parameter.getZoom ();
+//
+//						if (nowZoom < parameter.getMaxZoom ())
+//						{
+//							parameter.setZoom (nowZoom + 1);
+//						}
+//						camera.setParameters (parameter);
+//						return true;
+//					case KeyEvent.KEYCODE_VOLUME_DOWN:
+//						// ズームアウト機能
+//						parameter = camera.getParameters ();
+//						nowZoom = parameter.getZoom ();
+//
+//						if (nowZoom > 0)
+//						{
+//							parameter.setZoom (nowZoom - 1);
+//						}
+//						camera.setParameters (parameter);
+//						return true;
+//					default:
+//						break;
+//				}
+//				break;
 			case KeyEvent.ACTION_UP:
 				switch (event.getKeyCode ())
 				{
@@ -521,4 +511,15 @@ public class MainActivity extends Activity
         getMenuInflater ().inflate (R.menu.main, menu);
         return true;
     }
+
+	@Override
+	protected void onPause()
+	{
+		synchronized (mDrawCamera)
+		{
+			// TODO これがうまいこと機能してないかも
+			mDrawCamera.calledWhenOnPause();
+			super.onPause();
+		}
+	}
 }
