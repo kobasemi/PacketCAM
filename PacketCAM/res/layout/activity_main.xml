@@ -48,7 +48,7 @@
         android:layout_marginRight="10dp"
         android:background="@null"
         android:contentDescription="@string/effect"
-        android:src="@drawable/effect_on" />
+        android:src="@drawable/effect_off" />
 
     <!--<ImageButton-->
         <!--android:id="@+id/inout"-->

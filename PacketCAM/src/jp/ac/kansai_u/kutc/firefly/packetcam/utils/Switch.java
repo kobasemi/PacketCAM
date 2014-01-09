@@ -12,7 +12,7 @@ public class Switch {
 	private static Switch instance = new Switch();
 	public static Switch getInstance() {return instance;}
 
-	private VISIBILITY visibility = VISIBILITY.VISIBLE;
+	private VISIBILITY visibility = VISIBILITY.INVISIBLE;
 	private STATUS status = STATUS.STOP;
 	private DRAWSTATE drawstate = DRAWSTATE.PREPARATION;
 
