@@ -1,8 +1,7 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.opengl;
 
 import android.opengl.GLU;
-import android.util.Log;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.*;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.COLOR;
 
 import javax.microedition.khronos.opengles.GL10;
 import java.nio.ByteBuffer;
@@ -53,49 +52,7 @@ public class Draw2D {
 				right, top, // 右上
 		};
 
-
-		//region Color
-		if (color == COLOR.RED)
-		{
-			float colors[] = {
-					1f, 0f, 0f, 0.75f,
-					1f, 0f, 0f, 0.75f,
-					1f, 0f, 0f, 0.75f,
-					1f, 0f, 0f, 0.75f,
-			};
-			this.colors = colors;
-		}
-		if (color == COLOR.GREEN)
-		{
-			float colors[] = {
-					0f, 1f, 0f, 0.75f,
-					0f, 1f, 0f, 0.75f,
-					0f, 1f, 0f, 0.75f,
-					0f, 1f, 0f, 0.75f,
-			};
-			this.colors = colors;
-		}
-		if (color == COLOR.BLUE)
-		{
-			float colors[] = {
-					0f, 0f, 1f, 0.75f,
-					0f, 0f, 1f, 0.75f,
-					0f, 0f, 1f, 0.75f,
-					0f, 0f, 1f, 0.75f,
-			};
-			this.colors = colors;
-		}
-		if (color == COLOR.BLACK)
-		{
-			float colors[] = {
-					0f, 0f, 0f, 0.75f,
-					0f, 0f, 0f, 0.75f,
-					0f, 0f, 0f, 0.75f,
-					0f, 0f, 0f, 0.75f,
-			};
-			this.colors = colors;
-		}
-		//endregion
+        this.colors = GL_Color.getColorArray(color);
 
 		mVertexBuffer = makeFloatBuffer(positions);
 		mColorBuffer = makeFloatBuffer(colors);
