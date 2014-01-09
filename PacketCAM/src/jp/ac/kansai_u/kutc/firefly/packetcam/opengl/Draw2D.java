@@ -53,6 +53,8 @@ public class Draw2D {
 				right, top, // 右上
 		};
 
+
+		//region Color
 		if (color == COLOR.RED)
 		{
 			float colors[] = {
@@ -93,6 +95,7 @@ public class Draw2D {
 			};
 			this.colors = colors;
 		}
+		//endregion
 
 		mVertexBuffer = makeFloatBuffer(positions);
 		mColorBuffer = makeFloatBuffer(colors);

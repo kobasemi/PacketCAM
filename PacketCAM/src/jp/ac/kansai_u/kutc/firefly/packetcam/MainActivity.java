@@ -95,14 +95,14 @@ public class MainActivity extends Activity
 
 		// TODO ボタンイベントだけ拾っておいて，処理は別クラスで行うようにする（Switchを利用）
 		// カメラ切り替えボタン
-		ImageButton INOUTBtn = (ImageButton) findViewById (R.id.inout);
-		INOUTBtn.setOnClickListener (new OnClickListener ()
-		{
-			@TargetApi (Build.VERSION_CODES.GINGERBREAD)
-			public void onClick (View v)
-			{
-				mDrawCamera.inoutChange(context);
-
+//		ImageButton INOUTBtn = (ImageButton) findViewById (R.id.inout);
+//		INOUTBtn.setOnClickListener (new OnClickListener ()
+//		{
+//			@TargetApi (Build.VERSION_CODES.GINGERBREAD)
+//			public void onClick (View v)
+//			{
+//				mDrawCamera.inoutChange(context);
+//
 				// カメラが複数あるかチェック
 //				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD)
 //				{
@@ -155,9 +155,9 @@ public class MainActivity extends Activity
 //
 //				// プレビュー再開
 //				camera.startPreview ();
-			}
-		});
-		
+//			}
+//		});
+//
 		// シャッターボタン
 		ImageButton shutterBtn = (ImageButton) findViewById(R.id.shutter);
 		shutterBtn.setOnClickListener (new OnClickListener()
@@ -459,10 +459,11 @@ public class MainActivity extends Activity
 
 		switch (event.getAction ())
 		{
-//			case KeyEvent.ACTION_DOWN:
-//				switch (event.getKeyCode ())
-//				{
-//					case KeyEvent.KEYCODE_VOLUME_UP:
+			case KeyEvent.ACTION_DOWN:
+				switch (event.getKeyCode ())
+				{
+					case KeyEvent.KEYCODE_VOLUME_UP:
+						mDrawCamera.zoom(ZOOM.ZOOMUP);
 //						// ズームイン機能
 //						parameter = camera.getParameters ();
 //						nowZoom = parameter.getZoom ();
@@ -472,9 +473,10 @@ public class MainActivity extends Activity
 //							parameter.setZoom (nowZoom + 1);
 //						}
 //						camera.setParameters (parameter);
-//						return true;
-//					case KeyEvent.KEYCODE_VOLUME_DOWN:
-//						// ズームアウト機能
+						return true;
+					case KeyEvent.KEYCODE_VOLUME_DOWN:
+						// ズームダウン機能
+						mDrawCamera.zoom(ZOOM.ZOOMDOWN);
 //						parameter = camera.getParameters ();
 //						nowZoom = parameter.getZoom ();
 //
@@ -483,11 +485,11 @@ public class MainActivity extends Activity
 //							parameter.setZoom (nowZoom - 1);
 //						}
 //						camera.setParameters (parameter);
-//						return true;
-//					default:
-//						break;
-//				}
-//				break;
+						return true;
+					default:
+						break;
+				}
+				break;
 			case KeyEvent.ACTION_UP:
 				switch (event.getKeyCode ())
 				{

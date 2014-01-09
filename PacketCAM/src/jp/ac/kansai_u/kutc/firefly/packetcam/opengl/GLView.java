@@ -204,6 +204,7 @@ class ClearRenderer implements GLSurfaceView.Renderer
 	/**
 	 * 新たなオブジェクトを生成する
 	 */
+	// TODO ここに座標などの情報を渡して新規オブジェクトの作成をオーダーする
 	public void newGraphic()
 	{
 		Log.d(TAG, "newGraphic()");

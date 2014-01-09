@@ -16,7 +16,8 @@ import java.util.List;
 
 import static android.opengl.GLES11Ext.GL_TEXTURE_EXTERNAL_OES;
 /**
- * Created by black_000 on 14/01/07.
+ * Created by Kousaka on 14/01/07.
+ * カメラプレビューに関する処理を行うクラス
  */
 public class DrawCamera {
 
@@ -33,6 +34,7 @@ public class DrawCamera {
 
 	private int nowZoom;
 
+	// 描画先の座標
 	private float vertices[] = {
 			// 上下を反転させる必要がある
 			-1.0f, 1.0f, 0, // 左下
@@ -41,6 +43,7 @@ public class DrawCamera {
 			1.0f, -1.0f, 0, // 右上
 	};
 
+	// 描画元の座標
 	private float texcoords[] = {
 			0.0f, 0.0f, // 左下
 			1.0f, 0.0f, // 右下
@@ -128,10 +131,8 @@ public class DrawCamera {
 				}
 			});
 
-			/****************************************************************************/
-			/*************************     カメラ設定関連     ***************************/
-			/****************************************************************************/
 
+			//region カメラの設定
 			mCamera = Camera.open();
 
 			Camera.Parameters parameters = mCamera.getParameters();
@@ -150,55 +151,55 @@ public class DrawCamera {
 			}
 
 			mCamera.startPreview();
+			//endregion
 		}
 	}
 
 
-	public void inoutChange(Context context)
-	{
-		int numberOfCameras = Camera.getNumberOfCameras();
-		Toast.makeText(context, "NumberOfCameras :" + numberOfCameras, Toast.LENGTH_SHORT).show ();
-		if (numberOfCameras == 1)
-		{
-			Toast.makeText (context, "Cameraが一つです", Toast.LENGTH_SHORT).show ();
-			return;
-		}
 
-		// 現在利用しているカメラを解放
-		if (mCamera != null)
-		{
-			mCamera.release();
-		}
-
-		// カメラを切り替え
-		if (!mSwitch.getCameraInOut())
-		{
-			mCamera = Camera.open(1);
-			mSwitch.switchCameraInOut();
-		}
-		else
-		{
-			mCamera = Camera.open(0);
-			mSwitch.switchCameraInOut();
-		}
-
-		Camera.Parameters parameters = mCamera.getParameters();
-		List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
-		Camera.Size size = previewSizes.get(0);
-		parameters.setPreviewSize(size.width, size.height);
-		mCamera.setParameters(parameters);
-
-		try
-		{
-			mCamera.setPreviewTexture(mSurfaceTexture);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-
-		mCamera.startPreview();
-	}
+//	public void inoutChange(Context context)
+//	{
+//		int numberOfCameras = Camera.getNumberOfCameras();
+//		if (numberOfCameras == 1)
+//		{
+//			return;
+//		}
+//
+//		// 現在利用しているカメラを解放
+//		if (mCamera != null)
+//		{
+//			mCamera.release();
+//		}
+//
+//		// カメラを切り替え
+//		if (!mSwitch.getCameraInOut())
+//		{
+//			mCamera = Camera.open(1);
+//			mSwitch.switchCameraInOut();
+//		}
+//		else
+//		{
+//			mCamera = Camera.open(0);
+//			mSwitch.switchCameraInOut();
+//		}
+//
+//		Camera.Parameters parameters = mCamera.getParameters();
+//		List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
+//		Camera.Size size = previewSizes.get(0);
+//		parameters.setPreviewSize(size.width, size.height);
+//		mCamera.setParameters(parameters);
+//
+//		try
+//		{
+//			mCamera.setPreviewTexture(mSurfaceTexture);
+//		}
+//		catch (IOException e)
+//		{
+//			e.printStackTrace();
+//		}
+//
+//		mCamera.startPreview();
+//	}
 
 
 	/**

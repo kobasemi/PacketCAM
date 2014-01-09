@@ -12,11 +12,17 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
- * Created by black_000 on 14/01/07.
+ * Created by Kousaka on 14/01/07.
+ * 作成した画像をSDカードに保存する
  */
 public class SaveSDCard {
 	private static final String TAG = "SaveSDCard";
 
+
+	/**
+	 * 作成した画像を受け取って，SDカードに保存する
+	 * @param bmp 作成されたBitmap画像
+	 */
 	public static void save(Bitmap bmp)
 	{
 		Calendar calendar = Calendar.getInstance();
