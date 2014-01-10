@@ -88,6 +88,14 @@ public class PcapManager extends Thread{
     }
 
     /**
+     * PcapFileがオープンされているかどうか
+     * @return オープン/アンオープン
+     */
+    public boolean isPcapFileOpened(){
+        return (pcapFile != null);
+    }
+
+    /**
      * 開いているPcapFileを返す．開いていない場合は，nullを返す
      * @return PcapFile またはnull
      */
@@ -173,6 +181,8 @@ public class PcapManager extends Thread{
     /**
      * スレッド処理
      * 絶対，pm.start()で呼び出すこと，基本中の基本
+     * デフォルトでは1秒ごとにキューにパケットをセット（パケットがあれば）
+     * だから，ほぼ確実にキューが満パンになるどころか10個も溜まることないと思われる
      */
     @Override
     public void run() {
@@ -183,7 +193,8 @@ public class PcapManager extends Thread{
                 // イテレータにパケットが残っている場合
                 try {
                     // キューにパケットをセットする
-                    packetsQueue.add(packetIterator.next());
+                    if(packetsQueue.add(packetIterator.next()))
+                        Log.d(TAG + ": add", "Success");
                 } catch(IOException e) {
                     Log.d(TAG, "FAILED TO SET PACKET TO QUEUE");
                 }

@@ -12,6 +12,8 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.DrawCamera;
 import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.GLView;
+import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
+import jp.ac.kansai_u.kutc.firefly.packetcam.setting.ReadPcapFileDialog;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingButtonClickListener;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingsManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CopyAllPcapFileToSd;
@@ -104,6 +106,12 @@ public class MainActivity extends Activity
 			@Override
 			public void onClick (View v)
 			{
+                if(!PcapManager.getInstance().isPcapFileOpened()){
+                    // PcapFileがオープンされていない場合
+                    // PcapFile読み込みダイアログを表示する
+                    new ReadPcapFileDialog().show(MainActivity.this);
+                    return;
+                }
 				if (mSwitch.getVisibility() == VISIBILITY.INVISIBLE)
 				{
 					effectBtn.setImageResource(R.drawable.effect_on);
