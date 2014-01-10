@@ -4,8 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.PixelFormat;
-import android.opengl.GLSurfaceView;
-import android.opengl.GLU;
+import android.opengl.*;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -54,7 +53,9 @@ public class GLView extends GLSurfaceView
 	private void Init()
 	{
 		mRenderer = new ClearRenderer();
-		this.setEGLConfigChooser(8, 8, 8, 8, 0, 0);
+		this.getHolder().setFormat(PixelFormat.RGBA_8888);
+		this.setEGLConfigChooser(8, 8, 8, 0, 0, 0);
+
 		this.setRenderer(mRenderer);
 		this.setRenderMode(RENDERMODE_WHEN_DIRTY);
 
@@ -179,7 +180,6 @@ class ClearRenderer implements GLSurfaceView.Renderer
 		// ブレンドモードを指定
 		gl.glBlendFunc(GL10.GL_ONE_MINUS_DST_COLOR, GL10.GL_ONE_MINUS_SRC_ALPHA);
 
-
 		// GLViewクラスのvisibility変数をいじることで、描画のON・OFFが可能
 		//SwitchクラスのswitchVisibilityメソッドをcallして描画のON・OFFを行う
 		if (mSwitch.getVisibility() == VISIBILITY.VISIBLE)
@@ -243,6 +243,8 @@ class ClearRenderer implements GLSurfaceView.Renderer
 			return;
 		}
 		int size = mWidth * mHeight;
+
+		//region createBitmapFromFrameBuffer
 		ByteBuffer bb = ByteBuffer.allocateDirect(size * 4);
 
 		// OpenGLのフレームバッファからピクセル情報を読み込む
@@ -250,6 +252,7 @@ class ClearRenderer implements GLSurfaceView.Renderer
 
 		Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
 		bitmap.copyPixelsFromBuffer(bb);
+		//endregion
 
 		Matrix matrix = new Matrix();
 		matrix.preScale(1, -1);
