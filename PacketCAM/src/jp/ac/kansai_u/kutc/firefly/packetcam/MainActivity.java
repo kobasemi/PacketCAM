@@ -15,7 +15,7 @@ import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.GLView;
 import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.ReadPcapFileDialog;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingDialog;
-import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingsManager;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.SharedPreferencesManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CopyAllPcapFileToSd;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CreateDirectory;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.VISIBILITY;
@@ -51,7 +51,7 @@ public class MainActivity extends Activity
 
 
 				// 設定マネージャにアクティビティをセット + 初期処理
-				SettingsManager.getInstance().init(MainActivity.this);
+				SharedPreferencesManager.getInstance().init(MainActivity.this);
 
 				if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
 					// SDカードがマウントされているならば，ディレクトリを作成する

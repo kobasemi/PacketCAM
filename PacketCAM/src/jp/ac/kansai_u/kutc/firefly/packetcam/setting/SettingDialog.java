@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.hardware.Camera;
 import android.widget.Toast;
 import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.DrawCamera;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.SharedPreferencesManager;
 
 /**
  * 設定ダイアログに関するクラス
@@ -49,10 +50,10 @@ public class SettingDialog{
                                 Camera.Parameters parameters = DrawCamera.getCamera().getParameters ();
                                 //TODO: TORCHに対応しているかどうかチェック
                                 parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                                DrawCamera.getCamera().setParameters (parameters);
+                                DrawCamera.getCamera().setParameters(parameters);
                                 Toast.makeText (activity, "Flashを強制発光モードにしました", Toast.LENGTH_SHORT).show ();
                                 // 設定ファイルに保存
-                                SettingsManager.getInstance().setFlashStatus(Camera.Parameters.FLASH_MODE_TORCH);
+                                SharedPreferencesManager.getInstance().setFlashStatus(Camera.Parameters.FLASH_MODE_TORCH);
                             }
                             if (which == 1)
                             {
@@ -62,7 +63,7 @@ public class SettingDialog{
                                 DrawCamera.getCamera().setParameters (parameters);
                                 Toast.makeText (activity, "FlashをOFFにしました", Toast.LENGTH_SHORT).show();
                                 // 設定ファイルに保存
-                                SettingsManager.getInstance().setFlashStatus(Camera.Parameters.FLASH_MODE_OFF);
+                                SharedPreferencesManager.getInstance().setFlashStatus(Camera.Parameters.FLASH_MODE_OFF);
                             }
                         }
                     });

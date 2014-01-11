@@ -1,21 +1,18 @@
-package jp.ac.kansai_u.kutc.firefly.packetcam.setting;
+package jp.ac.kansai_u.kutc.firefly.packetcam.utils;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Name;
 
 /**
  * 設定項目の保存，編集，読出しを行うシングルトンデザインパターンクラス
  * はじめにActivityをセットすること
- * TODO: 設定する項目，Enum.javaを使用しようか
  * @author akasaka
  */
-public class SettingsManager {
+public class SharedPreferencesManager {
     /** シングルトン♪ シングルトン♪ 鈴が鳴る〜♪ */
-    private static SettingsManager instance = new SettingsManager();
-    public static SettingsManager getInstance() { return instance; }
+    private static SharedPreferencesManager instance = new SharedPreferencesManager();
+    public static SharedPreferencesManager getInstance() { return instance; }
 
     final static String KEY_EFFECT = "EFFECT";
     final static String KEY_FLASH  = "FLASH";
@@ -23,7 +20,7 @@ public class SettingsManager {
     SharedPreferences sp;
     SharedPreferences.Editor editor;
 
-    private SettingsManager(){
+    private SharedPreferencesManager(){
         sp = null;
         editor = null;
     }
