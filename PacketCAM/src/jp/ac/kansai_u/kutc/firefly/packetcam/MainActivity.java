@@ -14,7 +14,7 @@ import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.DrawCamera;
 import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.GLView;
 import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.ReadPcapFileDialog;
-import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingButtonClickListener;
+import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingDialog;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingsManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CopyAllPcapFileToSd;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CreateDirectory;
@@ -93,7 +93,12 @@ public class MainActivity extends Activity
 
 				// 設定ボタン
 				ImageButton settingBtn = (ImageButton) findViewById(R.id.setting);
-				settingBtn.setOnClickListener(new SettingButtonClickListener(MainActivity.this));
+                settingBtn.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new SettingDialog().show(MainActivity.this);
+                    }
+                });
 
 				// エフェクトボタン
 				final ImageButton effectBtn = (ImageButton) findViewById(R.id.effect);
