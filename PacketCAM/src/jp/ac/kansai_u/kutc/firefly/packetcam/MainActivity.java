@@ -212,6 +212,34 @@ public class MainActivity extends Activity
 //						}
 //						camera.setParameters (parameter);
 										return true;
+
+									// BackキーおよびHomeキーを押した際に終了処理を行う
+									case KeyEvent.KEYCODE_BACK:
+										mGLView.calledWhenExit();
+										try
+											{
+												mGLView.drawThread.join();
+											}
+										catch (InterruptedException e)
+											{
+												e.printStackTrace();
+											}
+										mDrawCamera.calledWhenExit();
+										finish();
+										return true;
+									case KeyEvent.KEYCODE_HOME:
+										mGLView.calledWhenExit();
+										try
+											{
+												mGLView.drawThread.join();
+											}
+										catch (InterruptedException e)
+											{
+												e.printStackTrace();
+											}
+										mDrawCamera.calledWhenExit();
+										finish();
+										return true;
 									default:
 										break;
 								}
@@ -238,16 +266,5 @@ public class MainActivity extends Activity
 				// Inflate the menu; this adds items to the action bar if it is present.
 				getMenuInflater().inflate(R.menu.main, menu);
 				return true;
-			}
-
-		@Override
-		protected void onPause()
-			{
-				super.onPause();
-				synchronized (mDrawCamera)
-					{
-						// TODO これがうまいこと機能してないかも
-						mDrawCamera.calledWhenOnPause();
-					}
 			}
 	}
