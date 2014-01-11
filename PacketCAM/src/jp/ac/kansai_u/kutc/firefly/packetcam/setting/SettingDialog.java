@@ -5,11 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.hardware.Camera;
 import android.widget.Toast;
-import jp.ac.kansai_u.kutc.firefly.packetcam.GetGCD;
-import jp.ac.kansai_u.kutc.firefly.packetcam.MainActivity;
 import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.DrawCamera;
-
-import java.util.List;
 
 /**
  * 設定ダイアログに関するクラス
@@ -109,7 +105,7 @@ public class SettingDialog{
                                 DrawCamera.getCamera().setParameters (parameters);
                                 Toast.makeText (activity, "Flashを強制発光モードにしました", Toast.LENGTH_SHORT).show ();
                                 // 設定ファイルに保存
-                                SettingsManager.getInstance().setFlash(Camera.Parameters.FLASH_MODE_ON);
+                                SettingsManager.getInstance().setFlashStatus(Camera.Parameters.FLASH_MODE_ON);
                             }
 //                            if (which == 1)
 //                            {
@@ -129,7 +125,7 @@ public class SettingDialog{
                                 DrawCamera.getCamera().setParameters (parameters);
                                 Toast.makeText (activity, "FlashをOFFにしました", Toast.LENGTH_SHORT).show();
                                 // 設定ファイルに保存
-                                SettingsManager.getInstance().setFlash(Camera.Parameters.FLASH_MODE_OFF);
+                                SettingsManager.getInstance().setFlashStatus(Camera.Parameters.FLASH_MODE_OFF);
                             }
                         }
                     });

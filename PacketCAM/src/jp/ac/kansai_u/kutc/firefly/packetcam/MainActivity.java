@@ -51,8 +51,7 @@ public class MainActivity extends Activity
 
 
 				// 設定マネージャにアクティビティをセット + 初期処理
-				SettingsManager.getInstance().setActivity(MainActivity.this);
-				SettingsManager.getInstance().setSharedPreferences();
+				SettingsManager.getInstance().init(MainActivity.this);
 
 				if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
 					// SDカードがマウントされているならば，ディレクトリを作成する

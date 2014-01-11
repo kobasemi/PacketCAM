@@ -3,11 +3,13 @@ package jp.ac.kansai_u.kutc.firefly.packetcam.setting;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Name;
 
 /**
  * 設定項目の保存，編集，読出しを行うシングルトンデザインパターンクラス
  * はじめにActivityをセットすること
+ * TODO: 設定する項目，Enum.javaを使用しようか
  * @author akasaka
  */
 public class SettingsManager {
@@ -15,7 +17,9 @@ public class SettingsManager {
     private static SettingsManager instance = new SettingsManager();
     public static SettingsManager getInstance() { return instance; }
 
-    private Activity activity;
+    final static String KEY_EFFECT = "EFFECT";
+    final static String KEY_FLASH  = "FLASH";
+
     SharedPreferences sp;
     SharedPreferences.Editor editor;
 
@@ -25,88 +29,72 @@ public class SettingsManager {
     }
 
     /**
-     * アクティビティをセットする
-     * SettingManagerを使う場合，最初に呼び出す必要がある
-     * @param activity メインアクティビティ
+     * SharedPreferencesの初期化を行う
+     * @param activity MainActivity
      */
-    public void setActivity(Activity activity) {
-        this.activity = activity;
-    }
-
-    /**
-     * SharedPreferencesを初期化する
-     * setActivity 後に必ず呼び出す必要がある
-     */
-    public void setSharedPreferences(){
+    public void init(Activity activity){
         sp = activity.getSharedPreferences(Name.PRE_FILENAME, Context.MODE_PRIVATE);
         editor = sp.edit();
     }
 
     /**
-     * カメラのフラッシュの設定を保存する
-     * @param mode FLASH_ON/OFF/AUTO
+     * エフェクトの状態を保存する
+     * @param status [VISIBLE|INVISIBLE]
      */
-    public void setFlash(String mode){
-        editor.putString("FLASH", mode);
+    public void setEffectStatus(Enum.VISIBILITY status){
+        editor.putString(KEY_EFFECT, status.name());
         editor.commit();
     }
 
-//    /**
-//     * カメラの解像度を保存する
-//     * @param w 解像度の幅
-//     * @param h 解像度の高さ
-//     */
-//    public void setResolution(int w, int h){
-//        editor.putInt("ResW", w);
-//        editor.putInt("ResH", h);
-//        editor.commit();
-//    }
+    /**
+     * エフェクトの状態を取得する
+     * @return Enum.VISIBILITY.[VISIBLE|INVISIBLE]
+     */
+    public Enum.VISIBILITY getEffectStatus(){
+        if(sp.getString(KEY_EFFECT, null).equals(Enum.VISIBILITY.VISIBLE.name()))
+            return Enum.VISIBILITY.VISIBLE;
+        else
+            return Enum.VISIBILITY.INVISIBLE;
+    }
+
+    /**
+     * エフェクトの状態を削除する
+     * @deprecated 使う必要ないよね？
+     */
+    public void removeEffectStatus(){
+        editor.remove(KEY_EFFECT);
+        editor.commit();
+    }
+
+    /**
+     * カメラのフラッシュの設定を保存する
+     * @param mode [ON|OFF]
+     */
+    public void setFlashStatus(String mode){
+        editor.putString(KEY_FLASH, mode);
+        editor.commit();
+    }
 
     /**
      * フラッシュの設定を取得する
-     * @return FLASH_ON/OFF/AUTO，失敗したらぬるぽ
+     * @return [ON|OFF|null]
      */
-    public String getFlash(){
-        return sp.getString("FLASH", "NULPO");
-    }
-
-    /**
-     * 解像度の幅を取得する
-     * @return 幅，失敗したら-1
-     */
-    public int getResolutionWidth(){
-        return sp.getInt("ResW", -1);
-    }
-
-    /**
-     * 解像度の高さを取得する
-     * @return 高さ，失敗したら-1
-     */
-    public int getResolutionHeight(){
-        return sp.getInt("ResH", -1);
+    public String getFlashStatus(){
+        return sp.getString(KEY_FLASH, null);
     }
 
     /**
      * フラッシュの設定を削除する
+     * @deprecated 使わないよね？
      */
-    public void removeFlash(){
-        editor.remove("FLASH");
-        editor.commit();
-    }
-
-    /**
-     * 解像度の設定を削除する
-     */
-    public void removeResolution(){
-        editor.remove("ResW");
-        editor.remove("ResH");
+    public void removeFlashStatus(){
+        editor.remove(KEY_FLASH);
         editor.commit();
     }
 
     /**
      * 全ての設定項目を削除する
-     * 恐らく，使う必要はない
-     * @deprecated
+     * @deprecated 使う必要ある？
      */
     public void removeAllPreferences(){
         editor.clear();
