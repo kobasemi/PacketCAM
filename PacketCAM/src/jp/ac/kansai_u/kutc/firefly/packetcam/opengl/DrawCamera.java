@@ -15,146 +15,150 @@ import java.nio.FloatBuffer;
 import java.util.List;
 
 import static android.opengl.GLES11Ext.GL_TEXTURE_EXTERNAL_OES;
+
 /**
  * Created by Kousaka on 14/01/07.
  * カメラプレビューに関する処理を行うクラス
  */
-public class DrawCamera {
-
-	private static final String TAG = DrawCamera.class.getSimpleName(); // デバッグ用タグ
-
-	private FloatBuffer mVertexBuffer; // 描画先の頂点座標バッファ
-	private FloatBuffer mTexCoordsBuffer; // 描画元の座標バッファ（どこを使うか的な）
-
-	private int textureId; // 生成時にIDを格納し，描画時に利用する
-	private SurfaceTexture mSurfaceTexture; // カメラプレビューの描画先テクスチャ
-
-	private static Camera mCamera;
-	private Switch mSwitch;
-
-	private int nowZoom;
-
-	// 描画先の座標
-	private float vertices[] = {
-			// 上下を反転させる必要がある
-			-1.0f, 1.0f, 0, // 左下
-			1.0f, 1.0f, 0, // 右下
-			-1.0f, -1.0f, 0, // 左上
-			1.0f, -1.0f, 0, // 右上
-	};
-
-	// 描画元の座標
-	private float texcoords[] = {
-			0.0f, 0.0f, // 左下
-			1.0f, 0.0f, // 右下
-			0.0f, 1.0f, // 左上
-			1.0f, 1.0f, // 右上
-	};
-
-
-	/**
-	 * Float配列からバッファを作成する
-	 */
-	public DrawCamera()
+public class DrawCamera
 	{
-		Log.i(TAG, "DrawCamera");
-		mSwitch = Switch.getInstance();
 
-		mVertexBuffer = Draw2D.makeFloatBuffer(vertices);
-		mTexCoordsBuffer = Draw2D.makeFloatBuffer(texcoords);
-	}
+		private static final String TAG = DrawCamera.class.getSimpleName(); // デバッグ用タグ
+
+		private FloatBuffer mVertexBuffer; // 描画先の頂点座標バッファ
+		private FloatBuffer mTexCoordsBuffer; // 描画元の座標バッファ（どこを使うか的な）
+
+		private int textureId; // 生成時にIDを格納し，描画時に利用する
+		private SurfaceTexture mSurfaceTexture; // カメラプレビューの描画先テクスチャ
+
+		private static Camera mCamera;
+		private Switch mSwitch;
+
+		private int nowZoom;
+
+		// 描画先の座標
+		private float vertices[] = {
+				// 上下を反転させる必要がある
+				-1.0f, 1.0f, 0, // 左下
+				1.0f, 1.0f, 0, // 右下
+				-1.0f, -1.0f, 0, // 左上
+				1.0f, -1.0f, 0, // 右上
+		};
+
+		// 描画元の座標
+		private float texcoords[] = {
+				0.0f, 0.0f, // 左下
+				1.0f, 0.0f, // 右下
+				0.0f, 1.0f, // 左上
+				1.0f, 1.0f, // 右上
+		};
 
 
-	/**
-	 * Textureを生成し，TextureIDを取得
-	 * @param gl
-	 */
-	public void generatedTexture(GL10 gl)
-	{
-		int[] textureIds = new int[1];
-		gl.glGenTextures(1, textureIds, 0);
-
-		textureId = textureIds[0];
-	}
-
-
-	/**
-	 * アプリケーション終了時の処理
-	 */
-	public void calledWhenOnPause()
-	{
-		synchronized (this)
-		{
-			if (mSwitch.getStatus() == STATUS.RUNNING) mSwitch.switchStatus();
-
-			if (mCamera != null)
+		/**
+		 * Float配列からバッファを作成する
+		 */
+		public DrawCamera()
 			{
-				mCamera.stopPreview();
+				Log.i(TAG, "DrawCamera");
+				mSwitch = Switch.getInstance();
 
-				mCamera.release();
-				mCamera = null;
+				mVertexBuffer = Draw2D.makeFloatBuffer(vertices);
+				mTexCoordsBuffer = Draw2D.makeFloatBuffer(texcoords);
 			}
-			if (mSurfaceTexture != null)
+
+
+		/**
+		 * Textureを生成し，TextureIDを取得
+		 *
+		 * @param gl
+		 */
+		public void generatedTexture(GL10 gl)
 			{
-				mSurfaceTexture = null;
+				int[] textureIds = new int[1];
+				gl.glGenTextures(1, textureIds, 0);
+
+				textureId = textureIds[0];
 			}
-		}
-	}
 
 
-	/**
-	 * カメラをセットアップする
-	 * カメラプレビューサイズ指定，SurfaceTextureにセットし，リスナをセット
-	 */
-	public void setUpCamera()
-	{
-		synchronized (this)
-		{
-			// 取得したTextureIDをもとに，SurfaceTextureを生成
-			mSurfaceTexture = new SurfaceTexture(textureId);
-
-			// SurfaceTextureに新規フレームが来た際に呼ばれるリスナを登録する
-			mSurfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
-				@Override
-				public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-					// 新規フレームが来た際に呼ばれる
-					if (surfaceTexture == null)
+		/**
+		 * アプリケーション終了時の処理
+		 */
+		public void calledWhenOnPause()
+			{
+				synchronized (this)
 					{
-						Log.i(TAG, "surfaceTextureIsNull");
-						return;
+						if (mSwitch.getStatus() == STATUS.RUNNING) mSwitch.switchStatus();
+
+						if (mCamera != null)
+							{
+								mCamera.stopPreview();
+
+								mCamera.release();
+								mCamera = null;
+							}
+						if (mSurfaceTexture != null)
+							{
+								mSurfaceTexture = null;
+							}
 					}
-					else if (mSwitch.getDrawstate() == DRAWSTATE.PREPARATION)
+			}
+
+
+		/**
+		 * カメラをセットアップする
+		 * カメラプレビューサイズ指定，SurfaceTextureにセットし，リスナをセット
+		 */
+		public void setUpCamera()
+			{
+				synchronized (this)
 					{
-						// DRAWSTATEをReadyにする
-						mSwitch.switchDrawState();
+						// 取得したTextureIDをもとに，SurfaceTextureを生成
+						mSurfaceTexture = new SurfaceTexture(textureId);
+
+						// SurfaceTextureに新規フレームが来た際に呼ばれるリスナを登録する
+						mSurfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener()
+						{
+							@Override
+							public void onFrameAvailable(SurfaceTexture surfaceTexture)
+								{
+									// 新規フレームが来た際に呼ばれる
+									if (surfaceTexture == null)
+										{
+											Log.i(TAG, "surfaceTextureIsNull");
+											return;
+										}
+									else if (mSwitch.getDrawstate() == DRAWSTATE.PREPARATION)
+										{
+											// DRAWSTATEをReadyにする
+											mSwitch.switchDrawState();
+										}
+								}
+						});
+
+
+						//region カメラの設定
+						mCamera = Camera.open();
+
+						Camera.Parameters parameters = mCamera.getParameters();
+						List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
+						Camera.Size size = previewSizes.get(0);
+						parameters.setPreviewSize(size.width, size.height);
+						mCamera.setParameters(parameters);
+
+						try
+							{
+								mCamera.setPreviewTexture(mSurfaceTexture);
+							}
+						catch (IOException e)
+							{
+								e.printStackTrace();
+							}
+
+						mCamera.startPreview();
+						//endregion
 					}
-				}
-			});
-
-
-			//region カメラの設定
-			mCamera = Camera.open();
-
-			Camera.Parameters parameters = mCamera.getParameters();
-			List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
-			Camera.Size size = previewSizes.get(0);
-			parameters.setPreviewSize(size.width, size.height);
-			mCamera.setParameters(parameters);
-
-			try
-			{
-				mCamera.setPreviewTexture(mSurfaceTexture);
 			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-
-			mCamera.startPreview();
-			//endregion
-		}
-	}
-
 
 
 //	public void inoutChange(Context context)
@@ -202,73 +206,77 @@ public class DrawCamera {
 //	}
 
 
-	/**
-	 * カメラプレビュー描画処理
-	 * @param gl
-	 */
-	public void draw(GL10 gl)
-	{
-		// SurfaceTextureはGL_DRAW_2Dではなく，GL_TEXTURE_EXTERNAL_OESを利用する
-		gl.glEnable(GL_TEXTURE_EXTERNAL_OES);
-		gl.glBindTexture(GL_TEXTURE_EXTERNAL_OES, textureId);
-
-		synchronized (this)
-		{
-			if (mSurfaceTexture != null)
+		/**
+		 * カメラプレビュー描画処理
+		 *
+		 * @param gl
+		 */
+		public void draw(GL10 gl)
 			{
-				// Image Create Success!!
-				mSurfaceTexture.updateTexImage();
+				// SurfaceTextureはGL_DRAW_2Dではなく，GL_TEXTURE_EXTERNAL_OESを利用する
+				gl.glEnable(GL_TEXTURE_EXTERNAL_OES);
+				gl.glBindTexture(GL_TEXTURE_EXTERNAL_OES, textureId);
+
+				synchronized (this)
+					{
+						if (mSurfaceTexture != null)
+							{
+								// Image Create Success!!
+								mSurfaceTexture.updateTexImage();
+							}
+					}
+
+				if (mSwitch.getDrawstate() == DRAWSTATE.PREPARATION)
+					{
+						// 初回起動時にonDrawFrameが1回ほど呼ばれるため，このIF文で描画を回避する
+						return;
+					}
+
+				gl.glMatrixMode(GL10.GL_PROJECTION);
+				gl.glLoadIdentity();
+				gl.glMatrixMode(GL10.GL_MODELVIEW);
+				gl.glLoadIdentity();
+
+				gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+				gl.glVertexPointer(3, GL10.GL_FLOAT, 0, mVertexBuffer);
+
+				gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+				gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, mTexCoordsBuffer);
+
+				gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+
+				gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+				gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+				gl.glDisable(GL_TEXTURE_EXTERNAL_OES);
+				gl.glFlush();
 			}
-		}
 
-		if (mSwitch.getDrawstate() == DRAWSTATE.PREPARATION)
-		{
-			// 初回起動時にonDrawFrameが1回ほど呼ばれるため，このIF文で描画を回避する
-			return;
-		}
+		public static Camera getCamera()
+			{
+				return mCamera;
+			}
 
-		gl.glMatrixMode(GL10.GL_PROJECTION);
-		gl.glLoadIdentity();
-		gl.glMatrixMode(GL10.GL_MODELVIEW);
-		gl.glLoadIdentity();
 
-		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, mVertexBuffer);
+		public void zoom(ZOOM zoom)
+			{
+				Camera.Parameters parameters = mCamera.getParameters();
+				nowZoom = parameters.getZoom();
 
-		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, mTexCoordsBuffer);
-
-		gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
-
-		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-		gl.glDisable(GL_TEXTURE_EXTERNAL_OES);
-		gl.glFlush();
+				if (zoom == ZOOM.ZOOMUP)
+					{
+						if (nowZoom < parameters.getMaxZoom())
+							{
+								parameters.setZoom(nowZoom + 1);
+							}
+						mCamera.setParameters(parameters);
+					}
+				else if (zoom == ZOOM.ZOOMDOWN)
+					{
+						if (nowZoom > 0)
+							{
+								parameters.setZoom(nowZoom - 1);
+							}
+						mCamera.setParameters(parameters);
+					}
+			}
 	}
-
-	public static Camera getCamera(){ return mCamera;}
-
-
-	public void zoom(ZOOM zoom)
-	{
-		Camera.Parameters parameters = mCamera.getParameters();
-		nowZoom = parameters.getZoom();
-
-		if (zoom == ZOOM.ZOOMUP)
-		{
-			if (nowZoom < parameters.getMaxZoom())
-			{
-				parameters.setZoom(nowZoom + 1);
-			}
-			mCamera.setParameters(parameters);
-		}
-		else if (zoom == ZOOM.ZOOMDOWN)
-		{
-			if (nowZoom > 0)
-			{
-				parameters.setZoom(nowZoom - 1);
-			}
-			mCamera.setParameters(parameters);
-		}
-	}
-}

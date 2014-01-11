@@ -26,57 +26,57 @@ import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
 import java.util.List;
 
 public class MainActivity extends Activity
-{
-	private static final String TAG = MainActivity.class.getSimpleName();
-
-	private GLView mGLView;
-	private Switch mSwitch = Switch.getInstance();
-	private DrawCamera mDrawCamera;
-
-	/**
-	 * アクティビティ起動時に呼び出される
-	 */
-	@Override
-	protected void onCreate (Bundle savedInstanceState)
 	{
-		super.onCreate (savedInstanceState);
+		private static final String TAG = MainActivity.class.getSimpleName();
 
-		// フルスクリーン化と，タイトルバーの非表示化
-		getWindow ().addFlags (WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		requestWindowFeature (Window.FEATURE_NO_TITLE);
+		private GLView mGLView;
+		private Switch mSwitch = Switch.getInstance();
+		private DrawCamera mDrawCamera;
 
-		setContentView (R.layout.activity_main);
-
-		mGLView = new GLView(this);
-		mDrawCamera = new DrawCamera();
-
-
-        // 設定マネージャにアクティビティをセット + 初期処理
-        SettingsManager.getInstance().setActivity(MainActivity.this);
-        SettingsManager.getInstance().setSharedPreferences();
-
-        Path.init();
-
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
-            // SDカードがマウントされているならば，ディレクトリを作成する
-            if(CreateDirectory.createDirectory())
-                Log.d(TAG, "Create Directory Success");
-            else
-                Log.d(TAG, "Create Directory Filed...");
-        else
-            Toast.makeText(this, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show ();
-
-        // assets/cap ディレクトリ以下の構造をそのままSDカードにコピーする
-        new CopyAllPcapFileToSd(getApplicationContext());
-
-
-		// シャッターボタン
-		ImageButton shutterBtn = (ImageButton) findViewById(R.id.shutter);
-		shutterBtn.setOnClickListener (new OnClickListener()
-		{
-			@Override
-			public void onClick (View v)
+		/**
+		 * アクティビティ起動時に呼び出される
+		 */
+		@Override
+		protected void onCreate(Bundle savedInstanceState)
 			{
+				super.onCreate(savedInstanceState);
+
+				// フルスクリーン化と，タイトルバーの非表示化
+				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+				setContentView(R.layout.activity_main);
+
+				mGLView = new GLView(this);
+				mDrawCamera = new DrawCamera();
+
+
+				// 設定マネージャにアクティビティをセット + 初期処理
+				SettingsManager.getInstance().setActivity(MainActivity.this);
+				SettingsManager.getInstance().setSharedPreferences();
+
+				Path.init();
+
+				if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+					// SDカードがマウントされているならば，ディレクトリを作成する
+					if (CreateDirectory.createDirectory())
+						Log.d(TAG, "Create Directory Success");
+					else
+						Log.d(TAG, "Create Directory Filed...");
+				else
+					Toast.makeText(this, "SDカードがマウントされていません", Toast.LENGTH_SHORT).show();
+
+				// assets/cap ディレクトリ以下の構造をそのままSDカードにコピーする
+				new CopyAllPcapFileToSd(getApplicationContext());
+
+
+				// シャッターボタン
+				ImageButton shutterBtn = (ImageButton) findViewById(R.id.shutter);
+				shutterBtn.setOnClickListener(new OnClickListener()
+				{
+					@Override
+					public void onClick(View v)
+						{
 //				if (camera != null)
 //				{
 //					if (!mIsTake)
@@ -89,77 +89,77 @@ public class MainActivity extends Activity
 //						glView.setShutter();
 //					}
 //				}
-				Toast.makeText(MainActivity.this, "パシャッ", Toast.LENGTH_SHORT).show();
-				mGLView.setShutter();
-			}
-			
-		});
+							Toast.makeText(MainActivity.this, "パシャッ", Toast.LENGTH_SHORT).show();
+							mGLView.setShutter();
+						}
 
-		// 設定ボタン
-		ImageButton settingBtn = (ImageButton) findViewById (R.id.setting);
-        settingBtn.setOnClickListener(new SettingButtonClickListener(MainActivity.this));
+				});
 
-        // エフェクトボタン
-		final ImageButton effectBtn = (ImageButton) findViewById(R.id.effect);
-		effectBtn.setOnClickListener (new OnClickListener()
-		{
-			@Override
-			public void onClick (View v)
-			{
-                if(!PcapManager.getInstance().isPcapFileOpened()){
-                    // PcapFileがオープンされていない場合
-                    // PcapFile読み込みダイアログを表示する
-                    new ReadPcapFileDialog().show(MainActivity.this);
-                    return;
-                }
-				if (mSwitch.getVisibility() == VISIBILITY.INVISIBLE)
+				// 設定ボタン
+				ImageButton settingBtn = (ImageButton) findViewById(R.id.setting);
+				settingBtn.setOnClickListener(new SettingButtonClickListener(MainActivity.this));
+
+				// エフェクトボタン
+				final ImageButton effectBtn = (ImageButton) findViewById(R.id.effect);
+				effectBtn.setOnClickListener(new OnClickListener()
 				{
-					effectBtn.setImageResource(R.drawable.effect_on);
+					@Override
+					public void onClick(View v)
+						{
+							if (!PcapManager.getInstance().isPcapFileOpened())
+								{
+									// PcapFileがオープンされていない場合
+									// PcapFile読み込みダイアログを表示する
+									new ReadPcapFileDialog().show(MainActivity.this);
+									return;
+								}
+							if (mSwitch.getVisibility() == VISIBILITY.INVISIBLE)
+								{
+									effectBtn.setImageResource(R.drawable.effect_on);
 
-					// エフェクトを表示
-					mGLView.setTransparent();
-				}
-				else if (mSwitch.getVisibility() == VISIBILITY.VISIBLE)
-				{
-					effectBtn.setImageResource(R.drawable.effect_off);
+									// エフェクトを表示
+									mGLView.setTransparent();
+								}
+							else if (mSwitch.getVisibility() == VISIBILITY.VISIBLE)
+								{
+									effectBtn.setImageResource(R.drawable.effect_off);
 
-					// エフェクトを非表示
-					mGLView.setTransparent();
-				}
+									// エフェクトを非表示
+									mGLView.setTransparent();
+								}
+						}
+				});
 			}
-		});
-	}
 
-	/**
-	 * 画面サイズに応じて最適なカメラプレビューのサイズを返すメソッド 参考URL：http://www.seeda.jp/modules/d3blog/details.php?bid=29&cid=7
-	 * 
-	 * @param params
-	 *        CameraParameter
-	 * @return カメラプレビューサイズ
-	 */
-	private Size getOptimalPreviewSize (Parameters params)
-	{
-		Size optimalSize = null;
-		List <Size> sizes = params.getSupportedPreviewSizes ();
-		float horizontalViewAngle = params.getHorizontalViewAngle ();
-		float verticalViewAngle = params.getVerticalViewAngle ();
-		double targetRatio = (double) horizontalViewAngle / verticalViewAngle;
-		double minDiff = Double.MAX_VALUE;
-
-		for (Size size : sizes)
-		{
-			double ratio = (double) size.width / size.height;
-			double tempDiff = Math.abs (targetRatio - ratio);
-			// 比率の差が少ない，より小さいプレビューサイズを選ぶ
-			if (tempDiff <= minDiff)
+		/**
+		 * 画面サイズに応じて最適なカメラプレビューのサイズを返すメソッド 参考URL：http://www.seeda.jp/modules/d3blog/details.php?bid=29&cid=7
+		 *
+		 * @param params CameraParameter
+		 * @return カメラプレビューサイズ
+		 */
+		private Size getOptimalPreviewSize(Parameters params)
 			{
-				minDiff = tempDiff;
-				optimalSize = size;
-			}
-		}
+				Size optimalSize = null;
+				List<Size> sizes = params.getSupportedPreviewSizes();
+				float horizontalViewAngle = params.getHorizontalViewAngle();
+				float verticalViewAngle = params.getVerticalViewAngle();
+				double targetRatio = (double) horizontalViewAngle / verticalViewAngle;
+				double minDiff = Double.MAX_VALUE;
 
-		return optimalSize;
-	}
+				for (Size size : sizes)
+					{
+						double ratio = (double) size.width / size.height;
+						double tempDiff = Math.abs(targetRatio - ratio);
+						// 比率の差が少ない，より小さいプレビューサイズを選ぶ
+						if (tempDiff <= minDiff)
+							{
+								minDiff = tempDiff;
+								optimalSize = size;
+							}
+					}
+
+				return optimalSize;
+			}
 
 //
 //	/**
@@ -178,16 +178,16 @@ public class MainActivity extends Activity
 //
 //	}
 
-	@Override
-	public boolean dispatchKeyEvent (KeyEvent event)
-	{
-		switch (event.getAction ())
-		{
-			case KeyEvent.ACTION_DOWN:
-				switch (event.getKeyCode ())
-				{
-					case KeyEvent.KEYCODE_VOLUME_UP:
-						mDrawCamera.zoom(ZOOM.ZOOMUP);
+		@Override
+		public boolean dispatchKeyEvent(KeyEvent event)
+			{
+				switch (event.getAction())
+					{
+						case KeyEvent.ACTION_DOWN:
+							switch (event.getKeyCode())
+								{
+									case KeyEvent.KEYCODE_VOLUME_UP:
+										mDrawCamera.zoom(ZOOM.ZOOMUP);
 //						// ズームイン機能
 //						parameter = camera.getParameters ();
 //						nowZoom = parameter.getZoom ();
@@ -197,10 +197,10 @@ public class MainActivity extends Activity
 //							parameter.setZoom (nowZoom + 1);
 //						}
 //						camera.setParameters (parameter);
-						return true;
-					case KeyEvent.KEYCODE_VOLUME_DOWN:
-						// ズームダウン機能
-						mDrawCamera.zoom(ZOOM.ZOOMDOWN);
+										return true;
+									case KeyEvent.KEYCODE_VOLUME_DOWN:
+										// ズームダウン機能
+										mDrawCamera.zoom(ZOOM.ZOOMDOWN);
 //						parameter = camera.getParameters ();
 //						nowZoom = parameter.getZoom ();
 //
@@ -209,43 +209,43 @@ public class MainActivity extends Activity
 //							parameter.setZoom (nowZoom - 1);
 //						}
 //						camera.setParameters (parameter);
-						return true;
-					default:
-						break;
-				}
-				break;
-			case KeyEvent.ACTION_UP:
-				switch (event.getKeyCode ())
-				{
-					case KeyEvent.KEYCODE_VOLUME_UP:
-					case KeyEvent.KEYCODE_VOLUME_DOWN:
-						// キーが離された場合にはイベントを捨てる
-						return true;
-					default:
-						break;
-				}
-			default:
-				break;
-		}
-		return super.dispatchKeyEvent (event);
-	}
+										return true;
+									default:
+										break;
+								}
+							break;
+						case KeyEvent.ACTION_UP:
+							switch (event.getKeyCode())
+								{
+									case KeyEvent.KEYCODE_VOLUME_UP:
+									case KeyEvent.KEYCODE_VOLUME_DOWN:
+										// キーが離された場合にはイベントを捨てる
+										return true;
+									default:
+										break;
+								}
+						default:
+							break;
+					}
+				return super.dispatchKeyEvent(event);
+			}
 
-    @Override
-    public boolean onCreateOptionsMenu (Menu menu)
-    {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater ().inflate (R.menu.main, menu);
-        return true;
-    }
+		@Override
+		public boolean onCreateOptionsMenu(Menu menu)
+			{
+				// Inflate the menu; this adds items to the action bar if it is present.
+				getMenuInflater().inflate(R.menu.main, menu);
+				return true;
+			}
 
-	@Override
-	protected void onPause()
-	{
-        super.onPause();
-		synchronized (mDrawCamera)
-		{
-			// TODO これがうまいこと機能してないかも
-			mDrawCamera.calledWhenOnPause();
-		}
+		@Override
+		protected void onPause()
+			{
+				super.onPause();
+				synchronized (mDrawCamera)
+					{
+						// TODO これがうまいこと機能してないかも
+						mDrawCamera.calledWhenOnPause();
+					}
+			}
 	}
-}
