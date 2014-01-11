@@ -128,6 +128,7 @@ public class MainActivity extends Activity
 									// エフェクトを非表示
 									mGLView.setTransparent();
 								}
+                            SharedPreferencesManager.getInstance().setEffectStatus(mSwitch.getVisibility());
 						}
 				});
 			}
