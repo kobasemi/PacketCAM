@@ -10,6 +10,10 @@ import org.jnetstream.capture.file.pcap.PcapPacket;
 import java.io.File;
 import java.io.IOException;
 import java.util.Queue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * readpcapパッケージ内の全ての親となるクラス
@@ -34,11 +38,6 @@ public class PcapManager extends Thread{
     // スレッドセーフなキュー @see ConcurrentPacketsQueue
     private Queue<PcapPacket> packetsQueue = new ConcurrentPacketsQueue<PcapPacket>();
 
-    // スレッド抹殺用
-    private boolean kill  = false;
-    // sleep time[milliseconds]
-    private long ms = 1000;
-
     private PcapManager(){
         pcapFile = null;
     }
@@ -52,7 +51,6 @@ public class PcapManager extends Thread{
         if(pcapFile != null){
             // 既にPcapFileが開かれていた場合
             closePcapFile();
-            pcapFile = null;
         }
 
         try {
@@ -163,20 +161,21 @@ public class PcapManager extends Thread{
         return -1;
     }
 
+    // スレッド抹殺用
+    private boolean kill  = false;
+    // sleep time[milliseconds]
+    private long ms = 1000;
+
     /**
      * スレッドを停止する
      */
-    public void kill(){
-        kill = true;
-    }
+    public void kill(){ kill = true; }
 
     /**
      * スリーブ時間を動的に変更する
      * @param ms ミリ秒
      */
-    public synchronized void setMs(long ms){
-        this.ms = ms;
-    }
+    public synchronized void setMs(long ms){ this.ms = ms; }
 
     /**
      * スレッド処理
@@ -207,5 +206,35 @@ public class PcapManager extends Thread{
             }else
                 kill();  // スレッドを殺す
         }
+    }
+
+    ScheduledExecutorService executor;
+    ScheduledFuture<?> future;
+    /**
+     * ScheduledExecutorServiceを使用したスレッド処理
+     * 内部処理は上記のrunと同等のことをやっている
+     * スレッド処理を開始する場合は，このメソッドを呼ぶ
+     * 一時停止: future.cancel();
+     * 停止: future.shutdown();
+     * TODO: 最終的にこちらを使い，上のメソッドと混ぜ合わせる
+     * @see java.util.concurrent.ScheduledExecutorService
+     */
+    public void pcapManagerThread(){
+        executor = Executors.newSingleThreadScheduledExecutor();
+//      TODO:  executor.scheduleAtFixedRate(this, 0, 1000, TimeUnit.MILLISECONDS);
+        future = executor.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                if(hasPacket()) {
+                    try {
+                        if(packetsQueue.add(packetIterator.next()))
+                            Log.d(TAG + ": add", "Success");
+                    } catch(IOException e) {
+                        Log.d(TAG, "FAILED TO SET PACKET TO QUEUE");
+                    }
+                }else
+                    future.cancel(true);
+            }
+        }, 0, 1000, TimeUnit.MILLISECONDS);
     }
 }
