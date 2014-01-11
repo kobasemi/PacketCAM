@@ -51,16 +51,16 @@
         android:contentDescription="@string/effect"
         android:src="@drawable/effect_off" />
 
-    <!--<ImageButton-->
-        <!--android:id="@+id/inout"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:layout_alignParentTop="true"-->
-        <!--android:layout_marginRight="10dp"-->
-        <!--android:layout_marginTop="10dp"-->
-        <!--android:background="@null"-->
-        <!--android:contentDescription="@string/inout"-->
-        <!--android:src="@drawable/in_out" />-->
+    <ImageButton
+        android:id="@+id/flash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@null"
+        android:contentDescription="@string/flash"
+        android:src="@drawable/flash_off" />
 
 </RelativeLayout>
