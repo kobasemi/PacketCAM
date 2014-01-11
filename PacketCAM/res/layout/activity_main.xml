@@ -10,6 +10,7 @@
     tools:context=".MainActivity" >
 
     <jp.ac.kansai_u.kutc.firefly.packetcam.opengl.GLView
+            android:id="@+id/glview"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
 		    android:keepScreenOn="true"/>

@@ -46,7 +46,7 @@ public class MainActivity extends Activity
 
 				setContentView(R.layout.activity_main);
 
-				mGLView = new GLView(this);
+                mGLView = (GLView)findViewById(R.id.glview);
 				mDrawCamera = new DrawCamera();
 
 

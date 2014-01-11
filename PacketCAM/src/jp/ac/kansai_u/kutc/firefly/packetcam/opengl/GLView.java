@@ -87,7 +87,6 @@ public class GLView extends GLSurfaceView
 			{
 				if (mSwitch.getVisibility() == VISIBILITY.VISIBLE)
 					{
-						this.setVisibility(View.GONE);
 						mSwitch.switchVisibility();
 					}
 				else if (mSwitch.getVisibility() == VISIBILITY.INVISIBLE)
