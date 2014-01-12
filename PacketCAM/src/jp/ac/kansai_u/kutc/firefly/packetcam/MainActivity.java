@@ -1,6 +1,7 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam;
 
 import android.app.Activity;
+import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
@@ -15,12 +16,10 @@ import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.GLView;
 import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.ReadPcapFileDialog;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingDialog;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.SharedPreferencesManager;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CopyAllPcapFileToSd;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CreateDirectory;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.*;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.VISIBILITY;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.ZOOM;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
 
 import java.util.List;
 
@@ -131,6 +130,32 @@ public class MainActivity extends Activity
                             SharedPreferencesManager.getInstance().setEffectStatus(mSwitch.getVisibility());
 						}
 				});
+
+                final ImageButton flashBtn = (ImageButton)findViewById(R.id.flash);
+                flashBtn.setOnClickListener(new OnClickListener(){
+                    @Override
+                    public void onClick(View v){
+                        Camera.Parameters parameters = DrawCamera.getCamera().getParameters ();
+                        if(parameters.getFlashMode().equals(Parameters.FLASH_MODE_TORCH)){
+                            // フラッシュがオンの場合
+                            flashBtn.setImageResource(R.drawable.flash_off);
+                            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                            // 設定ファイルに保存
+                            SharedPreferencesManager.getInstance().setFlashStatus(Camera.Parameters.FLASH_MODE_OFF);
+                        }else{
+                            flashBtn.setImageResource(R.drawable.flash_on);
+                            if(parameters.getSupportedFlashModes().contains(Parameters.FLASH_MODE_TORCH))
+                                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                            else{
+                                Toast.makeText(MainActivity.this, "CAMERAがTORCHに対応していません", Toast.LENGTH_SHORT).show();
+                                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
+                            }
+                            // 設定ファイルに保存
+                            SharedPreferencesManager.getInstance().setFlashStatus(Camera.Parameters.FLASH_MODE_TORCH);
+                        }
+                        DrawCamera.getCamera().setParameters(parameters);
+                    }
+                });
 			}
 
 		/**
