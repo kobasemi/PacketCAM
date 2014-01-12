@@ -107,13 +107,13 @@ public class MainActivity extends Activity
 					@Override
 					public void onClick(View v)
 						{
-//							if (!PcapManager.getInstance().isPcapFileOpened())
-//								{
-//									// PcapFileがオープンされていない場合
-//									// PcapFile読み込みダイアログを表示する
-//									new ReadPcapFileDialog().show(MainActivity.this);
-//									return;
-//								}
+							if (!PcapManager.getInstance().isPcapFileOpened())
+								{
+									// PcapFileがオープンされていない場合
+									// PcapFile読み込みダイアログを表示する
+									new ReadPcapFileDialog().show(MainActivity.this);
+									return;
+								}
 							if (mSwitch.getVisibility() == VISIBILITY.INVISIBLE)
 								{
 									effectBtn.setImageResource(R.drawable.effect_on);
