@@ -31,7 +31,7 @@ public class DrawCamera
 		private int textureId; // 生成時にIDを格納し，描画時に利用する
 		private SurfaceTexture mSurfaceTexture; // カメラプレビューの描画先テクスチャ
 
-		private static Camera mCamera;
+		private static Camera mCamera = null;
 		private Switch mSwitch;
 
 		private int nowZoom;
@@ -81,26 +81,26 @@ public class DrawCamera
 			}
 
 
-		/**
-		 * アプリケーション終了時の処理
-		 */
-		public void calledWhenOnPause()
+		public void calledWhenExit()
 			{
 				synchronized (this)
 					{
+						Log.i(TAG, "calledWhenExit");
+						if (mSwitch.getDrawstate() == DRAWSTATE.READY) mSwitch.switchDrawState();
 						if (mSwitch.getStatus() == STATUS.RUNNING) mSwitch.switchStatus();
 
 						if (mCamera != null)
 							{
 								mCamera.stopPreview();
-
 								mCamera.release();
 								mCamera = null;
 							}
 						if (mSurfaceTexture != null)
 							{
+								mSurfaceTexture.setOnFrameAvailableListener(null);
 								mSurfaceTexture = null;
 							}
+						Log.i(TAG, "calledWhenExitEnd");
 					}
 			}
 
@@ -137,6 +137,12 @@ public class DrawCamera
 						});
 
 
+						if (mCamera != null)
+							{
+								mCamera.stopPreview();
+								mCamera.release();
+								mCamera = null;
+							}
 						//region カメラの設定
 						mCamera = Camera.open();
 
@@ -224,12 +230,6 @@ public class DrawCamera
 								// Image Create Success!!
 								mSurfaceTexture.updateTexImage();
 							}
-					}
-
-				if (mSwitch.getDrawstate() == DRAWSTATE.PREPARATION)
-					{
-						// 初回起動時にonDrawFrameが1回ほど呼ばれるため，このIF文で描画を回避する
-						return;
 					}
 
 				gl.glMatrixMode(GL10.GL_PROJECTION);

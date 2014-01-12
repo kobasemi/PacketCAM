@@ -28,6 +28,8 @@ public class GLView extends GLSurfaceView
 
 		private Switch mSwitch = Switch.getInstance();
 
+		public Thread drawThread;
+
 		/**
 		 * エフェクトボタンを押した時に呼び出されるやつ
 		 *
@@ -55,6 +57,7 @@ public class GLView extends GLSurfaceView
 		private void Init()
 			{
 				mRenderer = new ClearRenderer();
+
 				this.getHolder().setFormat(PixelFormat.RGBA_8888);
 				this.setEGLConfigChooser(8, 8, 8, 0, 0, 0);
 
@@ -63,7 +66,7 @@ public class GLView extends GLSurfaceView
 
 				if (mSwitch.getStatus() == STATUS.STOP) mSwitch.switchStatus();
 
-				new Thread(new Runnable()
+				drawThread = new Thread(new Runnable()
 				{
 					@Override
 					public void run()
@@ -76,7 +79,9 @@ public class GLView extends GLSurfaceView
 										}
 								}
 						}
-				}).start();
+				});
+
+				drawThread.start();
 			}
 
 
@@ -110,6 +115,12 @@ public class GLView extends GLSurfaceView
 					}
 			}
 
+
+		public void calledWhenExit()
+			{
+				if (mSwitch.getDrawstate() == DRAWSTATE.READY) mSwitch.switchDrawState();
+				if (mSwitch.getStatus() == STATUS.RUNNING) mSwitch.switchStatus();
+			}
 	}
 
 
@@ -179,6 +190,13 @@ class ClearRenderer implements GLSurfaceView.Renderer
 		 */
 		public void onDrawFrame(GL10 gl)
 			{
+				Log.i(TAG, "onDrawFrame");
+
+				if (mSwitch.getDrawstate() == DRAWSTATE.PREPARATION)
+					{
+						return;
+					}
+
 				mDrawCamera.draw(gl);
 
 				// カメラプレビュー描画後に，ブレンドを有効化する
