@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  * readpcapパッケージ内の全ての親となるクラス
  * @author akasaka
  */
-public class PcapManager extends Thread{
+public class PcapManager implements Runnable{
 
     /** シングルトン♪ シングルトン♪ 鈴が鳴る〜♪ */
     private static PcapManager instance = new PcapManager();
@@ -161,80 +161,50 @@ public class PcapManager extends Thread{
         return -1;
     }
 
-    // スレッド抹殺用
-    private boolean kill  = false;
-    // sleep time[milliseconds]
-    private long ms = 1000;
-
     /**
-     * スレッドを停止する
+     * ScheduledExecutorServiceを使用したスレッド処理
+     * start()   ; スレッドの開始
+     * stop()    ; スレッドの一時停止
+     * shutdown(); スレッドの停止
+     * @see java.util.concurrent.ScheduledExecutorService
      */
-    public void kill(){ kill = true; }
-
+    ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    ScheduledFuture<?> future = null;
     /**
-     * スリーブ時間を動的に変更する
-     * @param ms ミリ秒
+     * スレッド処理を開始する
      */
-    public synchronized void setMs(long ms){ this.ms = ms; }
+    public void start(){
+        future = executor.scheduleAtFixedRate(this, 0, 1000, TimeUnit.MILLISECONDS);
+    }
+    /**
+     * スレッド処理を一時停止する
+     */
+    public void stop(){
+        if(future != null) future.cancel(true);
+    }
+    /**
+     * スレッド処理を完全停止する
+     */
+    public void shutdown(){
+        stop();  // 一時停止をしてから停止する
+        if(executor != null) executor.shutdown();
+    }
 
     /**
      * スレッド処理
-     * 絶対，pm.start()で呼び出すこと，基本中の基本
-     * デフォルトでは1秒ごとにキューにパケットをセット（パケットがあれば）
-     * だから，ほぼ確実にキューが満パンになるどころか10個も溜まることないと思われる
+     * パケットがある場合，1秒ごとにキューにパケットを装填
+     * パケットがなくなった場合，スレッドを停止
      */
     @Override
     public void run() {
-        kill = false;
-
-        while(!kill){
-            if(hasPacket()){
-                // イテレータにパケットが残っている場合
-                try {
-                    // キューにパケットをセットする
-                    if(packetsQueue.add(packetIterator.next()))
-                        Log.d(TAG + ": add", "Success");
-                } catch(IOException e) {
-                    Log.d(TAG, "FAILED TO SET PACKET TO QUEUE");
-                }
-                try {
-                    // 単位はミリ秒，動的に変えられる
-                    sleep(ms);
-                } catch(InterruptedException e) {
-                    Log.d(TAG, "INTERRUPTED SLEEP");
-                }
-            }else
-                kill();  // スレッドを殺す
-        }
-    }
-
-    ScheduledExecutorService executor;
-    ScheduledFuture<?> future;
-    /**
-     * ScheduledExecutorServiceを使用したスレッド処理
-     * 内部処理は上記のrunと同等のことをやっている
-     * スレッド処理を開始する場合は，このメソッドを呼ぶ
-     * 一時停止: future.cancel();
-     * 停止: future.shutdown();
-     * TODO: 最終的にこちらを使い，上のメソッドと混ぜ合わせる
-     * @see java.util.concurrent.ScheduledExecutorService
-     */
-    public void pcapManagerThread(){
-        executor = Executors.newSingleThreadScheduledExecutor();
-//      TODO:  executor.scheduleAtFixedRate(this, 0, 1000, TimeUnit.MILLISECONDS);
-        future = executor.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                if(hasPacket()) {
-                    try {
-                        if(packetsQueue.add(packetIterator.next()))
-                            Log.d(TAG + ": add", "Success");
-                    } catch(IOException e) {
-                        Log.d(TAG, "FAILED TO SET PACKET TO QUEUE");
-                    }
-                }else
-                    future.cancel(true);
+        if(hasPacket())
+            try {
+                if(packetsQueue.add(packetIterator.next()))  // キューに装填
+                    Log.d(TAG + ": add", "Success");
+            } catch(IOException e) {
+                Log.d(TAG, "FAILED TO SET PACKET TO QUEUE");
             }
-        }, 0, 1000, TimeUnit.MILLISECONDS);
+        else
+            shutdown();
     }
 }
