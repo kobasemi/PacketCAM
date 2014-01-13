@@ -53,13 +53,19 @@ public class PcapManager implements Runnable{
             closePcapFile();
         }
 
-        try {
-            pcapFile = Captures.openFile(PcapFile.class, file, FileMode.ReadOnly);
-            setPacketsToPacketIterator();  // Set Packets from pcapFile
-        } catch (IOException e) {
-            Log.d(TAG, "FAILED TO OPEN");
-            return false;
-        }
+        if(file.isDirectory())
+            // ディレクトリ内のファイルを再帰的に読み込む
+            for(File f: file.listFiles())
+                openPcapFile(f);
+        else
+            try {
+                pcapFile = Captures.openFile(PcapFile.class, file, FileMode.ReadOnly);
+                setPacketsToPacketIterator();  // Set Packets from pcapFile
+                Log.d(TAG, "FILE OPEN SUCCESS: " + file.getName());
+            } catch (IOException e) {
+                Log.d(TAG, "FAILED TO OPEN");
+                return false;
+            }
         return true;
     }
 

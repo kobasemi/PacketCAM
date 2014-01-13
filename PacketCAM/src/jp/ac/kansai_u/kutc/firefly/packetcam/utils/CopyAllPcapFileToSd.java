@@ -8,10 +8,6 @@ import java.io.*;
 
 /**
  * assets/cap ディレクトリ以下の全てのファイル（ディレクトリを含む）をSDカードにコピーする
- * cap以下のディレクトリ構造は，!!! 必ず深さ1にすること !!!
- * 例： cap/hoge/hoge/といった構造にせず，cap/hoge/までにすること
- * assetsの構造，中身はプログラマーが決められるのだからこれでいいはず
- * 深さ2以上の構造は考慮していない
  * @author akasaka
  */
 public class CopyAllPcapFileToSd {

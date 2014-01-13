@@ -3,7 +3,6 @@ package jp.ac.kansai_u.kutc.firefly.packetcam.setting;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.util.Log;
 import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Path;
 
@@ -27,6 +26,8 @@ public class ReadPcapFileDialog implements DialogInterface.OnClickListener {
         File dir = new File(Path.PACKETFOLDER_PATH);
 
         // 指定されたディレクトリ内のファイル名をすべて取得
+        // 但し，深さ1のディレクトリ構造のみを考慮している
+        // /hoge/hogehoge/fooの場合，hogeまでしか表示されない
         final File[] files = dir.listFiles();
         str_items = new String[files.length];
         for(int i = 0; i < files.length; i++) {
@@ -43,23 +44,6 @@ public class ReadPcapFileDialog implements DialogInterface.OnClickListener {
     public void onClick(DialogInterface dialog, int which) {
         // 選択されたパケットファイルのパス
         String filePath = Path.PACKETFOLDER_PATH + File.separator + str_items[which];
-        // ファイルを開く
-        File file = new File(filePath);
-        Log.d(TAG, "filePath = " + filePath);
-        // PcapManagerインスタンスを取得
-        PcapManager pcap = PcapManager.getInstance();
-
-        if(file.isDirectory()){
-            // ディレクトリの場合
-            // ディレクトリ内のファイルを読み込む
-            for(File f: file.listFiles()){
-                if(pcap.openPcapFile(f))
-                    Log.d(TAG, "FILE OPEN SUCCESS: " + f.getName());
-            }
-        }else{
-            // PcapManagerのopenPcapFileにファイルパスを渡す
-            pcap.openPcapFile(file);
-            Log.d(TAG, "FILE OPEN SUCCESS: " + file.getName());
-        }
+        PcapManager.getInstance().openPcapFile(new File(filePath));
     }
 }
