@@ -1,6 +1,5 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.opengl;
 
-import android.opengl.GLU;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.COLOR;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -19,60 +18,56 @@ public class Draw2D
 		// Java NIOに転送した頂点バッファや色バッファを格納する変数を定義
 		// 頂点バッファ
 		private FloatBuffer mVertexBuffer;
-
 		// 色バッファ
 		private FloatBuffer mColorBuffer;
 
-		private float colors[] = {};
+        public Draw2D(int x, int y, int w, int h, COLOR color)
+            {
+                setDrawObject(x/100.f, y/100.f, w/100.f, h/100.f, color);
+            }
 
-		private static int mWidth = 0, mHeight = 0;
+        public Draw2D(float x, float y, float width, float height, COLOR color){
+            setDrawObject(x, y, width, height, color);
+        }
 
+        /**
+         * 描画図形の設定を行う
+         * x, y座標及びwidth, heightは，パーセンテージで指定する
+         * 例
+         * x: .25f
+         * y: .25f
+         * width: .5f
+         * height: .5f
+         * を指定した場合，
+         * 画面プレビューのXY25%の位置に画面プレビューの50％の大きさの図形が描画される
+         *
+         * @param x      x座標[%]
+         * @param y      y座標[%]
+         * @param width  幅[%]
+         * @param height 高さ[%]
+         * @param color  EnumクラスのCOLORで指定できる色
+         */
+        private void setDrawObject(float x, float y, float width, float height, COLOR color){
+            float left   = x * 2.0f - 1.0f;
+            float top    = y * 2.0f - 1.0f;
+            float right  = left + width  * 2.0f;
+            float bottom = top  + height * 2.0f;
 
-		/**
-		 * 図形オブジェクトの描画位置と描画カラーを設定する
-		 *
-		 * @param x     x座標
-		 * @param y     y座標
-		 * @param w     幅
-		 * @param h     高さ
-		 * @param color EnumクラスのCOLORで指定できる色
-		 */
-		public Draw2D(int x, int y, int w, int h, COLOR color)
-			{
-				float left = (float) x;
-				float right = (float) x + (float) w;
-				float bottom = (float) y;
-				float top = (float) y + (float) h;
+            // 上下を反転させる（左下原点から左上原点へ）
+            top = -top;
+            bottom = -bottom;
 
+            // 位置情報(x, y)
+            float positions[] = {
+                left , top   , // 左上
+                left , bottom, // 左下
+                right, top   , // 右上
+                right, bottom, // 右下
+            };
 
-				// 最初の描画で上３つ，次の描画で下の３つが使われ，２個の三角形で四角形を描画する
-				float positions[] = {
-						//x, y
-						left, bottom, // 左下
-						right, bottom, // 右下
-						left, top, // 左上
-						right, top, // 右上
-				};
-
-				this.colors = GL_Color.getColorArray(color);
-
-				mVertexBuffer = makeFloatBuffer(positions);
-				mColorBuffer = makeFloatBuffer(colors);
-			}
-
-
-		/**
-		 * 初回オブジェクトを生成する前にこれを呼び出して幅と高さを設定しておく
-		 *
-		 * @param width
-		 * @param height
-		 */
-		public void setSize(int width, int height)
-			{
-				mWidth = width;
-				mHeight = height;
-			}
-
+            mVertexBuffer = makeFloatBuffer(positions);
+            mColorBuffer = makeFloatBuffer(GL_Color.getColorArray(color));
+        }
 
 		/**
 		 * オブジェクトの描画メソッド
@@ -81,11 +76,6 @@ public class Draw2D
 		 */
 		public void draw(GL10 gl)
 			{
-				gl.glMatrixMode(GL10.GL_PROJECTION);
-				gl.glLoadIdentity();
-
-				GLU.gluOrtho2D(gl, 0.0f, mWidth, 0.0f, mHeight);
-
 				gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 
 				gl.glEnableClientState(GL10.GL_COLOR_ARRAY);

@@ -67,7 +67,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
         gl.glViewport(0, 0, width, height);
 
         mDrawCamera.setUpCamera();
-        Draw2DList.get(0).setSize(width, height);
     }
 
 
@@ -115,17 +114,28 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
 
     /**
-     * 新たなオブジェクトを生成する
+     * 新たな描画オブジェクトを生成する
+     * Draw2Dに渡す引数は，xy座標及びwidth, height, 色情報
+     * なお，x, y, width, heightに関しては，
+     * 描画したい位置や描画図形の大きさをスクリーンのパーセンテージで指定する
+     * インスタンス化は次の2通りの方法がある
+     *  - int型で0〜100[%]で渡す方法．
+     *   ~ new Draw2D(0, 0, 100, 100, color);
+     *  - float型で0.f〜1.fで渡す方法
+     *   ~ new Draw2D(0.f, 0.f, 1.f, 1.f ,color);
+     * 2つの例はどちらも，左上から右下までを描画するもの
+     * 分かりやすい方法を使ったら良い
+     *
+     * @see jp.ac.kansai_u.kutc.firefly.packetcam.opengl.Draw2D
      */
-    // TODO ここに座標などの情報を渡して新規オブジェクトの作成をオーダーする
     public void newGraphic()
     {
         Log.d(TAG, "newGraphic()");
-        Draw2D drawBlue = new Draw2D(100, 100, 200, 200, Enum.COLOR.BLUE);
+        Draw2D drawBlue = new Draw2D(0.f, 0.f, .25f, .25f, Enum.COLOR.BLUE);
         Draw2DList.add(drawBlue);
-        Draw2D drawGreen = new Draw2D(200, 200, 300, 300, Enum.COLOR.GREEN);
+        Draw2D drawGreen = new Draw2D(.25f, .25f, .75f, .75f, Enum.COLOR.GREEN);
         Draw2DList.add(drawGreen);
-        Draw2D drawRed = new Draw2D(500, 150, 100, 100, Enum.COLOR.RED);
+        Draw2D drawRed = new Draw2D(.75f, .75f, .25f, .25f, Enum.COLOR.RED);
         Draw2DList.add(drawRed);
     }
 
