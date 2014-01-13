@@ -15,9 +15,9 @@ import java.util.ArrayList;
 /**
  * OpenGLの描画を行う
  */
-public class ClearRenderer implements GLSurfaceView.Renderer
+public class EffectRenderer implements GLSurfaceView.Renderer
 {
-    private static final String TAG = ClearRenderer.class.getSimpleName();
+    private static final String TAG = EffectRenderer.class.getSimpleName();
 
     // オブジェクトを格納するリスト
     ArrayList<Draw2D> Draw2DList = new ArrayList<Draw2D>();

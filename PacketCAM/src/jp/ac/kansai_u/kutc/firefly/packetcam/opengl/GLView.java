@@ -1,20 +1,15 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.opengl;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.graphics.PixelFormat;
-import android.opengl.*;
+import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.*;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.DRAWSTATE;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.STATUS;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.VISIBILITY;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 
 /**
  * Created by Kousaka on 2013/12/10.
@@ -24,7 +19,7 @@ public class GLView extends GLSurfaceView
 	{
 		private static final String TAG = GLView.class.getSimpleName();
 
-		private ClearRenderer mRenderer;
+		private EffectRenderer mRenderer;
 
 		private Switch mSwitch = Switch.getInstance();
 
@@ -56,7 +51,7 @@ public class GLView extends GLSurfaceView
 
 		private void Init()
 			{
-				mRenderer = new ClearRenderer();
+				mRenderer = new EffectRenderer();
 
 				this.getHolder().setFormat(PixelFormat.RGBA_8888);
 				this.setEGLConfigChooser(8, 8, 8, 0, 0, 0);
