@@ -16,10 +16,12 @@ import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.GLView;
 import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.ReadPcapFileDialog;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingDialog;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.*;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CopyAllPcapFileToSd;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CreateDirectory;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.VISIBILITY;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.ZOOM;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.SharedPreferencesManager;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
 
 import java.util.List;
 
@@ -239,32 +241,32 @@ public class MainActivity extends Activity
 										return true;
 
 									// BackキーおよびHomeキーを押した際に終了処理を行う
-									case KeyEvent.KEYCODE_BACK:
-										mGLView.calledWhenExit();
-										try
-											{
-												mGLView.drawThread.join();
-											}
-										catch (InterruptedException e)
-											{
-												e.printStackTrace();
-											}
-										mDrawCamera.calledWhenExit();
-										finish();
-										return true;
-									case KeyEvent.KEYCODE_HOME:
-										mGLView.calledWhenExit();
-										try
-											{
-												mGLView.drawThread.join();
-											}
-										catch (InterruptedException e)
-											{
-												e.printStackTrace();
-											}
-										mDrawCamera.calledWhenExit();
-										finish();
-										return true;
+//									case KeyEvent.KEYCODE_BACK:
+//										mGLView.calledWhenExit();
+//										try
+//											{
+//												mGLView.drawThread.join();
+//											}
+//										catch (InterruptedException e)
+//											{
+//												e.printStackTrace();
+//											}
+//										mDrawCamera.calledWhenExit();
+//										finish();
+//										return true;
+//									case KeyEvent.KEYCODE_HOME:
+//										mGLView.calledWhenExit();
+//										try
+//											{
+//												mGLView.drawThread.join();
+//											}
+//										catch (InterruptedException e)
+//											{
+//												e.printStackTrace();
+//											}
+//										mDrawCamera.calledWhenExit();
+//										finish();
+//										return true;
 									default:
 										break;
 								}
@@ -292,4 +294,17 @@ public class MainActivity extends Activity
 				getMenuInflater().inflate(R.menu.main, menu);
 				return true;
 			}
-	}
+
+        @Override
+        protected void onResume() {
+            super.onResume();
+            mGLView.onResume();
+        }
+
+        @Override
+        protected void onPause() {
+            super.onPause();
+            mGLView.onPause();
+            DrawCamera.cameraRelease();
+        }
+    }

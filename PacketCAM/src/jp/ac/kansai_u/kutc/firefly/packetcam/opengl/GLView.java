@@ -23,7 +23,7 @@ public class GLView extends GLSurfaceView
 
 		private Switch mSwitch = Switch.getInstance();
 
-		public Thread drawThread;
+//		public Thread drawThread;
 
 		/**
 		 * エフェクトボタンを押した時に呼び出されるやつ
@@ -33,7 +33,7 @@ public class GLView extends GLSurfaceView
 		public GLView(Context context)
 			{
 				super(context);
-				Init();
+				init();
 			}
 
 		/**
@@ -45,11 +45,15 @@ public class GLView extends GLSurfaceView
 		public GLView(Context context, AttributeSet attrs)
 			{
 				super(context, attrs);
-				Init();
+				init();
 			}
 
 
-		private void Init()
+        /**
+         * GLSurfaceViewに関する初期化
+         * Rendererをセット
+         */
+		private void init()
 			{
 				mRenderer = new EffectRenderer();
 
@@ -57,26 +61,38 @@ public class GLView extends GLSurfaceView
 				this.setEGLConfigChooser(8, 8, 8, 0, 0, 0);
 
 				this.setRenderer(mRenderer);
-				this.setRenderMode(RENDERMODE_WHEN_DIRTY);
 
 				if (mSwitch.getStatus() == STATUS.STOP) mSwitch.switchStatus();
 
-				drawThread = new Thread(new Runnable()
-				{
-					@Override
-					public void run()
-						{
-							while (mSwitch.getStatus() == STATUS.RUNNING)
-								{
-									if (mSwitch.getDrawstate() == DRAWSTATE.READY)
-										{
-											requestRender();
-										}
-								}
-						}
-				});
-
-				drawThread.start();
+                /*
+                 下ブロック内の処理について
+                 RENDERMODE_WHEN_DIRTYが設定されている場合
+                 requestRender()メソッドを使い，onDrawFrameを呼び出す
+                 そのために，スレッドを使用している
+                 ちなみに，onPuase(), onResume()が上手くいかなかった原因は
+                 onResume()のとき，スレッドが上手いこと動いてなかったため
+                 requestRenderer()が呼ばれなかったものによる
+                */
+                // スレッドを使っている理由は？
+                {
+//                    this.setRenderMode(RENDERMODE_WHEN_DIRTY);
+//                    drawThread = new Thread(new Runnable()
+//                    {
+//                        @Override
+//                        public void run()
+//                            {
+//                                while (mSwitch.getStatus() == STATUS.RUNNING)
+//                                    {
+//                                        if (mSwitch.getDrawstate() == DRAWSTATE.READY)
+//                                            {
+//                                                requestRender();
+//                                            }
+//                                    }
+//                            }
+//                    });
+//
+//                    drawThread.start();
+                }
 			}
 
 
@@ -116,4 +132,14 @@ public class GLView extends GLSurfaceView
 				if (mSwitch.getDrawstate() == DRAWSTATE.READY) mSwitch.switchDrawState();
 				if (mSwitch.getStatus() == STATUS.RUNNING) mSwitch.switchStatus();
 			}
-	}
+
+        @Override
+        public void onPause() {
+            super.onPause();
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+        }
+    }

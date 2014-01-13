@@ -1,13 +1,12 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.opengl;
 
-import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
-import android.os.Build;
 import android.util.Log;
-import android.widget.Toast;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.DRAWSTATE;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.STATUS;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.ZOOM;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.*;
 
 import javax.microedition.khronos.opengles.GL10;
 import java.io.IOException;
@@ -136,13 +135,8 @@ public class DrawCamera
 								}
 						});
 
+                        cameraRelease();
 
-						if (mCamera != null)
-							{
-								mCamera.stopPreview();
-								mCamera.release();
-								mCamera = null;
-							}
 						//region カメラの設定
 						mCamera = Camera.open();
 
@@ -256,6 +250,13 @@ public class DrawCamera
 				return mCamera;
 			}
 
+        public static void cameraRelease(){
+            if(mCamera != null){
+                mCamera.stopPreview();
+                mCamera.release();
+                mCamera = null;
+            }
+        }
 
 		public void zoom(ZOOM zoom)
 			{
