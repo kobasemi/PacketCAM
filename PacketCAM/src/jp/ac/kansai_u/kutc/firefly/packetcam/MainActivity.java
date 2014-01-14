@@ -121,6 +121,8 @@ public class MainActivity extends Activity
 
 									// エフェクトを表示
 									mGLView.setTransparent();
+                                    //TODO: スタート，ストップ処理がまだ不十分
+                                    PcapManager.getInstance().start();  // Thread Start
 								}
 							else if (mSwitch.getVisibility() == VISIBILITY.VISIBLE)
 								{
@@ -128,6 +130,7 @@ public class MainActivity extends Activity
 
 									// エフェクトを非表示
 									mGLView.setTransparent();
+                                    PcapManager.getInstance().stop();  // Thread Stop
 								}
                             SharedPreferencesManager.getInstance().setEffectStatus(mSwitch.getVisibility());
 						}
