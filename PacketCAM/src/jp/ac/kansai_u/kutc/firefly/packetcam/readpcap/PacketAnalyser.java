@@ -74,13 +74,15 @@ public class PacketAnalyser {
     /**
      * パケットにEthernetヘッダが含まれているか
      * @return Ethernetヘッダの有無
-     * @throws IOException
-     * @throws CodecCreateException
      */
-    public boolean hasEthernet() throws IOException, CodecCreateException {
+    public boolean hasEthernet() {
         try{
             return hasPacket() && packet.hasHeader(Ethernet2.class);
         }catch(IllegalArgumentException e){
+            return false;
+        }catch(CodecCreateException e){
+            return false;
+        }catch(IOException e){
             return false;
         }
     }
@@ -88,13 +90,15 @@ public class PacketAnalyser {
     /**
      * パケットにIEEE802.3ヘッダが含まれているか
      * @return IEEE802.3ヘッダの有無
-     * @throws IOException
-     * @throws CodecCreateException
      */
-    public boolean hasIeee802dot3() throws IOException, CodecCreateException {
+    public boolean hasIeee802dot3() {
         try{
             return hasPacket() && packet.hasHeader(IEEE802dot3.class);
         }catch(IllegalArgumentException e){
+            return false;
+        }catch(CodecCreateException e){
+            return false;
+        }catch(IOException e){
             return false;
         }
     }
@@ -102,13 +106,15 @@ public class PacketAnalyser {
     /**
      * パケットにIPv4ヘッダが含まれているか
      * @return IPv4ヘッダの有無
-     * @throws IOException
-     * @throws CodecCreateException
      */
-    public boolean hasIp4() throws IOException, CodecCreateException {
+    public boolean hasIp4() {
         try{
             return hasPacket() && packet.hasHeader(Ip4.class);
         }catch(IllegalArgumentException e){
+            return false;
+        }catch(CodecCreateException e){
+            return false;
+        }catch(IOException e){
             return false;
         }
     }
@@ -116,13 +122,15 @@ public class PacketAnalyser {
     /**
      * パケットにTCPヘッダが含まれているか
      * @return TCPヘッダの有無
-     * @throws IOException
-     * @throws CodecCreateException
      */
-    public boolean hasTcp() throws IOException, CodecCreateException {
+    public boolean hasTcp() {
         try{
             return hasPacket() && packet.hasHeader(Tcp.class);
         }catch(IllegalArgumentException e){
+            return false;
+        }catch(CodecCreateException e){
+            return false;
+        }catch(IOException e){
             return false;
         }
     }
@@ -130,13 +138,15 @@ public class PacketAnalyser {
     /**
      * パケットにUDPヘッダが含まれているか
      * @return UDPヘッダの有無
-     * @throws IOException
-     * @throws CodecCreateException
      */
-    public boolean hasUdp() throws IOException, CodecCreateException {
+    public boolean hasUdp() {
         try{
             return hasPacket() && packet.hasHeader(Udp.class);
         }catch(IllegalArgumentException e){
+            return false;
+        }catch(CodecCreateException e){
+            return false;
+        }catch(IOException e){
             return false;
         }
 
@@ -145,13 +155,15 @@ public class PacketAnalyser {
     /**
      * パケットにICMPヘッダが含まれているか
      * @return ICMPヘッダの有無
-     * @throws IOException
-     * @throws CodecCreateException
      */
-    public boolean hasIcmp() throws IOException, CodecCreateException {
+    public boolean hasIcmp() {
         try{
             return hasPacket() && packet.hasHeader(Icmp.class);
         }catch(IllegalArgumentException e){
+            return false;
+        }catch(CodecCreateException e){
+            return false;
+        }catch(IOException e){
             return false;
         }
     }
@@ -159,13 +171,15 @@ public class PacketAnalyser {
     /**
      * パケットにARPヘッダが含まれているか
      * @return ARPヘッダの有無
-     * @throws IOException
-     * @throws CodecCreateException
      */
-    public boolean hasArp() throws IOException, CodecCreateException {
+    public boolean hasArp() {
         try{
             return hasPacket() && packet.hasHeader(Arp.class);
         }catch(IllegalArgumentException e){
+            return false;
+        }catch(CodecCreateException e){
+            return false;
+        }catch(IOException e){
             return false;
         }
     }
