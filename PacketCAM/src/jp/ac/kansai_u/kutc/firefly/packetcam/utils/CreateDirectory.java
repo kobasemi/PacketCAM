@@ -9,21 +9,10 @@ import java.io.File;
 public class CreateDirectory {
 
     /**
-     * 画像保存用及びパケットファイル用ディレクトリの作成
-     * @return 正常に作成できればtrue，できなければfalseを返す
-     * TODO: 今はこのまま放置しておくけど，こんな訳わからんメソッドはいつか消す，またはメソッド名変える
-     */
-    public static boolean createDirectory ()
-    {
-        return createDirectory("Pictures", Path.APPROOT_PATH) && createDirectory("Packet", Path.APPROOT_PATH);
-    }
-
-    /**
      * ディレクトリの作成
      * @param fullpath 作成したいディレクトリのフルパス
      * @return 正常に作成できればtrue，できなければfalseを返す
      */
-    //TODO: ディレクトリ作成時にPathクラスにパス名を追加とかしたほうがいいかも？
     public static boolean createDirectory (String fullpath)
     {
         File dirFile = new File(fullpath);

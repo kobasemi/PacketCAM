@@ -170,7 +170,6 @@ public class PcapManager implements Runnable{
 
     /**
      * ConcurrentPacketsQueueオブジェクトを返す
-     * TODO: インスタンス化は違う場所でやった方がいいと思う
      * @return packetsQueue インスタンス
      */
     public Queue<PcapPacket> getConcurrentPacketsQueue(){ return packetsQueue; }
@@ -213,6 +212,10 @@ public class PcapManager implements Runnable{
      * スレッド処理を開始する
      */
     public void start(){
+        if(executor.isShutdown())
+            // 復帰時にシャットダウンしていた場合
+            executor = Executors.newSingleThreadScheduledExecutor();
+        // this: スレッド，1000: 周期，TimeUnit.MILLSECONDS: ミリ秒単位
         future = executor.scheduleAtFixedRate(this, 0, 1000, TimeUnit.MILLISECONDS);
     }
     /**
