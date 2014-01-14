@@ -13,7 +13,6 @@ import java.lang.reflect.Field;
 
 /**
  * res/raw/ディレクトリ以下にあるPcapファイルをSDカードへコピーする
- * TODO: assetsを使用したほうがいい，ファイル追加の柔軟性がダンチ
  * @author akasaka
  */
 public class CopyAllRawFieldToSd{

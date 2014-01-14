@@ -16,12 +16,9 @@ import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.GLView;
 import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.ReadPcapFileDialog;
 import jp.ac.kansai_u.kutc.firefly.packetcam.setting.SettingDialog;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CopyAllPcapFileToSd;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.CreateDirectory;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.*;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.VISIBILITY;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.ZOOM;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.SharedPreferencesManager;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
 
 import java.util.List;
 
@@ -55,8 +52,9 @@ public class MainActivity extends Activity
 				SharedPreferencesManager.getInstance().init(MainActivity.this);
 
 				if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
-					// SDカードがマウントされているならば，ディレクトリを作成する
-					if (CreateDirectory.createDirectory())
+					// SDカードがマウントされているならば，画像保存用及びパケット保存用ディレクトリを作成する
+					if (CreateDirectory.createDirectory("Pictures", Path.APPROOT_PATH) &&
+                            CreateDirectory.createDirectory("Packet", Path.APPROOT_PATH))
 						Log.d(TAG, "Create Directory Success");
 					else
 						Log.d(TAG, "Create Directory Filed...");
@@ -66,7 +64,6 @@ public class MainActivity extends Activity
 				// assets/cap ディレクトリ以下の構造をそのままSDカードにコピーする
 				new CopyAllPcapFileToSd(getApplicationContext());
 
-
 				// シャッターボタン
 				ImageButton shutterBtn = (ImageButton) findViewById(R.id.shutter);
 				shutterBtn.setOnClickListener(new OnClickListener()
@@ -74,18 +71,6 @@ public class MainActivity extends Activity
 					@Override
 					public void onClick(View v)
 						{
-//				if (camera != null)
-//				{
-//					if (!mIsTake)
-//					{
-//						Toast.makeText (MainActivity.this, "撮影", Toast.LENGTH_SHORT).show();
-//						mIsTake = true;
-//						camera.autoFocus (mAutoFocusListener);
-//
-//						// エフェクト画面の合成素材Bitmapを作成し、本クラスのeffectBitmapに格納
-//						glView.setShutter();
-//					}
-//				}
 							Toast.makeText(MainActivity.this, "パシャッ", Toast.LENGTH_SHORT).show();
 							mGLView.setShutter();
 						}
@@ -121,7 +106,6 @@ public class MainActivity extends Activity
 
 									// エフェクトを表示
 									mGLView.setTransparent();
-                                    //TODO: スタート，ストップ処理がまだ不十分
                                     PcapManager.getInstance().start();  // Thread Start
 								}
 							else if (mSwitch.getVisibility() == VISIBILITY.VISIBLE)
@@ -220,56 +204,11 @@ public class MainActivity extends Activity
 								{
 									case KeyEvent.KEYCODE_VOLUME_UP:
 										mDrawCamera.zoom(ZOOM.ZOOMUP);
-//						// ズームイン機能
-//						parameter = camera.getParameters ();
-//						nowZoom = parameter.getZoom ();
-//
-//						if (nowZoom < parameter.getMaxZoom ())
-//						{
-//							parameter.setZoom (nowZoom + 1);
-//						}
-//						camera.setParameters (parameter);
 										return true;
 									case KeyEvent.KEYCODE_VOLUME_DOWN:
 										// ズームダウン機能
 										mDrawCamera.zoom(ZOOM.ZOOMDOWN);
-//						parameter = camera.getParameters ();
-//						nowZoom = parameter.getZoom ();
-//
-//						if (nowZoom > 0)
-//						{
-//							parameter.setZoom (nowZoom - 1);
-//						}
-//						camera.setParameters (parameter);
 										return true;
-
-									// BackキーおよびHomeキーを押した際に終了処理を行う
-//									case KeyEvent.KEYCODE_BACK:
-//										mGLView.calledWhenExit();
-//										try
-//											{
-//												mGLView.drawThread.join();
-//											}
-//										catch (InterruptedException e)
-//											{
-//												e.printStackTrace();
-//											}
-//										mDrawCamera.calledWhenExit();
-//										finish();
-//										return true;
-//									case KeyEvent.KEYCODE_HOME:
-//										mGLView.calledWhenExit();
-//										try
-//											{
-//												mGLView.drawThread.join();
-//											}
-//										catch (InterruptedException e)
-//											{
-//												e.printStackTrace();
-//											}
-//										mDrawCamera.calledWhenExit();
-//										finish();
-//										return true;
 									default:
 										break;
 								}
