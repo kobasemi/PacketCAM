@@ -106,6 +106,7 @@ public class PcapManager implements Runnable{
      * PacketIteratorの不具合なのか原因は不明だが
      * pi.next()でBufferUnderflowExceptionの例外を吐く
      * しかし，リストへの追加は正常に行われているため，無理やりキャッチする
+     * ちなみに，このメソッドは絶対に例外を吐くメソッド，どうしようもないねｗ
      *
      * 調査したところ，hasNext()がどうも上手いこと動いていないように見える
      * 例えば，
@@ -172,9 +173,7 @@ public class PcapManager implements Runnable{
      * TODO: インスタンス化は違う場所でやった方がいいと思う
      * @return packetsQueue インスタンス
      */
-    public Queue getConcurrentPacketsQueue(){
-        return packetsQueue;
-    }
+    public Queue<PcapPacket> getConcurrentPacketsQueue(){ return packetsQueue; }
 
     /**
      * 使わないで．
@@ -184,9 +183,7 @@ public class PcapManager implements Runnable{
      * @throws IOException
      * @deprecated
      */
-    public PcapPacket getPacket() throws IOException {
-        return packetIterator.next();
-    }
+    public PcapPacket getPacket() throws IOException { return packetIterator.next(); }
 
     /**
      * ファイルからロードしたパケットの数を返す
