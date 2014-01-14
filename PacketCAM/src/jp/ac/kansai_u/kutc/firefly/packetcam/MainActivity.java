@@ -108,7 +108,7 @@ public class MainActivity extends Activity
 					@Override
 					public void onClick(View v)
 						{
-							if (!PcapManager.getInstance().isPcapFileOpened())
+							if (!PcapManager.getInstance().isReady())
 								{
 									// PcapFileがオープンされていない場合
 									// PcapFile読み込みダイアログを表示する
@@ -306,5 +306,12 @@ public class MainActivity extends Activity
             super.onPause();
             mGLView.onPause();
             DrawCamera.cameraRelease();
+            PcapManager.getInstance().stop();
+        }
+
+        @Override
+        protected void onDestroy() {
+            super.onDestroy();
+            PcapManager.getInstance().shutdown();
         }
     }

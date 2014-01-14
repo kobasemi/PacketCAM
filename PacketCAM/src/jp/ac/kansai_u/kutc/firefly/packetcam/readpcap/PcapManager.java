@@ -9,6 +9,10 @@ import org.jnetstream.capture.file.pcap.PcapPacket;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.BufferUnderflowException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -22,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class PcapManager implements Runnable{
 
     /** シングルトン♪ シングルトン♪ 鈴が鳴る〜♪ */
+    private PcapManager(){}
     private static PcapManager instance = new PcapManager();
     /**
      * シングルトンのインスタンスを返す
@@ -32,14 +37,31 @@ public class PcapManager implements Runnable{
     }
 
     final String TAG = "PcapManager.java";
-    private PcapFile pcapFile; // 常に一つのファイルのみを保持する
-    // pcapFileとキューの中間で橋渡しをするイテレータ
-    private PacketIterator<PcapPacket> packetIterator = null;
+    private PcapFile pcapFile = null; // 常に一つのファイルのみを保持する
+
+    /**
+     * PacketIterator<T>のhasNext()及びnext()が訳分からん例外を吐くため，
+     * 例外を吐かないIterator<T>を使用する
+     * コードは多少解りづらくなるが，仕方がない
+     * 詳しくは，setPacketsToPacketList()を参照
+     */
+    // PacketIterator<T>とIterator<T>の中間で橋渡しをするリスト
+    private List<PcapPacket> packetList = new ArrayList<PcapPacket>();
+    // キューへの装填を仲介するイテレータ
+    Iterator<PcapPacket> packetIterator = null;
     // スレッドセーフなキュー @see ConcurrentPacketsQueue
     private Queue<PcapPacket> packetsQueue = new ConcurrentPacketsQueue<PcapPacket>();
 
-    private PcapManager(){
-        pcapFile = null;
+    // PcapManagerの準備状態
+    private boolean isReady = false;
+
+    /**
+     * 絶対パスからファイルオブジェクトをインスタンス化し，open(File file)を呼び出す
+     * @param  path ファイルの絶対パス
+     * @return b    オープン成功・失敗
+     */
+    public boolean open(String path){
+        return open(new File(path));
     }
 
     /**
@@ -47,35 +69,76 @@ public class PcapManager implements Runnable{
      * @param file ファイルオブジェクト
      * @return b   オープン成功・失敗
      */
-    public boolean openPcapFile(File file){
+    public boolean open(File file){
+        if(file.isDirectory())
+            // ディレクトリ内の全てのファイルを読み込む
+            for(File f: file.listFiles())
+                openPcapFile(f);
+        else
+            openPcapFile(file);
+
+        // PcapFileからの全てのパケットが格納されたリストからイテレータを取得する
+        packetIterator = packetList.iterator();
+        isReady = true;
+        return true;
+    }
+
+    private boolean openPcapFile(File file){
         if(pcapFile != null){
             // 既にPcapFileが開かれていた場合
             closePcapFile();
         }
 
-        if(file.isDirectory())
-            // ディレクトリ内のファイルを再帰的に読み込む
-            for(File f: file.listFiles())
-                openPcapFile(f);
-        else
-            try {
-                pcapFile = Captures.openFile(PcapFile.class, file, FileMode.ReadOnly);
-                setPacketsToPacketIterator();  // Set Packets from pcapFile
-                Log.d(TAG, "FILE OPEN SUCCESS: " + file.getName());
-            } catch (IOException e) {
-                Log.d(TAG, "FAILED TO OPEN");
-                return false;
-            }
+        try {
+            pcapFile = Captures.openFile(PcapFile.class, file, FileMode.ReadOnly);
+            setPacketsToPacketList();
+            Log.d(TAG, "FILE OPEN SUCCESS: " + file.getName());
+        } catch (IOException e) {
+            Log.d(TAG, "FAILED TO OPEN");
+            return false;
+        }
         return true;
     }
 
+
     /**
-     * 絶対パスからファイルオブジェクトをインスタンス化し，openPcapFileを呼び出す
-     * @param  path ファイルの絶対パス
-     * @return b    オープン成功・失敗
+     * PcapFileからロードしたパケットをイテレータに変換した後，リストに追加する
+     *
+     * PacketIteratorの不具合なのか原因は不明だが
+     * pi.next()でBufferUnderflowExceptionの例外を吐く
+     * しかし，リストへの追加は正常に行われているため，無理やりキャッチする
+     *
+     * 調査したところ，hasNext()がどうも上手いこと動いていないように見える
+     * 例えば，
+         * while(pi.hasNext())
+         *     pi.next();
+     * というコードを実行したとき，イテレータが持っている範囲を超えてnext()をしているのではないか
+     * また下記デバッグコードを実行したとき
+         * // イテレータの中身は10個のみ
+         * static int cnt = 0;
+         * while(pi.hasNext()){
+         *     Log.d(TAG, String.valueOf(++cnt));
+         *     pi.next();
+         * }
+     * ログの結果を見ると，11までカウントが進んでいる
+     * イテレータの中身は10個のため，これは可笑しいと思われる
+     * hasNext()が上手いこと動かないことにより，next()で例外を吐いている？
+     * ??? 原因不明 ???
      */
-    public boolean openPcapFile(String path){
-        return openPcapFile(new File(path));
+    private void setPacketsToPacketList(){
+        if(pcapFile.isOpen()) {
+            try {
+                PacketIterator<PcapPacket> tmpPacketIterator = pcapFile.getPacketIterator();
+                while(tmpPacketIterator.hasNext()){
+                    packetList.add(tmpPacketIterator.next());
+                }
+            } catch(IOException e) {
+                Log.d(TAG, "FAILED TO SET PACKETS");
+            } catch(BufferUnderflowException e){
+                // イテレータのnext()が吐く例外
+                Log.d(TAG, "F**K Exception!!! why happen?");
+            }
+        }
     }
 
     /**
@@ -92,12 +155,10 @@ public class PcapManager implements Runnable{
     }
 
     /**
-     * PcapFileがオープンされているかどうか
-     * @return オープン/アンオープン
+     * PcapManagerの準備が完了しているかどうか
+     * @return 完了/未完了
      */
-    public boolean isPcapFileOpened(){
-        return (pcapFile != null);
-    }
+    public boolean isReady(){ return isReady; }
 
     /**
      * 開いているPcapFileを返す．開いていない場合は，nullを返す
@@ -117,32 +178,6 @@ public class PcapManager implements Runnable{
     }
 
     /**
-     * ファイルからロードしたパケットをイテレータにセットする
-     */
-    private void setPacketsToPacketIterator(){
-        if(pcapFile.isOpen()) {
-            try {
-                packetIterator = pcapFile.getPacketIterator();
-            } catch(IOException e) {
-                Log.d(TAG, "FAILED TO SET PACKETS");
-            }
-        }
-    }
-
-    /**
-     * イテレータにパケットが残っているか
-     * @return パケットの有無
-     */
-    public boolean hasPacket() {
-        try {
-            return packetIterator.hasNext();
-        } catch(IOException e) {
-            Log.d(TAG, "FAILED TO CHECK HASNEXT()");
-        }
-        return false;
-    }
-
-    /**
      * 使わないで．
      * パケットが欲しい場合は，キューから貰って．
      * これ使ったら，イテレータのポジションが進む
@@ -157,6 +192,7 @@ public class PcapManager implements Runnable{
     /**
      * ファイルからロードしたパケットの数を返す
      * @return パケット数，マイナスの場合はエラー
+     * @deprecated BufferUnderflowExceptionが投げられる
      */
     public long getPacketCount(){
         try {
@@ -184,12 +220,14 @@ public class PcapManager implements Runnable{
     }
     /**
      * スレッド処理を一時停止する
+     * called when onPause()
      */
     public void stop(){
         if(future != null) future.cancel(true);
     }
     /**
      * スレッド処理を完全停止する
+     * called when onDestroy()
      */
     public void shutdown(){
         stop();  // 一時停止をしてから停止する
@@ -203,14 +241,10 @@ public class PcapManager implements Runnable{
      */
     @Override
     public void run() {
-        if(hasPacket())
-            try {
-                if(packetsQueue.add(packetIterator.next()))  // キューに装填
-                    Log.d(TAG + ": add", "Success");
-            } catch(IOException e) {
-                Log.d(TAG, "FAILED TO SET PACKET TO QUEUE");
-            }
+        if(packetIterator.hasNext())
+            if(packetsQueue.add(packetIterator.next()))  // キューに装填
+                Log.d(TAG + ": add", "Success");
         else
-            shutdown();
+            stop();
     }
 }

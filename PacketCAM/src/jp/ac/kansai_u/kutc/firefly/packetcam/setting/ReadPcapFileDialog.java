@@ -44,6 +44,6 @@ public class ReadPcapFileDialog implements DialogInterface.OnClickListener {
     public void onClick(DialogInterface dialog, int which) {
         // 選択されたパケットファイルのパス
         String filePath = Path.PACKETFOLDER_PATH + File.separator + str_items[which];
-        PcapManager.getInstance().openPcapFile(new File(filePath));
+        PcapManager.getInstance().open(new File(filePath));
     }
 }
