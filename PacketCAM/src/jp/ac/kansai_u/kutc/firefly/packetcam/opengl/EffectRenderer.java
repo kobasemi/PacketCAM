@@ -4,13 +4,17 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
+import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PacketAnalyser;
 import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
 import org.jnetstream.capture.file.pcap.PcapPacket;
+import org.jnetstream.protocol.codec.CodecCreateException;
+import org.jnetstream.protocol.tcpip.Tcp;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Queue;
@@ -34,6 +38,9 @@ public class EffectRenderer implements GLSurfaceView.Renderer
     PcapPacket packet = null;
     // スレッドセーフなキュー，インスタンスはPcapManagerから取得する
     Queue<PcapPacket> packetsQueue;
+
+	// パケットアナライザ
+	PacketAnalyser packetAnalyser = new PacketAnalyser();
 
     /**
      * GLSurfaceViewのRendererが生成された際に呼ばれる
@@ -94,16 +101,187 @@ public class EffectRenderer implements GLSurfaceView.Renderer
             // 描画オブジェクトを追加する
 
 			// TODO ここでパケット情報を用いてエフェクトを追加していく
-
+/*
 			// 描画位置：TCPのdport
 			// dport値を前後に分割して，intの0〜100で出して利用する
 			// 分割前が奇数桁だった場合は，3桁と2桁みたいに分ける
 			// もし分割しても3桁だった場合は，/2する
 
+			// パケットアナライザに渡されたパケットをセットする
+			packetAnalyser.setPacket(packet);
+
+			if (!packetAnalyser.hasPacket())
+			{
+				// パケットがセットされていなければ処理を行わない
+				return;
+			}
+
+			// TCPヘッダがPacketに含まれているかを確認する
+
+			try
+			{
+				// Tcpヘッダを取得
+				Tcp tcp = packetAnalyser.getTcp();
+
+				// dport値，sport値を取得
+				short dport = tcp.destination();
+				short sport = tcp.source();
+
+				// dport，sportをそれぞれ，char配列に入れる
+				char[] dportChar = String.valueOf(dport).toCharArray();
+				char[] sportChar = String.valueOf(sport).toCharArray();
+
+
+				//region dport
+				if ((dportChar.length % 2) != 0)
+				{
+					// 桁数が奇数の場合の処理
+					// だいたい真ん中を求める
+					int aboutCenter = dportChar.length / 2;
+
+					char[] firstChar = new char[aboutCenter + 1];
+
+					int j = 0;
+					for (int i = 0; i < aboutCenter + 1; i++)
+					{
+						firstChar[i] = dportChar[i];
+						j++;
+					}
+
+
+					char[] secondChar = new char[aboutCenter];
+
+					j++;
+					for (int i = 0; i < aboutCenter; i++)
+					{
+						secondChar[i] = dportChar[j];
+						j++;
+					}
+
+					// firstの方が桁数が多くなるはず
+					short first = Short.valueOf(firstChar.toString());
+					short second = Short.valueOf(secondChar.toString());
+
+					// 0~65535
+					// firstが3桁以上の場合，2で割る
+
+					first = digitReducer(first);
+					second = digitReducer(second);
+				}
+				else
+				{
+					// 4桁か，2桁
+					int center = dportChar.length / 2;
+					char[] firstChar = new char[center];
+
+					int j = 0;
+					for (int i = 0; i < center; i++)
+					{
+						firstChar[i] = dportChar[i];
+						j++;
+					}
+
+					char[] secondChar = new char[center];
+
+					j++;
+					for (int i = 0; i < center; i++)
+					{
+						secondChar[i] = dportChar[j];
+						j++;
+					}
+
+					short first = Short.valueOf(firstChar.toString());
+					short second = Short.valueOf(secondChar.toString());
+
+					first = digitReducer(first);
+					second = digitReducer(second);
+				}
+				//endregion
+
+				short a = 0;
+
+				//region sport
+				if ((sportChar.length % 2) != 0)
+				{
+					// 桁数が奇数の場合の処理
+
+					// だいたい真ん中を求める
+					int aboutCenter = sportChar.length / 2;
+
+					char[] firstChar = new char[aboutCenter + 1];
+
+					int j = 0;
+					for (int i = 0; i < aboutCenter + 1; i++)
+					{
+						firstChar[i] = sportChar[i];
+						j++;
+					}
+
+					char[] secondChar = new char[aboutCenter];
+
+					j++;
+					for (int i = 0; i < aboutCenter; i++)
+					{
+						secondChar[i] = sportChar[j];
+						j++;
+					}
+
+					// firstの方が桁数が多くなるはず
+					short first = Short.valueOf(firstChar.toString());
+					short second = Short.valueOf(secondChar.toString());
+
+					// 0~65535
+					// 3桁の場合，2でひたすら割って2桁にする
+
+					first = digitReducer(first);
+					second = digitReducer(second);
+				}
+				else
+				{
+					// 桁数が偶数の場合の処理
+					// 4桁か2桁
+					int center = sportChar.length / 2;
+					char[] firstChar = new char[center];
+
+					int j = 0;
+					for (int i = 0; i < center; i++)
+					{
+						firstChar[i] = sportChar[i];
+						j++;
+					}
+
+					char[] secondChar = new char[center];
+
+					j++;
+					for (int i = 0; i < center; i++)
+					{
+						secondChar[i] = sportChar[j];
+						j++;
+					}
+
+					short first = Short.valueOf(firstChar.toString());
+					short second = Short.valueOf(secondChar.toString());
+
+					first = digitReducer(first);
+					second = digitReducer(second);
+				}
+				//endregion
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+			catch (CodecCreateException e)
+			{
+				e.printStackTrace();
+			}
+
+
 			// サイズ：TCPのsport
 			// こちらも上に同じ
 
 			// カラー：ICMPのchecksumとか，あるいはsequenceとか
+*/
             Draw2DList.add(new Draw2D(0, 0, 50, 20, Enum.COLOR.BLACK));
             packet = null;
         }
@@ -140,6 +318,19 @@ public class EffectRenderer implements GLSurfaceView.Renderer
         }
         gl.glDisable(GL10.GL_BLEND);
     }
+
+
+	// 3桁以上の値を2で割って2桁に抑える
+	private short digitReducer(short source)
+	{
+		if (String.valueOf(source).length() > 2)
+		{
+			source = (short)(source / 2);
+			digitReducer(source);
+		}
+
+		return source;
+	}
 
 
     /**
