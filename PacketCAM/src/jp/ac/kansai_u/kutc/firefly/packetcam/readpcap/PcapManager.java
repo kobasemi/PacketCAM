@@ -58,18 +58,17 @@ public class PcapManager implements Runnable{
     /**
      * 絶対パスからファイルオブジェクトをインスタンス化し，open(File file)を呼び出す
      * @param  path ファイルの絶対パス
-     * @return b    オープン成功・失敗
      */
-    public boolean open(String path){
-        return open(new File(path));
+    public void open(String path){
+        open(new File(path));
     }
 
     /**
-     * PcapFileを開き，イテレータにパケットをセットする
-     * @param file ファイルオブジェクト
-     * @return b   オープン成功・失敗
+     * 選択されたファイル（ディレクトリの場合，中の全てのファイル）を開き，
+     * 選択されたファイルから得られる全てのパケットを格納したリストをイテレータに変換する
+     * @param file 選択されたファイルオブジェクト
      */
-    public boolean open(File file){
+    public void open(File file){
         if(file.isDirectory())
             // ディレクトリ内の全てのファイルを読み込む
             for(File f: file.listFiles())
@@ -77,16 +76,18 @@ public class PcapManager implements Runnable{
         else
             openPcapFile(file);
 
-        // PcapFileからの全てのパケットが格納されたリストからイテレータを取得する
         packetIterator = packetList.iterator();
         isReady = true;
-        return true;
     }
 
-    private boolean openPcapFile(File file){
+    /**
+     * PcapFileをオープンし，パケットをリストに追加する
+     * @param file ロードするファイル
+     */
+    private void openPcapFile(File file){
         if(pcapFile != null){
             // 既にPcapFileが開かれていた場合
-            closePcapFile();
+            close();
         }
 
         try {
@@ -95,9 +96,7 @@ public class PcapManager implements Runnable{
             Log.d(TAG, "FILE OPEN SUCCESS: " + file.getName());
         } catch (IOException e) {
             Log.d(TAG, "FAILED TO OPEN");
-            return false;
         }
-        return true;
     }
 
 
@@ -145,7 +144,7 @@ public class PcapManager implements Runnable{
      * PcapFileを閉じる
      * プログラム終了時，必ず閉じなければならない
      */
-    public void closePcapFile(){
+    public void close(){
         try {
             pcapFile.close();
             pcapFile = null;
@@ -209,6 +208,7 @@ public class PcapManager implements Runnable{
      * stop()    ; スレッドの一時停止
      * shutdown(); スレッドの停止
      * @see java.util.concurrent.ScheduledExecutorService
+     * ref: http://www.02.246.ne.jp/~torutk/javahow2/timer.html#doc1_id147
      */
     ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     ScheduledFuture<?> future = null;
