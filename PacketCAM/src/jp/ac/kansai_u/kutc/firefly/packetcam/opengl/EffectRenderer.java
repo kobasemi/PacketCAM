@@ -4,13 +4,16 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
+import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
+import org.jnetstream.capture.file.pcap.PcapPacket;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Queue;
 
 /**
  * OpenGLの描画を行う
@@ -28,6 +31,9 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
     private DrawCamera mDrawCamera;
 
+    PcapPacket packet = null;
+    // スレッドセーフなキュー，インスタンスはPcapManagerから取得する
+    Queue<PcapPacket> packetsQueue;
 
     /**
      * GLSurfaceViewのRendererが生成された際に呼ばれる
@@ -42,6 +48,8 @@ public class EffectRenderer implements GLSurfaceView.Renderer
         mDrawCamera = new DrawCamera();
         mDrawCamera.generatedTexture(gl);
         newGraphic();
+        // キューの取得
+        packetsQueue = PcapManager.getInstance().getConcurrentPacketsQueue();
     }
 
 
@@ -78,6 +86,15 @@ public class EffectRenderer implements GLSurfaceView.Renderer
     public void onDrawFrame(GL10 gl)
     {
         Log.i(TAG, "onDrawFrame");
+
+        // キューの先頭パケットを取得．到着していない場合でもぬるぽを出さない
+        packet = packetsQueue.poll();
+        if(packet != null){
+            // パケットが到着した場合
+            // 描画オブジェクトを追加する
+            Draw2DList.add(new Draw2D(0, 0, 50, 20, Enum.COLOR.BLACK));
+            packet = null;
+        }
 
         if (mSwitch.getDrawstate() == Enum.DRAWSTATE.PREPARATION)
         {
