@@ -92,6 +92,18 @@ public class EffectRenderer implements GLSurfaceView.Renderer
         if(packet != null){
             // パケットが到着した場合
             // 描画オブジェクトを追加する
+
+			// TODO ここでパケット情報を用いてエフェクトを追加していく
+
+			// 描画位置：TCPのdport
+			// dport値を前後に分割して，intの0〜100で出して利用する
+			// 分割前が奇数桁だった場合は，3桁と2桁みたいに分ける
+			// もし分割しても3桁だった場合は，/2する
+
+			// サイズ：TCPのsport
+			// こちらも上に同じ
+
+			// カラー：ICMPのchecksumとか，あるいはsequenceとか
             Draw2DList.add(new Draw2D(0, 0, 50, 20, Enum.COLOR.BLACK));
             packet = null;
         }
