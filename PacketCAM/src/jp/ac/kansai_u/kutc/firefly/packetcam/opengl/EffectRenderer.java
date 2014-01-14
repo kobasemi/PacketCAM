@@ -320,6 +320,91 @@ public class EffectRenderer implements GLSurfaceView.Renderer
     }
 
 
+	/**
+	 * ポート番号から，オブジェクト生成用の座標を求める
+	 * @param port
+	 * @return
+	 */
+	private short[] calcPort(short port)
+	{
+		// ポート番号をchar配列に
+		char[] portChar = String.valueOf(port).toCharArray();
+
+		if ((portChar.length % 2) != 0)
+		{
+			// 桁数が奇数の場合の処理
+			// だいたい真ん中を求める
+			int aboutCenter = portChar.length / 2;
+
+			char[] firstChar = new char[aboutCenter + 1];
+
+			int j = 0;
+			for (int i = 0; i < aboutCenter + 1; i++)
+			{
+				firstChar[i] = portChar[i];
+				j++;
+			}
+
+			char[] secondChar = new char[aboutCenter];
+
+			j++;
+			for (int i = 0; i < aboutCenter; i++)
+			{
+				secondChar[i] = portChar[j];
+				j++;
+			}
+
+			// firstの方が桁数が多くなるはず
+			short first = Short.valueOf(firstChar.toString());
+			short second = Short.valueOf(secondChar.toString());
+
+			// PORT番号の幅は，0~65535
+			// firstが3桁以上の場合，ひたすら2で割って2桁に抑える
+			first = digitReducer(first);
+			second = digitReducer(second);
+
+			short[] data = new short[2];
+			data[0] = first;
+			data[1] = second;
+			return data;
+		}
+		else
+		{
+			// 桁数が偶数の場合
+			// 4桁か，2桁
+			int center = portChar.length / 2;
+			char[] firstChar = new char[center];
+
+			int j = 0;
+			for (int i = 0; i < center; i++)
+			{
+				firstChar[i] = portChar[i];
+				j++;
+			}
+
+			char[] secondChar = new char[center];
+
+			j++;
+			for (int i = 0; i < center; i++)
+			{
+				secondChar[i] = portChar[j];
+				j++;
+			}
+
+			short first = Short.valueOf(firstChar.toString());
+			short second = Short.valueOf(secondChar.toString());
+
+			first = digitReducer(first);
+			second = digitReducer(second);
+
+			short[] data = new short[2];
+			data[0] = first;
+			data[1] = second;
+			return data;
+		}
+	}
+
+
 	// 3桁以上の値を2で割って2桁に抑える
 	private short digitReducer(short source)
 	{
