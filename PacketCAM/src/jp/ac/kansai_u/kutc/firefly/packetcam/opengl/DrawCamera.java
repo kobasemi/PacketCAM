@@ -61,8 +61,8 @@ public class DrawCamera
 				Log.i(TAG, "DrawCamera");
 				mSwitch = Switch.getInstance();
 
-				mVertexBuffer = Draw2D.makeFloatBuffer(vertices);
-				mTexCoordsBuffer = Draw2D.makeFloatBuffer(texcoords);
+				mVertexBuffer = DrawBlendingRectangle.makeFloatBuffer(vertices);
+				mTexCoordsBuffer = DrawBlendingRectangle.makeFloatBuffer(texcoords);
 			}
 
 

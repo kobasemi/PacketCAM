@@ -26,7 +26,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
     private static final String TAG = EffectRenderer.class.getSimpleName();
 
     // オブジェクトを格納するリスト
-    ArrayList<Draw2D> Draw2DList = new ArrayList<Draw2D>();
+    ArrayList<DrawBlendingRectangle> drawBlendingRectangleList = new ArrayList<DrawBlendingRectangle>();
 
     int mWidth = 0, mHeight = 0;
 
@@ -117,28 +117,13 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                 Tcp tcp = pa.getTcp();
 
                 short dport = tcp.destination();
-				Log.i(TAG, "dport = " + dport);
                 short sport = tcp.source();
-				Log.i(TAG, "sport = " + sport);
-
-				// データにマイナス？が混じっている場合があるので，取り除く
-				dport = minusReducer(dport);
-				sport = minusReducer(sport);
-
-				Log.i(TAG, "noMinusdport = " + dport);
-				Log.i(TAG, "noMinussport = " + sport);
 
                 // 描画位置：TCPヘッダのdport
-                short[] dportPoint = calcPort(dport);
+                short[] dportPoint = DrawBlendingRectangle.calcPort(dport);
 
                 // 描画サイズ：TCPヘッダのsport
-                short[] sportPoint = calcPort(sport);
-
-				Log.i(TAG, "dportPoint[0] = " + dportPoint[0]);
-				Log.i(TAG, "dportPoint[1] = " + dportPoint[1]);
-
-				Log.i(TAG, "sportPoint[0] = " + sportPoint[0]);
-				Log.i(TAG, "sportPoint[1] = " + sportPoint[1]);
+                short[] sportPoint = DrawBlendingRectangle.calcPort(sport);
 
 				Enum.COLOR color = null;
 				if (colorFlg == 0) color = Enum.COLOR.RED;
@@ -150,18 +135,11 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 				if (colorFlg == 6) color = Enum.COLOR.WHITE;
 				if (colorFlg == 7) color = Enum.COLOR.BLACK;
 
-
-				Draw2DList.add(new Draw2D(dportPoint[0], dportPoint[1], sportPoint[0], sportPoint[1], color));
+				drawBlendingRectangleList.add(new DrawBlendingRectangle(dportPoint[0], dportPoint[1], sportPoint[0], sportPoint[1], color));
 
 				colorFlg++;
 				if (colorFlg == 8) colorFlg = 0;
 			}
-
-            // カラー：ICMPのchecksumとか，あるいはsequenceとか
-
-//            Draw2DList.add(new Draw2D(dportPoint[0], dportPoint[1], sportPoint[0], sportPoint[1], Enum.COLOR.BLACK));
-
-//            Draw2DList.add(new Draw2D(0, 0, 50, 20, Enum.COLOR.BLACK));
             packet = null;
         }
 
@@ -183,9 +161,9 @@ public class EffectRenderer implements GLSurfaceView.Renderer
         //SwitchクラスのswitchVisibilityメソッドをcallして描画のON・OFFを行う
         if (mSwitch.getVisibility() == Enum.VISIBILITY.VISIBLE)
         {
-            for (int i = 0; i < this.Draw2DList.size(); i++)
+            for (int i = 0; i < this.drawBlendingRectangleList.size(); i++)
             {
-                Draw2DList.get(i).draw(gl);
+                drawBlendingRectangleList.get(i).draw(gl);
             }
         }
 
@@ -200,119 +178,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
     }
 
 
-	private short minusReducer(short num)
-		{
-			if (num >= 0) return num;
-
-			char[] oldNumCharArray = String.valueOf(num).toCharArray();
-			char[] newNumCharArray = new char[oldNumCharArray.length - 1];
-
-			for (int i = 1; i < oldNumCharArray.length; i++)
-				{
-					newNumCharArray[i - 1] = oldNumCharArray[i];
-				}
-
-			short newNum = Short.valueOf(String.valueOf(newNumCharArray));
-			return newNum;
-		}
-
-
-	/**
-	 * ポート番号から，オブジェクト生成用の座標を求める
-	 * @param port
-	 * @return
-	 */
-	private short[] calcPort(short port)
-	{
-		// ポート番号をchar配列に
-		char[] portChar = String.valueOf(port).toCharArray();
-
-		if ((portChar.length % 2) != 0)
-		{
-			// 桁数が奇数の場合の処理
-			// だいたい真ん中を求める
-			int aboutCenter = portChar.length / 2;
-
-			char[] firstChar = new char[aboutCenter + 1];
-
-			int j = 0;
-			for (int i = 0; i < aboutCenter + 1; i++)
-			{
-				firstChar[i] = portChar[i];
-				j++;
-			}
-
-			char[] secondChar = new char[aboutCenter];
-
-			for (int i = 0; i < aboutCenter; i++)
-			{
-				secondChar[i] = portChar[j];
-				j++;
-			}
-
-			// firstの方が桁数が多くなるはず
-			short first = Short.valueOf(String.valueOf(firstChar));
-			short second = Short.valueOf(String.valueOf(secondChar));
-
-			// PORT番号の幅は，0~65535
-			// firstが3桁以上の場合，ひたすら2で割って2桁に抑える
-			first = digitReducer(first);
-			second = digitReducer(second);
-
-			short[] data = new short[2];
-			data[0] = first;
-			data[1] = second;
-			return data;
-		}
-		else
-		{
-			// 桁数が偶数の場合
-			// 4桁か，2桁
-			int center = portChar.length / 2;
-			char[] firstChar = new char[center];
-
-			int j = 0;
-			for (int i = 0; i < center; i++)
-			{
-				firstChar[i] = portChar[i];
-				j++;
-			}
-
-			char[] secondChar = new char[center];
-
-			for (int i = 0; i < center; i++)
-			{
-				secondChar[i] = portChar[j];
-				j++;
-			}
-
-			short first = Short.valueOf(String.valueOf(firstChar));
-			short second = Short.valueOf(String.valueOf(secondChar));
-
-			first = digitReducer(first);
-			second = digitReducer(second);
-
-			short[] data = new short[2];
-			data[0] = first;
-			data[1] = second;
-			return data;
-		}
-	}
-
-
-	// 3桁以上の値を10で割って2桁に抑える
-	private short digitReducer(short source)
-	{
-		if (String.valueOf(source).length() > 2)
-		{
-			source = (short)(source / 10);
-			digitReducer(source);
-		}
-
-		return source;
-	}
-
-
     /**
      * 新たな描画オブジェクトを生成する
      * Draw2Dに渡す引数は，xy座標及びwidth, height, 色情報
@@ -320,23 +185,23 @@ public class EffectRenderer implements GLSurfaceView.Renderer
      * 描画したい位置や描画図形の大きさをスクリーンのパーセンテージで指定する
      * インスタンス化は次の2通りの方法がある
      *  - int型で0〜100[%]で渡す方法．
-     *   ~ new Draw2D(0, 0, 100, 100, color);
+     *   ~ new DrawBlendingRectangle(0, 0, 100, 100, color);
      *  - float型で0.f〜1.fで渡す方法
-     *   ~ new Draw2D(0.f, 0.f, 1.f, 1.f ,color);
+     *   ~ new DrawBlendingRectangle(0.f, 0.f, 1.f, 1.f ,color);
      * 2つの例はどちらも，左上から右下までを描画するもの
      * 分かりやすい方法を使ったら良い
      *
-     * @see jp.ac.kansai_u.kutc.firefly.packetcam.opengl.Draw2D
+     * @see DrawBlendingRectangle
      */
     public void newGraphic()
     {
         Log.d(TAG, "newGraphic()");
-        Draw2D drawBlue = new Draw2D(0.f, 0.f, .25f, .25f, Enum.COLOR.BLUE);
-        Draw2DList.add(drawBlue);
-        Draw2D drawGreen = new Draw2D(.25f, .25f, .75f, .75f, Enum.COLOR.GREEN);
-        Draw2DList.add(drawGreen);
-        Draw2D drawRed = new Draw2D(.75f, .75f, .25f, .25f, Enum.COLOR.RED);
-        Draw2DList.add(drawRed);
+        DrawBlendingRectangle drawBlue = new DrawBlendingRectangle(0.f, 0.f, .25f, .25f, Enum.COLOR.BLUE);
+        drawBlendingRectangleList.add(drawBlue);
+        DrawBlendingRectangle drawGreen = new DrawBlendingRectangle(.25f, .25f, .75f, .75f, Enum.COLOR.GREEN);
+        drawBlendingRectangleList.add(drawGreen);
+        DrawBlendingRectangle drawRed = new DrawBlendingRectangle(.75f, .75f, .25f, .25f, Enum.COLOR.RED);
+        drawBlendingRectangleList.add(drawRed);
     }
 
 
@@ -348,7 +213,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
     public void removeGraphic(int num)
     {
         Log.d(TAG, "removeGraphic()");
-        Draw2DList.remove(num);
+        drawBlendingRectangleList.remove(num);
     }
 
 
