@@ -19,6 +19,7 @@ import java.util.Queue;
 
 /**
  * OpenGLの描画を行う
+ * @author akasaka kousaka
  */
 public class EffectRenderer implements GLSurfaceView.Renderer
 {
@@ -101,21 +102,27 @@ public class EffectRenderer implements GLSurfaceView.Renderer
         // キューの先頭パケットを取得．到着していない場合でもぬるぽを出さない
         packet = packetsQueue.poll();
         if(packet != null){
-            // パケットが到着した場合
-            // 描画オブジェクトを追加する
+            // パケットが到着した場合，描画オブジェクトを追加する
+
+            // 解析機にパケットをセットする
+            pa.setPacket(packet);
 
 			// TODO ここでパケット情報を用いてエフェクトを追加していく
 
-            Tcp tcp = pa.getTcp();
+            // 解析機からヘッダを取り出す場合
+            // 先にヘッダがあるかを確認してほしい
+            if(pa.hasTcp()){
+                Tcp tcp = pa.getTcp();
 
-            short dport = tcp.destination();
-            short sport = tcp.source();
+                short dport = tcp.destination();
+                short sport = tcp.source();
 
-            // 描画位置：TCPヘッダのdport
-            short[] dportPoint = calcPort(dport);
+                // 描画位置：TCPヘッダのdport
+                short[] dportPoint = calcPort(dport);
 
-            // 描画サイズ：TCPヘッダのsport
-            short[] sportPoint = calcPort(sport);
+                // 描画サイズ：TCPヘッダのsport
+                short[] sportPoint = calcPort(sport);
+            }
 
             // カラー：ICMPのchecksumとか，あるいはsequenceとか
 
