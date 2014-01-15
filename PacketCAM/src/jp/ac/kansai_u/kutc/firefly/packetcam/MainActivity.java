@@ -87,7 +87,9 @@ public class MainActivity extends Activity
                 });
 
 				// エフェクトボタン
-				final ImageButton effectBtn = (ImageButton) findViewById(R.id.effect);
+   				final ImageButton effectBtn = (ImageButton) findViewById(R.id.effect);
+                if(mSwitch.getVisibility() == VISIBILITY.VISIBLE)
+                    effectBtn.setImageResource(R.drawable.effect_on);
 				effectBtn.setOnClickListener(new OnClickListener()
 				{
 					@Override
@@ -241,6 +243,9 @@ public class MainActivity extends Activity
         protected void onResume() {
             super.onResume();
             mGLView.onResume();
+            if(mSwitch.getVisibility() == VISIBILITY.VISIBLE)
+                // エフェクトオン状態で復帰した場合
+                PcapManager.getInstance().start();
         }
 
         @Override
