@@ -36,6 +36,9 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
     PcapPacket packet = null;
 
+	int colorFlg = 0;
+	boolean alphaFlg = false;
+
     /**
      * スレッドセーフなキュー，インスタンスはPcapManagerから取得する
      * @see jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.ConcurrentPacketsQueue
@@ -97,9 +100,8 @@ public class EffectRenderer implements GLSurfaceView.Renderer
      */
     public void onDrawFrame(GL10 gl)
     {
-        Log.i(TAG, "onDrawFrame");
-
         // キューの先頭パケットを取得．到着していない場合でもぬるぽを出さない
+		// パケットは1秒ごとに装填される
         packet = packetsQueue.poll();
         if(packet != null){
             // パケットが到着した場合，描画オブジェクトを追加する
@@ -115,20 +117,51 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                 Tcp tcp = pa.getTcp();
 
                 short dport = tcp.destination();
+				Log.i(TAG, "dport = " + dport);
                 short sport = tcp.source();
+				Log.i(TAG, "sport = " + sport);
+
+				// データにマイナス？が混じっている場合があるので，取り除く
+				dport = minusReducer(dport);
+				sport = minusReducer(sport);
+
+				Log.i(TAG, "noMinusdport = " + dport);
+				Log.i(TAG, "noMinussport = " + sport);
 
                 // 描画位置：TCPヘッダのdport
                 short[] dportPoint = calcPort(dport);
 
                 // 描画サイズ：TCPヘッダのsport
                 short[] sportPoint = calcPort(sport);
-            }
+
+				Log.i(TAG, "dportPoint[0] = " + dportPoint[0]);
+				Log.i(TAG, "dportPoint[1] = " + dportPoint[1]);
+
+				Log.i(TAG, "sportPoint[0] = " + sportPoint[0]);
+				Log.i(TAG, "sportPoint[1] = " + sportPoint[1]);
+
+				Enum.COLOR color = null;
+				if (colorFlg == 0) color = Enum.COLOR.RED;
+				if (colorFlg == 1) color = Enum.COLOR.GREEN;
+				if (colorFlg == 2) color = Enum.COLOR.BLUE;
+				if (colorFlg == 3) color = Enum.COLOR.CYAN;
+				if (colorFlg == 4) color = Enum.COLOR.MAGENTA;
+				if (colorFlg == 5) color = Enum.COLOR.YELLOW;
+				if (colorFlg == 6) color = Enum.COLOR.WHITE;
+				if (colorFlg == 7) color = Enum.COLOR.BLACK;
+
+
+				Draw2DList.add(new Draw2D(dportPoint[0], dportPoint[1], sportPoint[0], sportPoint[1], color));
+
+				colorFlg++;
+				if (colorFlg == 8) colorFlg = 0;
+			}
 
             // カラー：ICMPのchecksumとか，あるいはsequenceとか
 
-            // Draw2DList.add(new Draw2D(dportPoint[0], dportPoint[1], sportPoint[0], sportPoint[1], Enum.COLOR.BLACK));
+//            Draw2DList.add(new Draw2D(dportPoint[0], dportPoint[1], sportPoint[0], sportPoint[1], Enum.COLOR.BLACK));
 
-            Draw2DList.add(new Draw2D(0, 0, 50, 20, Enum.COLOR.BLACK));
+//            Draw2DList.add(new Draw2D(0, 0, 50, 20, Enum.COLOR.BLACK));
             packet = null;
         }
 
@@ -143,6 +176,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
         gl.glEnable(GL10.GL_BLEND);
 
         // ブレンドモードを指定
+		// src, dst
         gl.glBlendFunc(GL10.GL_ONE_MINUS_DST_COLOR, GL10.GL_ONE_MINUS_SRC_ALPHA);
 
         // GLViewクラスのvisibility変数をいじることで、描画のON・OFFが可能
@@ -164,6 +198,23 @@ public class EffectRenderer implements GLSurfaceView.Renderer
         }
         gl.glDisable(GL10.GL_BLEND);
     }
+
+
+	private short minusReducer(short num)
+		{
+			if (num >= 0) return num;
+
+			char[] oldNumCharArray = String.valueOf(num).toCharArray();
+			char[] newNumCharArray = new char[oldNumCharArray.length - 1];
+
+			for (int i = 1; i < oldNumCharArray.length; i++)
+				{
+					newNumCharArray[i - 1] = oldNumCharArray[i];
+				}
+
+			short newNum = Short.valueOf(String.valueOf(newNumCharArray));
+			return newNum;
+		}
 
 
 	/**
@@ -193,7 +244,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
 			char[] secondChar = new char[aboutCenter];
 
-			j++;
 			for (int i = 0; i < aboutCenter; i++)
 			{
 				secondChar[i] = portChar[j];
@@ -201,8 +251,8 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 			}
 
 			// firstの方が桁数が多くなるはず
-			short first = Short.valueOf(firstChar.toString());
-			short second = Short.valueOf(secondChar.toString());
+			short first = Short.valueOf(String.valueOf(firstChar));
+			short second = Short.valueOf(String.valueOf(secondChar));
 
 			// PORT番号の幅は，0~65535
 			// firstが3桁以上の場合，ひたすら2で割って2桁に抑える
@@ -230,15 +280,14 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
 			char[] secondChar = new char[center];
 
-			j++;
 			for (int i = 0; i < center; i++)
 			{
 				secondChar[i] = portChar[j];
 				j++;
 			}
 
-			short first = Short.valueOf(firstChar.toString());
-			short second = Short.valueOf(secondChar.toString());
+			short first = Short.valueOf(String.valueOf(firstChar));
+			short second = Short.valueOf(String.valueOf(secondChar));
 
 			first = digitReducer(first);
 			second = digitReducer(second);
