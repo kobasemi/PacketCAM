@@ -16,14 +16,14 @@ import java.io.IOException;
 /**
  * パケット解析を行うクラス
  * 一つのパケットのみを保持し，そのパケットの様々な結果を返す
- * 必要なのかは不明
+ * 吐かれる例外を全て回収するため，nullチェックなどをしっかりとすること
  * @author akasaka
  */
 public class PacketAnalyser {
     PcapPacket packet;
 
     /**
-     * 空のコンストラクタ
+     * デフォルトコンストラクタ
      * 後からパケットをセットすること
      */
     public PacketAnalyser(){}
@@ -32,26 +32,20 @@ public class PacketAnalyser {
      * パケットをセットする
      * @param p パケット
      */
-    public void setPacket(PcapPacket p){
-        packet = p;
-    }
+    public void setPacket(PcapPacket p){ packet = p; }
 
     /**
      * パケットをゲットする
      * @return パケット
      * @deprecated ヘッダのゲッターを使ってね
      */
-    public PcapPacket getPacket(){
-        return packet;
-    }
+    public PcapPacket getPacket(){ return packet; }
 
     /**
      * パケットがセットされているか
      * @return パケットの有無
      */
-    public boolean hasPacket(){
-        return packet != null;
-    }
+    public boolean hasPacket(){ return packet != null; }
 
     /**
      * パケットに含まれる全てのヘッダを返す
@@ -187,88 +181,110 @@ public class PacketAnalyser {
     /**
      * Ethernetヘッダを取得する．ヘッダがない場合はnullを返す．
      * @return Ethernetヘッダ
-     * @throws IOException
-     * @throws CodecCreateException
      */
-    public Ethernet2 getEthernet() throws IOException, CodecCreateException {
-        return hasEthernet()? packet.getHeader(Ethernet2.class): null;
+    public Ethernet2 getEthernet() {
+        try {
+            return hasEthernet()? packet.getHeader(Ethernet2.class): null;
+        }catch(IOException e){
+            return null;
+        }
     }
 
     /**
      * IEEE802.3ヘッダを取得する．ヘッダがない場合はnullを返す．
      * @return IEEE802.3ヘッダ
-     * @throws IOException
-     * @throws CodecCreateException
      */
-    public IEEE802dot3 getIeee802dot3() throws IOException, CodecCreateException {
-        return hasIeee802dot3()? packet.getHeader(IEEE802dot3.class): null;
+    public IEEE802dot3 getIeee802dot3() {
+        try {
+            return hasIeee802dot3()? packet.getHeader(IEEE802dot3.class): null;
+        }catch(IOException e){
+            return null;
+        }
     }
 
     /**
      * IPv4ヘッダを取得する．ヘッダがない場合はnullを返す．
      * @return IPv4ヘッダ
-     * @throws IOException
-     * @throws CodecCreateException
      */
-    public Ip4 getIp4() throws IOException, CodecCreateException {
-        return hasIp4()? packet.getHeader(Ip4.class): null;
+    public Ip4 getIp4() {
+        try {
+            return hasIp4()? packet.getHeader(Ip4.class): null;
+        }catch(IOException e){
+            return null;
+        }
     }
 
     /**
      * TCPヘッダを取得する．ヘッダがない場合はnullを返す．
      * @return TCPヘッダ
-     * @throws IOException
-     * @throws CodecCreateException
      */
-    public Tcp getTcp() throws IOException, CodecCreateException {
-        return hasTcp()? packet.getHeader(Tcp.class): null;
+    public Tcp getTcp() {
+        try {
+            return hasTcp()? packet.getHeader(Tcp.class): null;
+        }catch(IOException e){
+            return null;
+        }
+
     }
 
     /**
      * UDPヘッダを取得する．ヘッダがない場合はnullを返す．
      * @return UDPヘッダ
-     * @throws IOException
-     * @throws CodecCreateException
      */
-    public Udp getUdp() throws IOException, CodecCreateException {
-        return hasUdp()? packet.getHeader(Udp.class): null;
+    public Udp getUdp() {
+        try {
+            return hasUdp()? packet.getHeader(Udp.class): null;
+        }catch(IOException e){
+            return null;
+        }
     }
 
     /**
      * ICMPヘッダを取得する．ヘッダがない場合はnullを返す．
      * @return ICMPヘッダ
-     * @throws IOException
-     * @throws CodecCreateException
      */
-    public Icmp getIcmp() throws IOException, CodecCreateException {
-        return hasIcmp()? packet.getHeader(Icmp.class): null;
+    public Icmp getIcmp() {
+        try {
+            return hasIcmp()? packet.getHeader(Icmp.class): null;
+        }catch(IOException e){
+            return null;
+        }
     }
 
     /**
      * ARPヘッダを取得する．ヘッダがない場合はnullを返す．
      * @return ARPヘッダ
-     * @throws IOException
-     * @throws CodecCreateException
      */
-    public Arp getArp() throws IOException, CodecCreateException {
-        return hasArp()? packet.getHeader(Arp.class): null;
+    public Arp getArp() {
+        try {
+            return hasArp()? packet.getHeader(Arp.class): null;
+        }catch(IOException e){
+            return null;
+        }
     }
 
     /**
      * パケットのタイムスタンプを返す．パケットがない場合は-1を返す．
-     * @return 秒数
-     * @throws IOException
+     * @return 秒数，失敗した場合 -1
      */
-    public long getSeconds() throws IOException {
-        return hasPacket()? packet.getTimestampSeconds(): -1;
+    public long getSeconds() {
+        try {
+            return hasPacket()? packet.getTimestampSeconds(): -1;
+        }catch(IOException e){
+            return -1;
+        }
     }
 
     /**
      * パケットのタイムスタンプを返す．パケットがない場合は-1を返す．
-     * @return ナノ秒
-     * @throws IOException
+     * @return ナノ秒，失敗した場合 -1
      */
-    public long getNanos() throws IOException {
-        return hasPacket()? packet.getTimestampNanos(): -1;
+    public long getNanos() {
+        try {
+            return hasPacket()? packet.getTimestampNanos(): -1;
+        }catch(IOException e){
+            return -1;
+        }
+
     }
 }

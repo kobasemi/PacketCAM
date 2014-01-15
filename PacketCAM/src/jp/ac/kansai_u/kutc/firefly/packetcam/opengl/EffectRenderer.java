@@ -9,12 +9,10 @@ import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
 import org.jnetstream.capture.file.pcap.PcapPacket;
-import org.jnetstream.protocol.codec.CodecCreateException;
 import org.jnetstream.protocol.tcpip.Tcp;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Queue;
@@ -36,11 +34,17 @@ public class EffectRenderer implements GLSurfaceView.Renderer
     private DrawCamera mDrawCamera;
 
     PcapPacket packet = null;
-    // スレッドセーフなキュー，インスタンスはPcapManagerから取得する
-    Queue<PcapPacket> packetsQueue;
 
-	// パケットアナライザ
-	PacketAnalyser packetAnalyser = new PacketAnalyser();
+    /**
+     * スレッドセーフなキュー，インスタンスはPcapManagerから取得する
+     * @see jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.ConcurrentPacketsQueue
+     */
+    Queue<PcapPacket> packetsQueue;
+    /**
+     * パケット解析インスタンス
+     * @see jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PacketAnalyser
+     */
+	PacketAnalyser pa = new PacketAnalyser();
 
     /**
      * GLSurfaceViewのRendererが生成された際に呼ばれる
@@ -102,35 +106,20 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
 			// TODO ここでパケット情報を用いてエフェクトを追加していく
 
-			try
-				{
-					Tcp tcp = packetAnalyser.getTcp();
+            Tcp tcp = pa.getTcp();
 
-					short dport = tcp.destination();
-					short sport = tcp.source();
+            short dport = tcp.destination();
+            short sport = tcp.source();
 
-					// 描画位置：TCPヘッダのdport
-					short[] dportPoint = calcPort(dport);
+            // 描画位置：TCPヘッダのdport
+            short[] dportPoint = calcPort(dport);
 
-					// 描画サイズ：TCPヘッダのsport
-					short[] sportPoint = calcPort(sport);
+            // 描画サイズ：TCPヘッダのsport
+            short[] sportPoint = calcPort(sport);
 
-					// カラー：ICMPのchecksumとか，あるいはsequenceとか
+            // カラー：ICMPのchecksumとか，あるいはsequenceとか
 
-					// Draw2DList.add(new Draw2D(dportPoint[0], dportPoint[1], sportPoint[0], sportPoint[1], Enum.COLOR.BLACK));
-				}
-			catch (IOException e)
-				{
-					e.printStackTrace();
-					return;
-				}
-			catch (CodecCreateException e)
-				{
-					e.printStackTrace();
-					return;
-				}
-
-
+            // Draw2DList.add(new Draw2D(dportPoint[0], dportPoint[1], sportPoint[0], sportPoint[1], Enum.COLOR.BLACK));
 
             Draw2DList.add(new Draw2D(0, 0, 50, 20, Enum.COLOR.BLACK));
             packet = null;
