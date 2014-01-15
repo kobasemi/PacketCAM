@@ -405,12 +405,12 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 	}
 
 
-	// 3桁以上の値を2で割って2桁に抑える
+	// 3桁以上の値を10で割って2桁に抑える
 	private short digitReducer(short source)
 	{
 		if (String.valueOf(source).length() > 2)
 		{
-			source = (short)(source / 2);
+			source = (short)(source / 10);
 			digitReducer(source);
 		}
 
