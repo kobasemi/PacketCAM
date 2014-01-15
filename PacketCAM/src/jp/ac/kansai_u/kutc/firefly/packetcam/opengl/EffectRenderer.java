@@ -101,187 +101,37 @@ public class EffectRenderer implements GLSurfaceView.Renderer
             // 描画オブジェクトを追加する
 
 			// TODO ここでパケット情報を用いてエフェクトを追加していく
-/*
-			// 描画位置：TCPのdport
-			// dport値を前後に分割して，intの0〜100で出して利用する
-			// 分割前が奇数桁だった場合は，3桁と2桁みたいに分ける
-			// もし分割しても3桁だった場合は，/2する
-
-			// パケットアナライザに渡されたパケットをセットする
-			packetAnalyser.setPacket(packet);
-
-			if (!packetAnalyser.hasPacket())
-			{
-				// パケットがセットされていなければ処理を行わない
-				return;
-			}
-
-			// TCPヘッダがPacketに含まれているかを確認する
 
 			try
-			{
-				// Tcpヘッダを取得
-				Tcp tcp = packetAnalyser.getTcp();
-
-				// dport値，sport値を取得
-				short dport = tcp.destination();
-				short sport = tcp.source();
-
-				// dport，sportをそれぞれ，char配列に入れる
-				char[] dportChar = String.valueOf(dport).toCharArray();
-				char[] sportChar = String.valueOf(sport).toCharArray();
-
-
-				//region dport
-				if ((dportChar.length % 2) != 0)
 				{
-					// 桁数が奇数の場合の処理
-					// だいたい真ん中を求める
-					int aboutCenter = dportChar.length / 2;
+					Tcp tcp = packetAnalyser.getTcp();
 
-					char[] firstChar = new char[aboutCenter + 1];
+					short dport = tcp.destination();
+					short sport = tcp.source();
 
-					int j = 0;
-					for (int i = 0; i < aboutCenter + 1; i++)
-					{
-						firstChar[i] = dportChar[i];
-						j++;
-					}
+					// 描画位置：TCPヘッダのdport
+					short[] dportPoint = calcPort(dport);
 
+					// 描画サイズ：TCPヘッダのsport
+					short[] sportPoint = calcPort(sport);
 
-					char[] secondChar = new char[aboutCenter];
+					// カラー：ICMPのchecksumとか，あるいはsequenceとか
 
-					j++;
-					for (int i = 0; i < aboutCenter; i++)
-					{
-						secondChar[i] = dportChar[j];
-						j++;
-					}
-
-					// firstの方が桁数が多くなるはず
-					short first = Short.valueOf(firstChar.toString());
-					short second = Short.valueOf(secondChar.toString());
-
-					// 0~65535
-					// firstが3桁以上の場合，2で割る
-
-					first = digitReducer(first);
-					second = digitReducer(second);
+					// Draw2DList.add(new Draw2D(dportPoint[0], dportPoint[1], sportPoint[0], sportPoint[1], Enum.COLOR.BLACK));
 				}
-				else
-				{
-					// 4桁か，2桁
-					int center = dportChar.length / 2;
-					char[] firstChar = new char[center];
-
-					int j = 0;
-					for (int i = 0; i < center; i++)
-					{
-						firstChar[i] = dportChar[i];
-						j++;
-					}
-
-					char[] secondChar = new char[center];
-
-					j++;
-					for (int i = 0; i < center; i++)
-					{
-						secondChar[i] = dportChar[j];
-						j++;
-					}
-
-					short first = Short.valueOf(firstChar.toString());
-					short second = Short.valueOf(secondChar.toString());
-
-					first = digitReducer(first);
-					second = digitReducer(second);
-				}
-				//endregion
-
-				short a = 0;
-
-				//region sport
-				if ((sportChar.length % 2) != 0)
-				{
-					// 桁数が奇数の場合の処理
-
-					// だいたい真ん中を求める
-					int aboutCenter = sportChar.length / 2;
-
-					char[] firstChar = new char[aboutCenter + 1];
-
-					int j = 0;
-					for (int i = 0; i < aboutCenter + 1; i++)
-					{
-						firstChar[i] = sportChar[i];
-						j++;
-					}
-
-					char[] secondChar = new char[aboutCenter];
-
-					j++;
-					for (int i = 0; i < aboutCenter; i++)
-					{
-						secondChar[i] = sportChar[j];
-						j++;
-					}
-
-					// firstの方が桁数が多くなるはず
-					short first = Short.valueOf(firstChar.toString());
-					short second = Short.valueOf(secondChar.toString());
-
-					// 0~65535
-					// 3桁の場合，2でひたすら割って2桁にする
-
-					first = digitReducer(first);
-					second = digitReducer(second);
-				}
-				else
-				{
-					// 桁数が偶数の場合の処理
-					// 4桁か2桁
-					int center = sportChar.length / 2;
-					char[] firstChar = new char[center];
-
-					int j = 0;
-					for (int i = 0; i < center; i++)
-					{
-						firstChar[i] = sportChar[i];
-						j++;
-					}
-
-					char[] secondChar = new char[center];
-
-					j++;
-					for (int i = 0; i < center; i++)
-					{
-						secondChar[i] = sportChar[j];
-						j++;
-					}
-
-					short first = Short.valueOf(firstChar.toString());
-					short second = Short.valueOf(secondChar.toString());
-
-					first = digitReducer(first);
-					second = digitReducer(second);
-				}
-				//endregion
-			}
 			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
+				{
+					e.printStackTrace();
+					return;
+				}
 			catch (CodecCreateException e)
-			{
-				e.printStackTrace();
-			}
+				{
+					e.printStackTrace();
+					return;
+				}
 
 
-			// サイズ：TCPのsport
-			// こちらも上に同じ
 
-			// カラー：ICMPのchecksumとか，あるいはsequenceとか
-*/
             Draw2DList.add(new Draw2D(0, 0, 50, 20, Enum.COLOR.BLACK));
             packet = null;
         }
