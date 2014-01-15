@@ -13,7 +13,7 @@ import java.nio.IntBuffer;
  * このクラスの中で様々な図形の描画メソッドを定義し，GLViewにおいて適宜
  * 該当メソッドを指定して描画させればいい感じかもしれない
  */
-public class Draw2D
+public class DrawBlendingRectangle
 	{
 		// Java NIOに転送した頂点バッファや色バッファを格納する変数を定義
 		// 頂点バッファ
@@ -21,12 +21,12 @@ public class Draw2D
 		// 色バッファ
 		private FloatBuffer mColorBuffer;
 
-        public Draw2D(int x, int y, int w, int h, COLOR color)
+        public DrawBlendingRectangle(int x, int y, int w, int h, COLOR color)
             {
                 setDrawObject(x/100.f, y/100.f, w/100.f, h/100.f, color);
             }
 
-        public Draw2D(float x, float y, float width, float height, COLOR color){
+        public DrawBlendingRectangle(float x, float y, float width, float height, COLOR color){
             setDrawObject(x, y, width, height, color);
         }
 
@@ -97,6 +97,126 @@ public class Draw2D
 				gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 				gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 			}
+
+
+		/**
+		 * ポート番号から，オブジェクト生成用の座標を求める
+		 * @param port
+		 * @return
+		 */
+		protected static short[] calcPort(short port)
+			{
+				// ポート番号にマイナス？が混じっている場合があるので，取り除く
+				port = minusReducer(port);
+
+				// ポート番号をchar配列に
+				char[] portChar = String.valueOf(port).toCharArray();
+
+				if ((portChar.length % 2) != 0)
+					{
+						// 桁数が奇数の場合の処理
+						// だいたい真ん中を求める
+						int aboutCenter = portChar.length / 2;
+
+						char[] firstChar = new char[aboutCenter + 1];
+
+						int j = 0;
+						for (int i = 0; i < aboutCenter + 1; i++)
+							{
+								firstChar[i] = portChar[i];
+								j++;
+							}
+
+						char[] secondChar = new char[aboutCenter];
+
+						for (int i = 0; i < aboutCenter; i++)
+							{
+								secondChar[i] = portChar[j];
+								j++;
+							}
+
+						// firstの方が桁数が多くなるはず
+						short first = Short.valueOf(String.valueOf(firstChar));
+						short second = Short.valueOf(String.valueOf(secondChar));
+
+						// PORT番号の幅は，0~65535
+						// firstが3桁以上の場合，ひたすら2で割って2桁に抑える
+						first = digitReducer(first);
+						second = digitReducer(second);
+
+						short[] data = new short[2];
+						data[0] = first;
+						data[1] = second;
+						return data;
+					}
+				else
+					{
+						// 桁数が偶数の場合
+						// 4桁か，2桁
+						int center = portChar.length / 2;
+						char[] firstChar = new char[center];
+
+						int j = 0;
+						for (int i = 0; i < center; i++)
+							{
+								firstChar[i] = portChar[i];
+								j++;
+							}
+
+						char[] secondChar = new char[center];
+
+						for (int i = 0; i < center; i++)
+							{
+								secondChar[i] = portChar[j];
+								j++;
+							}
+
+						short first = Short.valueOf(String.valueOf(firstChar));
+						short second = Short.valueOf(String.valueOf(secondChar));
+
+						first = digitReducer(first);
+						second = digitReducer(second);
+
+						short[] data = new short[2];
+						data[0] = first;
+						data[1] = second;
+						return data;
+					}
+			}
+
+
+		protected static short minusReducer(short num)
+			{
+				if (num >= 0) return num;
+
+				char[] oldNumCharArray = String.valueOf(num).toCharArray();
+				char[] newNumCharArray = new char[oldNumCharArray.length - 1];
+
+				for (int i = 1; i < oldNumCharArray.length; i++)
+					{
+						newNumCharArray[i - 1] = oldNumCharArray[i];
+					}
+
+				short newNum = Short.valueOf(String.valueOf(newNumCharArray));
+				return newNum;
+			}
+
+
+		// 3桁以上の値を10で割って2桁に抑える
+		protected static short digitReducer(short source)
+			{
+				if (String.valueOf(source).length() > 2)
+					{
+						source = (short)(source / 10);
+						digitReducer(source);
+					}
+
+				return source;
+			}
+
+
+
+
 
 
 		/**
