@@ -76,6 +76,13 @@ public class DrawBlendingRectangle
 		 */
 		public void draw(GL10 gl)
 			{
+                // カメラプレビュー描画後に，ブレンドを有効化する
+                gl.glEnable(GL10.GL_BLEND);
+
+                // ブレンドモードを指定
+                // src, dst
+                gl.glBlendFunc(GL10.GL_ONE_MINUS_DST_COLOR, GL10.GL_ONE_MINUS_SRC_ALPHA);
+
 				gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 
 				gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
@@ -96,6 +103,7 @@ public class DrawBlendingRectangle
 				gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
 				gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 				gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+                gl.glDisable(GL10.GL_BLEND);
 			}
 
 

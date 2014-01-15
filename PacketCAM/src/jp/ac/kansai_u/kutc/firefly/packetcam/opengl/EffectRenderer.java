@@ -150,13 +150,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
         mDrawCamera.draw(gl);
 
-        // カメラプレビュー描画後に，ブレンドを有効化する
-        gl.glEnable(GL10.GL_BLEND);
-
-        // ブレンドモードを指定
-		// src, dst
-        gl.glBlendFunc(GL10.GL_ONE_MINUS_DST_COLOR, GL10.GL_ONE_MINUS_SRC_ALPHA);
-
         // GLViewクラスのvisibility変数をいじることで、描画のON・OFFが可能
         //SwitchクラスのswitchVisibilityメソッドをcallして描画のON・OFFを行う
         if (mSwitch.getVisibility() == Enum.VISIBILITY.VISIBLE)
@@ -174,7 +167,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
             createOpenGLBitmap(gl);
             mSwitch.switchShutter();
         }
-        gl.glDisable(GL10.GL_BLEND);
     }
 
 
