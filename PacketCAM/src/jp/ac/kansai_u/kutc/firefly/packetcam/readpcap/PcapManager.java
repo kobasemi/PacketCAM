@@ -46,7 +46,7 @@ public class PcapManager implements Runnable{
      * 詳しくは，setPacketsToPacketList()を参照
      */
     // PacketIterator<T>とIterator<T>の中間で橋渡しをするリスト
-    private List<PcapPacket> packetList = new ArrayList<PcapPacket>();
+    private List<PcapPacket> packetList = null;
     // キューへの装填を仲介するイテレータ
     Iterator<PcapPacket> packetIterator = null;
     // スレッドセーフなキュー @see ConcurrentPacketsQueue
@@ -69,6 +69,8 @@ public class PcapManager implements Runnable{
      * @param file 選択されたファイルオブジェクト
      */
     public void open(File file){
+        // パケットリストの参照を削除
+        packetList = null;
         if(file.isDirectory())
             // ディレクトリ内の全てのファイルを読み込む
             for(File f: file.listFiles())
@@ -129,6 +131,7 @@ public class PcapManager implements Runnable{
         if(pcapFile.isOpen()) {
             try {
                 PacketIterator<PcapPacket> tmpPacketIterator = pcapFile.getPacketIterator();
+                packetList = new ArrayList<PcapPacket>();
                 while(tmpPacketIterator.hasNext()){
                     packetList.add(tmpPacketIterator.next());
                 }
