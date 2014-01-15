@@ -14,12 +14,15 @@ import org.jnetstream.protocol.tcpip.Tcp;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Queue;
 
 /**
  * OpenGLの描画を行う
- * @author akasaka kousaka
+ * @author Kousaka akasaka
  */
 public class EffectRenderer implements GLSurfaceView.Renderer
 {
@@ -34,11 +37,10 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
     private DrawCamera mDrawCamera;
 
-    PcapPacket packet = null;
-
 	int colorFlg = 0;
 	boolean alphaFlg = false;
 
+    PcapPacket packet = null;
     /**
      * スレッドセーフなキュー，インスタンスはPcapManagerから取得する
      * @see jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.ConcurrentPacketsQueue
@@ -49,6 +51,11 @@ public class EffectRenderer implements GLSurfaceView.Renderer
      * @see jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PacketAnalyser
      */
 	PacketAnalyser pa = new PacketAnalyser();
+
+    /**
+     * オブジェクト描画用の頂点座標に関するバッファ
+     */
+    static FloatBuffer buffer = null;
 
     /**
      * GLSurfaceViewのRendererが生成された際に呼ばれる
@@ -62,7 +69,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
         mDrawCamera = new DrawCamera();
         mDrawCamera.generatedTexture(gl);
-        newGraphic();
         // キューの取得
         packetsQueue = PcapManager.getInstance().getConcurrentPacketsQueue();
     }
@@ -90,6 +96,15 @@ public class EffectRenderer implements GLSurfaceView.Renderer
         gl.glViewport(0, 0, width, height);
 
         mDrawCamera.setUpCamera();
+
+        // ネイティブのメモリ領域にバッファを作成する
+        float positions[] = {
+                -1.0f,   1.0f,  // 左上
+                -1.0f,  -1.0f,  // 左下
+                1.0f,   1.0f,  // 右上
+                1.0f,  -1.0f,  // 右下
+        };
+        buffer = makeFloatBuffer(positions);
     }
 
 
@@ -244,4 +259,33 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
         SaveSDCard.save(correctBitmap);
     }
+
+    /**
+     * OpenGL ESはVMのヒープ領域は使用できないため，ネイティブのメモリ領域に書き込む
+     * @param buf float型の配列
+     * @return ネイティブ領域に書き込まれたバッファの参照
+     */
+    public static FloatBuffer makeFloatBuffer(float[] buf){
+        ByteBuffer bb = ByteBuffer.allocateDirect(buf.length * 4);
+        bb.order(ByteOrder.nativeOrder());
+        FloatBuffer fb = bb.asFloatBuffer();
+        fb.put(buf);
+        fb.position(0);
+        return fb;
+    }
+
+    /**
+     * OpenGL ESはVMのヒープ領域は使用できないため，ネイティブのメモリ領域に書き込む
+     * @param buf int型の配列
+     * @return ネイティブ領域に書き込まれたバッファの参照
+     */
+    public static IntBuffer makeIntBuffer(int[] buf){
+        ByteBuffer bb = ByteBuffer.allocateDirect(buf.length * 4);
+        bb.order(ByteOrder.nativeOrder());
+        IntBuffer ib = bb.asIntBuffer();
+        ib.put(buf);
+        ib.position(0);
+        return ib;
+    }
+
 }

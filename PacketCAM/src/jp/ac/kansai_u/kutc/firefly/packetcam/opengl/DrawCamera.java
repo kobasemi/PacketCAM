@@ -16,8 +16,8 @@ import java.util.List;
 import static android.opengl.GLES11Ext.GL_TEXTURE_EXTERNAL_OES;
 
 /**
- * Created by Kousaka on 14/01/07.
  * カメラプレビューに関する処理を行うクラス
+ * @author Kousaka akasaka
  */
 public class DrawCamera
 	{
@@ -61,8 +61,8 @@ public class DrawCamera
 				Log.i(TAG, "DrawCamera");
 				mSwitch = Switch.getInstance();
 
-				mVertexBuffer = DrawBlendingRectangle.makeFloatBuffer(vertices);
-				mTexCoordsBuffer = DrawBlendingRectangle.makeFloatBuffer(texcoords);
+				mVertexBuffer = EffectRenderer.makeFloatBuffer(vertices);
+				mTexCoordsBuffer = EffectRenderer.makeFloatBuffer(texcoords);
 			}
 
 

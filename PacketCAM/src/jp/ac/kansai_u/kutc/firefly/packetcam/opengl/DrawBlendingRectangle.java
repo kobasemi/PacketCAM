@@ -3,15 +3,12 @@ package jp.ac.kansai_u.kutc.firefly.packetcam.opengl;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.COLOR;
 
 import javax.microedition.khronos.opengles.GL10;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
 /**
- * Created by Kousaka on 2013/12/10.
  * このクラスの中で様々な図形の描画メソッドを定義し，GLViewにおいて適宜
  * 該当メソッドを指定して描画させればいい感じかもしれない
+ * @author akasaka Kousaka
  */
 public class DrawBlendingRectangle
 	{
@@ -21,13 +18,19 @@ public class DrawBlendingRectangle
 		// 色バッファ
 		private FloatBuffer mColorBuffer;
 
+        float x, y, width, height;
+
         public DrawBlendingRectangle(int x, int y, int w, int h, COLOR color)
             {
-                setDrawObject(x/100.f, y/100.f, w/100.f, h/100.f, color);
+                mVertexBuffer = EffectRenderer.buffer;
+                mColorBuffer  = GL_Color.getColorFloatBuffer(color);
+                setDrawObject(x/100.f, y/100.f, w/100.f, h/100.f);
             }
 
         public DrawBlendingRectangle(float x, float y, float width, float height, COLOR color){
-            setDrawObject(x, y, width, height, color);
+            mVertexBuffer = EffectRenderer.buffer;
+            mColorBuffer  = GL_Color.getColorFloatBuffer(color);
+            setDrawObject(x, y, width, height);
         }
 
         /**
@@ -45,28 +48,17 @@ public class DrawBlendingRectangle
          * @param y      y座標[%]
          * @param width  幅[%]
          * @param height 高さ[%]
-         * @param color  EnumクラスのCOLORで指定できる色
          */
-        private void setDrawObject(float x, float y, float width, float height, COLOR color){
-            float left   = x * 2.0f - 1.0f;
-            float top    = y * 2.0f - 1.0f;
-            float right  = left + width  * 2.0f;
-            float bottom = top  + height * 2.0f;
+        private void setDrawObject(float x, float y, float width, float height){
+            this.width  = width;
+            this.height = height;
+
+            // 座標位置を正規化したのち，サイズ分移動する
+            this.x = (x * 2.f - 1.f) + width;
+            this.y = (y * 2.f - 1.f) + height;
 
             // 上下を反転させる（左下原点から左上原点へ）
-            top = -top;
-            bottom = -bottom;
-
-            // 位置情報(x, y)
-            float positions[] = {
-                left , top   , // 左上
-                left , bottom, // 左下
-                right, top   , // 右上
-                right, bottom, // 右下
-            };
-
-            mVertexBuffer = makeFloatBuffer(positions);
-            mColorBuffer = makeFloatBuffer(GL_Color.getColorArray(color));
+            this.y = -this.y;
         }
 
 		/**
@@ -84,18 +76,15 @@ public class DrawBlendingRectangle
                 gl.glBlendFunc(GL10.GL_ONE_MINUS_DST_COLOR, GL10.GL_ONE_MINUS_SRC_ALPHA);
 
 				gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-
 				gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 
 				gl.glMatrixMode(GL10.GL_MODELVIEW);
-
 				gl.glLoadIdentity();
-				// 点のサイズ
-				gl.glPointSize(10);
+                gl.glTranslatef(x, y, 0.f);
+                gl.glScalef(width, height, 0.f);
 
 				// 頂点バッファのポインタの場所を設定
 				gl.glVertexPointer(2, GL10.GL_FLOAT, 0, mVertexBuffer);
-
 				// 色バッファのポインタの場所を設定
 				gl.glColorPointer(4, GL10.GL_FLOAT, 0, mColorBuffer);
 
@@ -220,43 +209,5 @@ public class DrawBlendingRectangle
 					}
 
 				return source;
-			}
-
-
-
-
-
-
-		/**
-		 * float型の配列からダイレクトなNew I/OのFloatBufferを生成します．
-		 *
-		 * @param arr 配列
-		 * @return 生成されたFloatBuffer
-		 */
-		protected static FloatBuffer makeFloatBuffer(float[] arr)
-			{
-				ByteBuffer bb = ByteBuffer.allocateDirect(arr.length * 4);
-				bb.order(ByteOrder.nativeOrder());
-				FloatBuffer fb = bb.asFloatBuffer();
-				fb.put(arr);
-				fb.position(0);
-				return fb;
-			}
-
-
-		/**
-		 * int型の配列からダイレクトなNew I/OのIntBufferを生成します．
-		 *
-		 * @param arr 配列
-		 * @return 生成されたIntBuffer
-		 */
-		protected static IntBuffer makeIntBuffer(int[] arr)
-			{
-				ByteBuffer bb = ByteBuffer.allocateDirect(arr.length * 4);
-				bb.order(ByteOrder.nativeOrder());
-				IntBuffer ib = bb.asIntBuffer();
-				ib.put(arr);
-				ib.position(0);
-				return ib;
 			}
 	}
