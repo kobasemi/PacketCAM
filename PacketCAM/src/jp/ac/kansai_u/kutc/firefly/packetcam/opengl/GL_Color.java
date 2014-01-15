@@ -4,7 +4,6 @@ import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.COLOR;
 
 import java.nio.FloatBuffer;
 
-
 /**
  * OpenGL ESで使用する色情報に関するクラス
  *

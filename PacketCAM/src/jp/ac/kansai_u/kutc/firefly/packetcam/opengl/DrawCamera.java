@@ -4,7 +4,6 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.util.Log;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.DRAWSTATE;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.STATUS;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.ZOOM;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
 
@@ -80,30 +79,6 @@ public class DrawCamera
 			}
 
 
-		public void calledWhenExit()
-			{
-				synchronized (this)
-					{
-						Log.i(TAG, "calledWhenExit");
-						if (mSwitch.getDrawstate() == DRAWSTATE.READY) mSwitch.switchDrawState();
-						if (mSwitch.getStatus() == STATUS.RUNNING) mSwitch.switchStatus();
-
-						if (mCamera != null)
-							{
-								mCamera.stopPreview();
-								mCamera.release();
-								mCamera = null;
-							}
-						if (mSurfaceTexture != null)
-							{
-								mSurfaceTexture.setOnFrameAvailableListener(null);
-								mSurfaceTexture = null;
-							}
-						Log.i(TAG, "calledWhenExitEnd");
-					}
-			}
-
-
 		/**
 		 * カメラをセットアップする
 		 * カメラプレビューサイズ指定，SurfaceTextureにセットし，リスナをセット
@@ -159,52 +134,6 @@ public class DrawCamera
 						//endregion
 					}
 			}
-
-
-//	public void inoutChange(Context context)
-//	{
-//		int numberOfCameras = Camera.getNumberOfCameras();
-//		if (numberOfCameras == 1)
-//		{
-//			return;
-//		}
-//
-//		// 現在利用しているカメラを解放
-//		if (mCamera != null)
-//		{
-//			mCamera.release();
-//		}
-//
-//		// カメラを切り替え
-//		if (!mSwitch.getCameraInOut())
-//		{
-//			mCamera = Camera.open(1);
-//			mSwitch.switchCameraInOut();
-//		}
-//		else
-//		{
-//			mCamera = Camera.open(0);
-//			mSwitch.switchCameraInOut();
-//		}
-//
-//		Camera.Parameters parameters = mCamera.getParameters();
-//		List<Camera.Size> previewSizes = parameters.getSupportedPreviewSizes();
-//		Camera.Size size = previewSizes.get(0);
-//		parameters.setPreviewSize(size.width, size.height);
-//		mCamera.setParameters(parameters);
-//
-//		try
-//		{
-//			mCamera.setPreviewTexture(mSurfaceTexture);
-//		}
-//		catch (IOException e)
-//		{
-//			e.printStackTrace();
-//		}
-//
-//		mCamera.startPreview();
-//	}
-
 
 		/**
 		 * カメラプレビュー描画処理

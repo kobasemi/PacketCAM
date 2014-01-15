@@ -6,7 +6,6 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.DRAWSTATE;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.STATUS;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.VISIBILITY;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
@@ -22,8 +21,6 @@ public class GLView extends GLSurfaceView
 		private EffectRenderer mRenderer;
 
 		private Switch mSwitch = Switch.getInstance();
-
-//		public Thread drawThread;
 
 		/**
 		 * エフェクトボタンを押した時に呼び出されるやつ
@@ -63,36 +60,6 @@ public class GLView extends GLSurfaceView
 				this.setRenderer(mRenderer);
 
 				if (mSwitch.getStatus() == STATUS.STOP) mSwitch.switchStatus();
-
-                /*
-                 下ブロック内の処理について
-                 RENDERMODE_WHEN_DIRTYが設定されている場合
-                 requestRender()メソッドを使い，onDrawFrameを呼び出す
-                 そのために，スレッドを使用している
-                 ちなみに，onPuase(), onResume()が上手くいかなかった原因は
-                 onResume()のとき，スレッドが上手いこと動いてなかったため
-                 requestRenderer()が呼ばれなかったものによる
-                */
-                // スレッドを使っている理由は？
-                {
-//                    this.setRenderMode(RENDERMODE_WHEN_DIRTY);
-//                    drawThread = new Thread(new Runnable()
-//                    {
-//                        @Override
-//                        public void run()
-//                            {
-//                                while (mSwitch.getStatus() == STATUS.RUNNING)
-//                                    {
-//                                        if (mSwitch.getDrawstate() == DRAWSTATE.READY)
-//                                            {
-//                                                requestRender();
-//                                            }
-//                                    }
-//                            }
-//                    });
-//
-//                    drawThread.start();
-                }
 			}
 
 
@@ -124,13 +91,6 @@ public class GLView extends GLSurfaceView
 					{
 						mSwitch.switchShutter();
 					}
-			}
-
-
-		public void calledWhenExit()
-			{
-				if (mSwitch.getDrawstate() == DRAWSTATE.READY) mSwitch.switchDrawState();
-				if (mSwitch.getStatus() == STATUS.RUNNING) mSwitch.switchStatus();
 			}
 
         @Override
