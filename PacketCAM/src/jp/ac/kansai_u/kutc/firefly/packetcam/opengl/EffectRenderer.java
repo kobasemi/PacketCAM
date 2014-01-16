@@ -50,13 +50,11 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 		PcapPacket packet = null;
 		/**
 		 * スレッドセーフなキュー，インスタンスはPcapManagerから取得する
-		 *
 		 * @see jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.ConcurrentPacketsQueue
 		 */
 		Queue<PcapPacket> packetsQueue;
 		/**
 		 * パケット解析インスタンス
-		 *
 		 * @see jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PacketAnalyser
 		 */
 		PacketAnalyser pa = new PacketAnalyser();
@@ -122,6 +120,12 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 			}
 
 
+        short dIpPoint;
+        short sIpPoint;
+        short sizeX = 0;
+        short sizeY = 0;
+        Enum.COLOR color = null;
+
 		/**
 		 * 描画処理のループ
 		 *
@@ -133,170 +137,20 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 				// パケットは1秒ごとに装填される
 				packet = packetsQueue.poll();
 				if (packet != null)
+                // パケットが到着した場合，描画オブジェクトを追加する
 					{
-						// パケットが到着した場合，描画オブジェクトを追加する
-						short sizeX = 0;
-						short sizeY = 0;
-						Enum.COLOR color = null;
+                        // 解析機にパケットをセットする
+                        pa.setPacket(packet);
 
-						// 解析機にパケットをセットする
-						pa.setPacket(packet);
+                        // 描画オブジェクト用のパラメータを作成する
+                        buildDrawBlendingRectangleParametor();
 
-						// TODO ここでパケット情報を用いてエフェクトを追加していく
-						if (pa.hasEthernet() && !macFlg)
-							{
-								// MACアドレス取得
-								Ethernet2 ethernet2 = pa.getEthernet();
+                        /**
+                         * @see DrawBlendingRectangle
+                         */
+                        drawBlendingRectangleList.add(new DrawBlendingRectangle(dIpPoint, sIpPoint, sizeX, sizeY, color));
 
-								try
-									{
-										// MACアドレスを取得
-										dEthernetStrFlg = ethernet2.destination().toString();
-
-										// byte配列からStringに変換
-										Log.i(TAG, "dEthernetStrFlg = " + dEthernetStrFlg);
-										macFlg = true;
-									}
-								catch (IOException e)
-									{
-										e.printStackTrace();
-									}
-							}
-
-						// 解析機からヘッダを取り出す場合
-						// 先にヘッダがあるかを確認してほしい
-						if (pa.hasIp4() && pa.hasEthernet() && dEthernetStrFlg != null)
-							{
-								Ethernet2 ethernet2 = pa.getEthernet();
-
-								try
-									{
-										// IPアドレスの各オクテットをXOR演算したものをオブジェクトのXY座標点として利用する
-										// MACアドレスを取得
-										String dEthernetStr = ethernet2.destination().toString();
-										Log.i(TAG, "dEthernetStr = " + dEthernetStr);
-
-										// IPヘッダのIPアドレスを取得する
-										Ip4 ip4 = pa.getIp4();
-
-										String dIPStr = ip4.destination().toString();
-										Log.i(TAG, "dIPStr = " + dIPStr);
-
-										String sIPStr = ip4.source().toString();
-										Log.i(TAG, "sIPStr = " + sIPStr);
-
-										short dIpPoint = DrawBlendingRectangle.xorIP(dIPStr);
-										Log.i(TAG, "dIpPoint = " + dIpPoint);
-
-										short sIpPoint = DrawBlendingRectangle.xorIP(sIPStr);
-										Log.i(TAG, "sIpPoint = " + sIpPoint);
-
-										if (!dEthernetStrFlg.equals(dEthernetStr))
-											{
-												dIpPoint = (short) (100 - dIpPoint);
-												Log.i(TAG, "revdIpPoint = " + dIpPoint);
-												sIpPoint = (short) (100 - sIpPoint);
-												Log.i(TAG, "revsIpPoint = " + sIpPoint);
-											}
-
-										// サイズ指定はTCP or UDPを利用する
-										if (pa.hasTcp())
-											{
-												// Tcpの場合，windowで求めたもので
-												Tcp tcp = pa.getTcp();
-
-												short window = tcp.window();
-												Log.i(TAG, "window = " + window);
-												if (0 < window)
-													{
-														short[] size = DrawBlendingRectangle.calcSize(window);
-
-														sizeX = size[0];
-														sizeY = size[1];
-													}
-												else
-													{
-														sizeX = 0;
-														sizeY = 0;
-													}
-												Log.i(TAG, "TcpSizeX = " + sizeX);
-												Log.i(TAG, "TcpSizeY = " + sizeY);
-											}
-										else if (pa.hasUdp())
-											{
-												sizeX = 30;
-												sizeY = 30;
-											}
-										else
-											{
-												// ICMPが来た場合
-												sizeX = 0;
-												sizeY = 0;
-											}
-
-
-										//TODO カラー指定を，ポート番号を使うようにする（MACアドレスで，dかsかを切り替え）
-										// IPヘッダのlengthで分岐
-
-										short length = ip4.length();
-
-										short id = ip4.id();
-
-
-										Log.i(TAG, "length = " + length);
-
-										if (length < 40)
-											{
-												color = Enum.COLOR.RED;
-											}
-										else if (40 <= length && length < 50)
-											{
-												color = Enum.COLOR.GREEN;
-											}
-										else if (50 <= length && length < 60)
-											{
-												color = Enum.COLOR.BLUE;
-											}
-										else if (60 <= length && length < 70)
-											{
-												color = Enum.COLOR.CYAN;
-											}
-										else if (70 <= length && length < 80)
-											{
-												color = Enum.COLOR.MAGENTA;
-											}
-										else if (80 <= length && length < 500)
-											{
-												color = Enum.COLOR.YELLOW;
-											}
-										else if (500 <= length && length < 700)
-											{
-												color = Enum.COLOR.WHITE;
-											}
-										else
-											{
-												color = Enum.COLOR.BLACK;
-											}
-
-										Log.i(TAG, "color = " + color);
-
-
-										drawBlendingRectangleList.add(new DrawBlendingRectangle(dIpPoint, sIpPoint, sizeX, sizeY, color));
-									}
-								catch (IOException e)
-									{
-										e.printStackTrace();
-									}
-								catch (IllegalArgumentException e)
-									{
-										e.printStackTrace();
-									}
-								catch (IndexOutOfBoundsException e)
-									{
-										e.printStackTrace();
-									}
-							}
-						packet = null;
+                        packet = null;
 					}
 
 				if (mSwitch.getDrawstate() == Enum.DRAWSTATE.PREPARATION)
@@ -325,33 +179,163 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 					}
 			}
 
+        /**
+         * DrawBlendingRectangleクラス用のパラメータを作成する
+         */
+        public void buildDrawBlendingRectangleParametor(){
 
-		/**
-		 * 新たな描画オブジェクトを生成する
-		 * Draw2Dに渡す引数は，xy座標及びwidth, height, 色情報
-		 * なお，x, y, width, heightに関しては，
-		 * 描画したい位置や描画図形の大きさをスクリーンのパーセンテージで指定する
-		 * インスタンス化は次の2通りの方法がある
-		 * - int型で0〜100[%]で渡す方法．
-		 * ~ new DrawBlendingRectangle(0, 0, 100, 100, color);
-		 * - float型で0.f〜1.fで渡す方法
-		 * ~ new DrawBlendingRectangle(0.f, 0.f, 1.f, 1.f ,color);
-		 * 2つの例はどちらも，左上から右下までを描画するもの
-		 * 分かりやすい方法を使ったら良い
-		 *
-		 * @see DrawBlendingRectangle
-		 */
-		public void newGraphic ()
-			{
-				Log.d(TAG, "newGraphic()");
-				DrawBlendingRectangle drawBlue = new DrawBlendingRectangle(0.f, 0.f, .25f, .25f, Enum.COLOR.BLUE);
-				drawBlendingRectangleList.add(drawBlue);
-				DrawBlendingRectangle drawGreen = new DrawBlendingRectangle(.25f, .25f, .75f, .75f, Enum.COLOR.GREEN);
-				drawBlendingRectangleList.add(drawGreen);
-				DrawBlendingRectangle drawRed = new DrawBlendingRectangle(.75f, .75f, .25f, .25f, Enum.COLOR.RED);
-				drawBlendingRectangleList.add(drawRed);
-			}
+            if (pa.hasEthernet() && !macFlg)
+            {
+                // MACアドレス取得
+                Ethernet2 ethernet2 = pa.getEthernet();
 
+                try
+                {
+                    // MACアドレスを取得
+                    dEthernetStrFlg = ethernet2.destination().toString();
+
+                    // byte配列からStringに変換
+                    Log.i(TAG, "dEthernetStrFlg = " + dEthernetStrFlg);
+                    macFlg = true;
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
+            // 解析機からヘッダを取り出す場合
+            // 先にヘッダがあるかを確認してほしい
+            if (pa.hasIp4() && pa.hasEthernet() && dEthernetStrFlg != null)
+            {
+                Ethernet2 ethernet2 = pa.getEthernet();
+
+                try
+                {
+                    // IPアドレスの各オクテットをXOR演算したものをオブジェクトのXY座標点として利用する
+                    // MACアドレスを取得
+                    String dEthernetStr = ethernet2.destination().toString();
+//										Log.i(TAG, "dEthernetStr = " + dEthernetStr);
+
+                    // IPヘッダのIPアドレスを取得する
+                    Ip4 ip4 = pa.getIp4();
+
+                    String dIPStr = ip4.destination().toString();
+//										Log.i(TAG, "dIPStr = " + dIPStr);
+
+                    String sIPStr = ip4.source().toString();
+//										Log.i(TAG, "sIPStr = " + sIPStr);
+
+                    dIpPoint = DrawBlendingRectangle.xorIP(dIPStr);
+                    Log.i(TAG, "dIpPoint = " + dIpPoint);
+
+                    sIpPoint = DrawBlendingRectangle.xorIP(sIPStr);
+                    Log.i(TAG, "sIpPoint = " + sIpPoint);
+
+                    if (!dEthernetStrFlg.equals(dEthernetStr))
+                    {
+                        dIpPoint = (short) (255 - dIpPoint);
+                        Log.i(TAG, "revdIpPoint = " + dIpPoint);
+//												sIpPoint = (short) (255 - sIpPoint);
+                        Log.i(TAG, "revsIpPoint = " + sIpPoint);
+                    }
+
+                    // サイズ指定はTCP or UDPを利用する
+                    if (pa.hasTcp())
+                    {
+                        // Tcpの場合，windowで求めたもので
+                        Tcp tcp = pa.getTcp();
+
+                        short window = tcp.window();
+                        Log.i(TAG, "window = " + window);
+                        if (0 < window)
+                        {
+                            short[] size = DrawBlendingRectangle.calcSize(window);
+
+                            sizeX = size[0];
+                            sizeY = size[1];
+                        }
+                        else
+                        {
+                            sizeX = 0;
+                            sizeY = 0;
+                        }
+                        Log.i(TAG, "TcpSizeX = " + sizeX);
+                        Log.i(TAG, "TcpSizeY = " + sizeY);
+                    }
+                    else if (pa.hasUdp())
+                    {
+                        sizeX = 30;
+                        sizeY = 30;
+                    }
+                    else
+                    {
+                        // ICMPが来た場合
+                        sizeX = 0;
+                        sizeY = 0;
+                    }
+
+
+                    //TODO カラー指定を，ポート番号を使うようにする（MACアドレスで，dかsかを切り替え）
+                    // IPヘッダのlengthで分岐
+
+                    short length = ip4.length();
+
+                    short id = ip4.id();
+
+
+                    Log.i(TAG, "length = " + length);
+
+                    if (length < 40)
+                    {
+                        color = Enum.COLOR.RED;
+                    }
+                    else if (40 <= length && length < 50)
+                    {
+                        color = Enum.COLOR.GREEN;
+                    }
+                    else if (50 <= length && length < 60)
+                    {
+                        color = Enum.COLOR.BLUE;
+                    }
+                    else if (60 <= length && length < 70)
+                    {
+                        color = Enum.COLOR.CYAN;
+                    }
+                    else if (70 <= length && length < 80)
+                    {
+                        color = Enum.COLOR.MAGENTA;
+                    }
+                    else if (80 <= length && length < 500)
+                    {
+                        color = Enum.COLOR.YELLOW;
+                    }
+                    else if (500 <= length && length < 700)
+                    {
+                        color = Enum.COLOR.WHITE;
+                    }
+                    else
+                    {
+                        color = Enum.COLOR.BLACK;
+                    }
+
+                    Log.i(TAG, "color = " + color);
+
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+                catch (IllegalArgumentException e)
+                {
+                    e.printStackTrace();
+                }
+                catch (IndexOutOfBoundsException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
 
 		/**
 		 * 指定したオブジェクトを破棄する
