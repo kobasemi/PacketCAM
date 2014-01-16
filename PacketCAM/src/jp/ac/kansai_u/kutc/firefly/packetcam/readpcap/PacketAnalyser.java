@@ -1,5 +1,7 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.readpcap;
 
+import com.slytechs.utils.net.EUI48;
+import com.slytechs.utils.net.Ip4Address;
 import org.jnetstream.capture.file.pcap.PcapPacket;
 import org.jnetstream.packet.Header;
 import org.jnetstream.protocol.codec.CodecCreateException;
@@ -21,6 +23,13 @@ import java.io.IOException;
  */
 public class PacketAnalyser {
     PcapPacket packet;
+
+    // 参照先を用意する
+    Ethernet2 eth;
+    Ip4 ip4;
+    Tcp tcp;
+    Udp udp;
+    Icmp icmp;
 
     /**
      * デフォルトコンストラクタ
@@ -263,8 +272,164 @@ public class PacketAnalyser {
         }
     }
 
+    // それぞれのパケットの情報を取得するメソッド群
+    // 本アプリケーション内で使用するもののみ用意しているため
+    // 下記メソッド以外からも取得できる情報がある
+
     /**
-     * パケットのタイムスタンプを返す．パケットがない場合は-1を返す．
+     * 送信元MACアドレスを返す
+     * @return source/ null（失敗）
+     */
+    public EUI48 getMacAddressSource(){
+        if((eth = getEthernet()) != null)
+            try {
+                return eth.source();
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+        return null;
+    }
+
+    /**
+     * 送信先MACアドレスを返す
+     * @return destination/ null（失敗）
+     */
+    public EUI48 getMacAddressDestination(){
+        if((eth = getEthernet()) != null)
+            try {
+                return eth.destination();
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+        return null;
+    }
+
+    /**
+     * 送信元IPアドレスを返す
+     * @return source/ null（失敗）
+     */
+    public Ip4Address getIpAddressSource(){
+        if((ip4 = getIp4()) != null)
+            return ip4.source();
+        return null;
+    }
+
+    /**
+     * 送信先IPアドレスを返す
+     * @return destination/ null（失敗）
+     */
+    public Ip4Address getIpAddressDestination(){
+        if((ip4 = getIp4()) != null)
+            return ip4.destination();
+        return null;
+    }
+
+    /**
+     * IPヘッダのTTL(Time to Live)を返す
+     * @return ttl/ -1（失敗）
+     */
+    public short getIpTtl(){
+        if((ip4 = getIp4()) != null)
+            return (short)(ip4.ttl() & 0xFF);
+        return -1;
+    }
+
+    /**
+     * IPヘッダに含まれるプロトコル情報を返す
+     * 例 1: ICMP, 6: TCP, 17: UDP
+     * @return protocol/ -1（失敗）
+     */
+    public byte getIpProtocol(){
+        if((ip4 = getIp4()) != null)
+            return ip4.protocol();
+        return -1;
+    }
+
+    /**
+     * 送信元ポートを返す
+     * @return source/ -1（失敗）
+     */
+    public int getTcpPortSource(){
+        if((tcp = getTcp()) != null)
+            return (int)(char)tcp.source();
+        return -1;
+    }
+
+    /**
+     * 送信先ポートを返す
+     * @return destination/ -1（失敗）
+     */
+    public int getTcpPortDestination(){
+        if((tcp = getTcp()) != null)
+            return (int)(char)tcp.destination();
+        return -1;
+    }
+
+    /**
+     * TCPヘッダに含まれるフラグ情報を返す
+     * 例 URG|ACK|PSH|RST|SYN|FIN
+     * @return flags/ -1（失敗）
+     */
+    public int getTcpFlags(){
+        if((tcp = getTcp()) != null)
+            return tcp.flags();
+        return -1;
+    }
+
+    /**
+     * TCPヘッダに含まれるWindow（サイズ）情報を返す
+     * @return window/ -1（失敗）
+     */
+    public int getTcpWindow(){
+        if((tcp = getTcp()) != null)
+            return (int)(char)tcp.window();
+        return -1;
+    }
+
+    /**
+     * 送信元ポートを返す
+     * @return source/ -1（失敗）
+     */
+    public int getUdpPortSource(){
+        if((udp = getUdp()) != null)
+            return (int)(char)udp.source();
+        return -1;
+    }
+
+    /**
+     * 送信先ポートを返す
+     * @return destination/ -1（失敗）
+     */
+    public int getUdpPortDestination(){
+        if((udp = getUdp()) != null)
+            return (int)(char)udp.destination();
+        return -1;
+    }
+
+    /**
+     * ICMPに含まれるタイプ情報を返す
+     * 例 0: エコー応答, 8: エコー要求, 11: 時間超過
+     * @return type/ -1（失敗）
+     */
+    public byte getIcmpType(){
+        if((icmp = getIcmp()) != null)
+            return icmp.type();
+        return -1;
+    }
+
+    /**
+     * ICMPに含まれるタイプに関するコードを返す
+     * 例 0: ネットワークが到達できない
+     * @return code/ -1（失敗）
+     */
+    public byte getIcmpCode(){
+        if((icmp = getIcmp()) != null)
+            return icmp.code();
+        return -1;
+    }
+
+    /**
+     * パケットのタイムスタンプを返す
      * @return 秒数，失敗した場合 -1
      */
     public long getSeconds() {
@@ -276,7 +441,7 @@ public class PacketAnalyser {
     }
 
     /**
-     * パケットのタイムスタンプを返す．パケットがない場合は-1を返す．
+     * パケットのタイムスタンプを返す
      * @return ナノ秒，失敗した場合 -1
      */
     public long getNanos() {
@@ -285,6 +450,5 @@ public class PacketAnalyser {
         }catch(IOException e){
             return -1;
         }
-
     }
 }
