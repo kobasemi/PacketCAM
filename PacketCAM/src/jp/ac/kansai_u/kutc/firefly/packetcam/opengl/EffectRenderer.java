@@ -193,10 +193,12 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 										String sIPStr = ip4.source().toString();
 										Log.i(TAG, "sIPStr = " + sIPStr);
 
-										short dIpPoint = DrawBlendingRectangle.calcIP(dIPStr);
+//										short dIpPoint = DrawBlendingRectangle.calcIP(dIPStr);
+										short dIpPoint = DrawBlendingRectangle.xorIP(dIPStr);
 										Log.i(TAG, "dIpPoint = " + dIpPoint);
 
-										short sIpPoint = DrawBlendingRectangle.calcIP(sIPStr);
+//										short sIpPoint = DrawBlendingRectangle.calcIP(sIPStr);
+										short sIpPoint = DrawBlendingRectangle.xorIP(sIPStr);
 										Log.i(TAG, "sIpPoint = " + sIpPoint);
 
 
@@ -334,7 +336,10 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 									{
 										e.printStackTrace();
 									}
-
+								catch (IndexOutOfBoundsException e)
+									{
+										e.printStackTrace();
+									}
 							}
 						packet = null;
 					}

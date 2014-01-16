@@ -25,6 +25,8 @@ public class DrawBlendingRectangle
 		private int objectIDcount = 0;
 		private int objectID = 0;
 
+		private static short xorValue;
+
         public DrawBlendingRectangle(int x, int y, int w, int h, COLOR color)
             {
                 this(x/100.f, y/100.f, w/100.f, h/100.f, color);
@@ -113,6 +115,29 @@ public class DrawBlendingRectangle
 				short ipaddrPoint = Short.valueOf(ipaddrPointStr);
 				ipaddrPoint = digitReducer(ipaddrPoint);
 				return ipaddrPoint;
+			}
+
+
+		protected static short xorIP(String ipaddr)
+			{
+				String[] point = ipaddr.split("\\.");
+				Log.i(TAG, "point.length = " + point.length);
+
+				short[] ipaddrPoint = new short[point.length];
+				for (int i = 0; i < point.length; i++)
+					{
+						ipaddrPoint[i] = Short.valueOf(point[i]);
+					}
+
+				xorValue = (short)(ipaddrPoint[0] ^ ipaddrPoint[1]);
+				xorValue = (short)(xorValue ^ ipaddrPoint[2]);
+				xorValue = (short)(xorValue ^ ipaddrPoint[3]);
+
+
+				Log.i(TAG, "xorValue = " + xorValue);
+
+				xorValue = digitReducer(xorValue);
+				return xorValue;
 			}
 
 
