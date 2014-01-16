@@ -1,5 +1,6 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.opengl;
 
+import android.util.Log;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.COLOR;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -12,6 +13,7 @@ import java.nio.FloatBuffer;
  */
 public class DrawBlendingRectangle
 	{
+		private static final String TAG = DrawBlendingRectangle.class.getSimpleName();
 		// Java NIOに転送した頂点バッファや色バッファを格納する変数を定義
 		// 頂点バッファ
 		private FloatBuffer mVertexBuffer;
@@ -19,6 +21,9 @@ public class DrawBlendingRectangle
 		private FloatBuffer mColorBuffer;
 
         float x, y, width, height;
+
+		private int objectIDcount = 0;
+		private int objectID = 0;
 
         public DrawBlendingRectangle(int x, int y, int w, int h, COLOR color)
             {
@@ -29,7 +34,9 @@ public class DrawBlendingRectangle
             mVertexBuffer = EffectRenderer.rectangleBuffer;
             mColorBuffer  = GL_Color.getColorFloatBuffer(color);
             setDrawObject(x, y, width, height);
-        }
+			objectIDcount++;
+			objectID = objectIDcount;
+		}
 
         /**
          * 描画図形の設定を行う
@@ -91,6 +98,21 @@ public class DrawBlendingRectangle
 				gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
 				gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
                 gl.glDisable(GL10.GL_BLEND);
+			}
+
+
+		protected static short calcIP(String ipaddr)
+			{
+				// IPアドレスを"."で分割する
+				String[] point = ipaddr.split("\\.");
+				Log.i(TAG, "point.length = " + point.length);
+
+				// IPアドレスの末尾アドレスのみを取得する
+				String ipaddrPointStr = point[point.length - 1];
+
+				short ipaddrPoint = Short.valueOf(ipaddrPointStr);
+				ipaddrPoint = digitReducer(ipaddrPoint);
+				return ipaddrPoint;
 			}
 
 
