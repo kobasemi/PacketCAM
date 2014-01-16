@@ -18,6 +18,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 
 /**
@@ -29,7 +30,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
     private static final String TAG = EffectRenderer.class.getSimpleName();
 
     // オブジェクトを格納するリスト
-    ArrayList<DrawBlendingRectangle> drawBlendingRectangleList = new ArrayList<DrawBlendingRectangle>();
+    List<DrawBlendingRectangle> drawBlendingRectangleList = new ArrayList<DrawBlendingRectangle>();
 
     int mWidth = 0, mHeight = 0;
 
@@ -56,6 +57,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
      * オブジェクト描画用の頂点座標に関するバッファ
      */
     static FloatBuffer rectangleBuffer = null;
+    static FloatBuffer pointBuffer     = null;
 
     /**
      * GLSurfaceViewのRendererが生成された際に呼ばれる
@@ -98,13 +100,15 @@ public class EffectRenderer implements GLSurfaceView.Renderer
         mDrawCamera.setUpCamera();
 
         // ネイティブのメモリ領域にバッファを作成する
-        float positions[] = {
+        float point[] = { 0.f, 0.f, };  // x, y
+        float rectangle[] = {
                 -1.0f,   1.0f,  // 左上
                 -1.0f,  -1.0f,  // 左下
                 1.0f,   1.0f,  // 右上
                 1.0f,  -1.0f,  // 右下
         };
-        rectangleBuffer = makeFloatBuffer(positions);
+        pointBuffer = makeFloatBuffer(point);
+        rectangleBuffer = makeFloatBuffer(rectangle);
     }
 
 
