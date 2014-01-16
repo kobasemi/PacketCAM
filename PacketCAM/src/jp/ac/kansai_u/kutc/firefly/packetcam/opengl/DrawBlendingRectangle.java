@@ -29,10 +29,11 @@ public class DrawBlendingRectangle
 
         public DrawBlendingRectangle(int x, int y, int w, int h, COLOR color)
             {
-                this(x/100.f, y/100.f, w/100.f, h/100.f, color);
+                // 座標を0 ~ 255の範囲に正規化
+                this(x/255.f, y/255.f, w/100.f, h/100.f, color);
             }
 
-        public DrawBlendingRectangle(float x, float y, float width, float height, COLOR color){
+        private DrawBlendingRectangle(float x, float y, float width, float height, COLOR color){
             mVertexBuffer = EffectRenderer.rectangleBuffer;
             mColorBuffer  = GL_Color.getColorFloatBuffer(color);
             setDrawObject(x, y, width, height);
