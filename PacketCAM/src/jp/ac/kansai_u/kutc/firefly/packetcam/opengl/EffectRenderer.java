@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
-import com.slytechs.utils.net.EUI48;
 import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PacketAnalyser;
 import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
@@ -13,7 +12,6 @@ import org.jnetstream.capture.file.pcap.PcapPacket;
 import org.jnetstream.protocol.lan.Ethernet2;
 import org.jnetstream.protocol.tcpip.Ip4;
 import org.jnetstream.protocol.tcpip.Tcp;
-import org.jnetstream.protocol.tcpip.Udp;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -174,13 +172,8 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 								try
 									{
 										// IPアドレスの末尾アドレスをオブジェクトの座標情報として用いる
-										// TODO 末端のみ利用しているのを，01からXORを利用してすべての情報を使うように
-										// 1オクテット XOR 2オクテット
-										// 上記結果 XOR 3オクテット
-										// 上記結果 XOR 4オクテット
 
 										// MACアドレスを取得
-//										String dEthernetStr = new String(ethernet2.getDestinationRaw(), "UTF-8");
 										String dEthernetStr = ethernet2.destination().toString();
 										Log.i(TAG, "dEthernetStr = " + dEthernetStr);
 
@@ -193,14 +186,11 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 										String sIPStr = ip4.source().toString();
 										Log.i(TAG, "sIPStr = " + sIPStr);
 
-//										short dIpPoint = DrawBlendingRectangle.calcIP(dIPStr);
 										short dIpPoint = DrawBlendingRectangle.xorIP(dIPStr);
 										Log.i(TAG, "dIpPoint = " + dIpPoint);
 
-//										short sIpPoint = DrawBlendingRectangle.calcIP(sIPStr);
 										short sIpPoint = DrawBlendingRectangle.xorIP(sIPStr);
 										Log.i(TAG, "sIpPoint = " + sIpPoint);
-
 
 										if (!dEthernetStrFlg.equals(dEthernetStr))
 											{
@@ -210,20 +200,17 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 												Log.i(TAG, "revsIpPoint = " + sIpPoint);
 											}
 
-
 										// サイズ指定はTCP or UDPを利用する
 										if (pa.hasTcp())
 											{
-												// Tcpの場合，window/flagで求めたもので
+												// Tcpの場合，windowで求めたもので
 												Tcp tcp = pa.getTcp();
-
-
 
 												short window = tcp.window();
 												Log.i(TAG, "window = " + window);
 												if (0 < window)
 													{
-														short[] size = DrawBlendingRectangle.calcPort(window);
+														short[] size = DrawBlendingRectangle.calcSize(window);
 
 														sizeX = size[0];
 														sizeY = size[1];
@@ -235,48 +222,17 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 													}
 												Log.i(TAG, "TcpSizeX = " + sizeX);
 												Log.i(TAG, "TcpSizeY = " + sizeY);
-
-//												// 描画位置：TCPヘッダのdport
-//												short[] dportPoint = DrawBlendingRectangle.calcPort(dport);
-//
-//												// 描画サイズ：TCPヘッダのsport
-//												short[] sportPoint = DrawBlendingRectangle.calcPort(sport);
 											}
 										else if (pa.hasUdp())
 											{
-												// TODO サイズ指定を，正方形固定にする（サイズは適当に決める）
-												Udp udp = pa.getUdp();
-
-												if (dEthernetStrFlg.equals(dEthernetStr))
-													{
-														short dport = udp.destination();
-														short[] size = DrawBlendingRectangle.calcPort(dport);
-
-														sizeX = size[0];
-														sizeY = size[1];
-
-														Log.i(TAG, "dUdpSizeX = " + sizeX);
-														Log.i(TAG, "dUdpSizeY = " + sizeY);
-													}
-												else
-													{
-														short sport = udp.source();
-														short[] size = DrawBlendingRectangle.calcPort(sport);
-
-														sizeX = size[0];
-														sizeY = size[1];
-
-														Log.i(TAG, "sUdpSizeX = " + sizeX);
-														Log.i(TAG, "sUdpSizeY = " + sizeY);
-													}
+												sizeX = 30;
+												sizeY = 30;
 											}
 										else
 											{
-												sizeX = 25;
-												sizeY = 25;
-
-												Log.i(TAG, "sizeX = " + sizeX);
-												Log.i(TAG, "sizeY = " + sizeY);
+												// ICMPが来た場合
+												sizeX = 0;
+												sizeY = 0;
 											}
 
 

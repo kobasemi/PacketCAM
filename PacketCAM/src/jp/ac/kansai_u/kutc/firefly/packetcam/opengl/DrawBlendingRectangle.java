@@ -103,21 +103,11 @@ public class DrawBlendingRectangle
 			}
 
 
-		protected static short calcIP(String ipaddr)
-			{
-				// IPアドレスを"."で分割する
-				String[] point = ipaddr.split("\\.");
-				Log.i(TAG, "point.length = " + point.length);
-
-				// IPアドレスの末尾アドレスのみを取得する
-				String ipaddrPointStr = point[point.length - 1];
-
-				short ipaddrPoint = Short.valueOf(ipaddrPointStr);
-				ipaddrPoint = digitReducer(ipaddrPoint);
-				return ipaddrPoint;
-			}
-
-
+		/**
+		 * IPアドレスの各オクテットをXOR演算し，結果を返す
+		 * @param ipaddr String型のIPアドレス
+		 * @return short型で，10で割って2桁に処理したXOR計算結果
+		 */
 		protected static short xorIP(String ipaddr)
 			{
 				String[] point = ipaddr.split("\\.");
@@ -143,16 +133,16 @@ public class DrawBlendingRectangle
 
 		/**
 		 * ポート番号から，オブジェクト生成用の座標を求める
-		 * @param port
-		 * @return
+		 * @param value short型の数値
+		 * @return だいたい真ん中で分けられ，10で割って2桁に処理されたshort配列
 		 */
-		protected static short[] calcPort(short port)
+		protected static short[] calcSize(short value)
 			{
 				// ポート番号にマイナス？が混じっている場合があるので，取り除く
-				port = minusReducer(port);
+				value = minusReducer(value);
 
 				// ポート番号をchar配列に
-				char[] portChar = String.valueOf(port).toCharArray();
+				char[] portChar = String.valueOf(value).toCharArray();
 
 				if ((portChar.length % 2) != 0)
 					{
@@ -227,6 +217,11 @@ public class DrawBlendingRectangle
 			}
 
 
+		/**
+		 * 数値内にマイナスが含まれている場合，マイナスを取り除く
+		 * @param num 処理するshort型の数値
+		 * @return マイナスが取り除かれたshort型の数値
+		 */
 		protected static short minusReducer(short num)
 			{
 				if (num >= 0) return num;
@@ -245,6 +240,12 @@ public class DrawBlendingRectangle
 
 
 		// 3桁以上の値を10で割って2桁に抑える
+
+		/**
+		 * 3桁以上の値を10で割って2桁に抑える
+		 * @param source 処理するshort型の数値
+		 * @return 2桁のshort型の数値
+		 */
 		protected static short digitReducer(short source)
 			{
 				if (String.valueOf(source).length() > 2)
