@@ -171,8 +171,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
 								try
 									{
-										// IPアドレスの末尾アドレスをオブジェクトの座標情報として用いる
-
+										// IPアドレスの各オクテットをXOR演算したものをオブジェクトのXY座標点として利用する
 										// MACアドレスを取得
 										String dEthernetStr = ethernet2.destination().toString();
 										Log.i(TAG, "dEthernetStr = " + dEthernetStr);
