@@ -22,13 +22,11 @@ public class DrawBlendingRectangle
 
         public DrawBlendingRectangle(int x, int y, int w, int h, COLOR color)
             {
-                mVertexBuffer = EffectRenderer.buffer;
-                mColorBuffer  = GL_Color.getColorFloatBuffer(color);
-                setDrawObject(x/100.f, y/100.f, w/100.f, h/100.f);
+                this(x/100.f, y/100.f, w/100.f, h/100.f, color);
             }
 
         public DrawBlendingRectangle(float x, float y, float width, float height, COLOR color){
-            mVertexBuffer = EffectRenderer.buffer;
+            mVertexBuffer = EffectRenderer.rectangleBuffer;
             mColorBuffer  = GL_Color.getColorFloatBuffer(color);
             setDrawObject(x, y, width, height);
         }

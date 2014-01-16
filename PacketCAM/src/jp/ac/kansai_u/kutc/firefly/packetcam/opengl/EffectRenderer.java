@@ -55,7 +55,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
     /**
      * オブジェクト描画用の頂点座標に関するバッファ
      */
-    static FloatBuffer buffer = null;
+    static FloatBuffer rectangleBuffer = null;
 
     /**
      * GLSurfaceViewのRendererが生成された際に呼ばれる
@@ -104,7 +104,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                 1.0f,   1.0f,  // 右上
                 1.0f,  -1.0f,  // 右下
         };
-        buffer = makeFloatBuffer(positions);
+        rectangleBuffer = makeFloatBuffer(positions);
     }
 
 
