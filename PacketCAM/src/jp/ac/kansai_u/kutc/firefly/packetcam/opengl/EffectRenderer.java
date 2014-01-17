@@ -10,10 +10,12 @@ import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
 import org.jnetstream.capture.file.pcap.PcapPacket;
 import org.jnetstream.protocol.lan.Ethernet2;
+import org.jnetstream.protocol.tcpip.Ip4;
 import org.jnetstream.protocol.tcpip.Tcp;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -134,7 +136,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 				// パケットは1秒ごとに装填される
 				packet = packetsQueue.poll();
 				if (packet != null)
-                // パケットが到着した場合，描画オブジェクトを追加する
+					// パケットが到着した場合，描画オブジェクトを追加する
 					{
                         // 解析機にパケットをセットする
                         pa.setPacket(packet);
@@ -144,16 +146,18 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 							{
 								// 描画オブジェクト用のパラメータを作成する
 								buildDrawBlendingRectangleParametor();
-                            }
 
-                        if(color == null)
-                            color = Enum.COLOR.BLACK;
-                        /**
-                         * @see DrawBlendingRectangle
-                         */
-                        drawBlendingRectangleList.add(new DrawBlendingRectangle(dIpPoint, sIpPoint, sizeX, sizeY, color));
+                                if(color == null)
+                                    color = Enum.COLOR.BLACK;
 
-                        packet = null;
+                                /**
+                                 * @see jp.ac.kansai_u.kutc.firefly.packetcam.opengl.DrawBlendingRectangle
+                                 */
+        
+                                short ttl = pa.getIpTtl();
+                                drawBlendingRectangleList.add(new DrawBlendingRectangle(dIpPoint, sIpPoint, sizeX, sizeY, color, ttl));
+							}
+						packet = null;
 					}
 
 				if (mSwitch.getDrawstate() == Enum.DRAWSTATE.PREPARATION)
@@ -163,13 +167,23 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
 				mDrawCamera.draw(gl);
 
+
+				Log.e(TAG, "listSize = " + drawBlendingRectangleList.size());
 				// GLViewクラスのvisibility変数をいじることで、描画のON・OFFが可能
 				//SwitchクラスのswitchVisibilityメソッドをcallして描画のON・OFFを行う
 				if (mSwitch.getVisibility() == Enum.VISIBILITY.VISIBLE)
 					{
 						for (int i = 0; i < this.drawBlendingRectangleList.size(); i++)
 							{
-								drawBlendingRectangleList.get(i).draw(gl);
+								if (drawBlendingRectangleList.get(i).getDeadFlag())
+									{
+										drawBlendingRectangleList.remove(i);
+										i++;
+									}
+								else
+									{
+										drawBlendingRectangleList.get(i).draw(gl);
+									}
 							}
 					}
 
@@ -260,10 +274,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                         sizeX = 30;
                         sizeY = 30;
                     }
-
-
-                    //TODO カラー指定を，ポート番号を使うようにする（MACアドレスで，dかsかを切り替え）
-                    // IPヘッダのlengthで分岐
 
 					// TCPかUDPのポート番号から，カラーを指定する
 					// PORT番号は，分割せずそのまま利用する
