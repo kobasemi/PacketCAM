@@ -10,12 +10,10 @@ import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
 import org.jnetstream.capture.file.pcap.PcapPacket;
 import org.jnetstream.protocol.lan.Ethernet2;
-import org.jnetstream.protocol.tcpip.Ip4;
 import org.jnetstream.protocol.tcpip.Tcp;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -44,9 +42,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
 		int colorFlg = 0;
 
-		// パケットファイルの初回読み込み時のみ，MACアドレスをセットする
-		public static boolean macFlg = false;
-
 		PcapPacket packet = null;
 		/**
 		 * スレッドセーフなキュー，インスタンスはPcapManagerから取得する
@@ -65,7 +60,9 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 		static FloatBuffer rectangleBuffer = null;
 		static FloatBuffer pointBuffer = null;
 
-		String dEthernetStrFlg = null;
+        // MACアドレスを保持する
+        // 大会用パケットは2種類しかないため，この方法で判別する
+        String typeMacAddress = null;
 
 		/**
 		 * GLSurfaceViewのRendererが生成された際に呼ばれる
@@ -147,12 +144,15 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 							{
 								// 描画オブジェクト用のパラメータを作成する
 								buildDrawBlendingRectangleParametor();
+                            }
 
-								/**
-								 * @see DrawBlendingRectangle
-								 */
-								drawBlendingRectangleList.add(new DrawBlendingRectangle(dIpPoint, sIpPoint, sizeX, sizeY, color));
-							}
+                        if(color == null)
+                            color = Enum.COLOR.BLACK;
+                        /**
+                         * @see DrawBlendingRectangle
+                         */
+                        drawBlendingRectangleList.add(new DrawBlendingRectangle(dIpPoint, sIpPoint, sizeX, sizeY, color));
+
                         packet = null;
 					}
 
@@ -187,29 +187,22 @@ public class EffectRenderer implements GLSurfaceView.Renderer
          */
         public void buildDrawBlendingRectangleParametor(){
 
-            if (pa.hasEthernet() && !macFlg)
-            {
-                // MACアドレス取得
-                Ethernet2 ethernet2 = pa.getEthernet();
-
-                try
-                {
-                    // MACアドレスを取得
-                    dEthernetStrFlg = ethernet2.destination().toString();
-
-                    // byte配列からStringに変換
-                    Log.i(TAG, "dEthernetStrFlg = " + dEthernetStrFlg);
-                    macFlg = true;
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
+            if (pa.hasEthernet()){
+                // MACアドレスを取得
+                if(typeMacAddress == null)
+                    // 初期化
+                    typeMacAddress = pa.getMacAddressDestination().toString();
+                else
+                    // MACアドレスのタイプスイッチ
+                    if(typeMacAddress.equals(pa.getMacAddressSource().toString()))
+                        typeMacAddress = pa.getMacAddressDestination().toString();
+                    else
+                        typeMacAddress = pa.getMacAddressSource().toString();
             }
 
             // 解析機からヘッダを取り出す場合
             // 先にヘッダがあるかを確認してほしい
-            if (pa.hasIp4() && pa.hasEthernet() && dEthernetStrFlg != null && !pa.hasIcmp())
+            if (pa.hasIp4() && pa.hasEthernet())
             {
                 Ethernet2 ethernet2 = pa.getEthernet();
 
@@ -217,17 +210,14 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                 {
                     // IPアドレスの各オクテットをXOR演算したものをオブジェクトのXY座標点として利用する
                     // MACアドレスを取得
-                    String dEthernetStr = ethernet2.destination().toString();
-//										Log.i(TAG, "dEthernetStr = " + dEthernetStr);
+                    String dEthernetStr = pa.getMacAddressDestination().toString();
+                    Log.i(TAG, "dEthernetStr = " + dEthernetStr);
 
-                    // IPヘッダのIPアドレスを取得する
-                    Ip4 ip4 = pa.getIp4();
+                    String dIPStr = pa.getIpAddressDestination().toString();
+                    Log.i(TAG, "dIPStr = " + dIPStr);
 
-                    String dIPStr = ip4.destination().toString();
-//										Log.i(TAG, "dIPStr = " + dIPStr);
-
-                    String sIPStr = ip4.source().toString();
-//										Log.i(TAG, "sIPStr = " + sIPStr);
+                    String sIPStr = pa.getIpAddressSource().toString();
+                    Log.i(TAG, "sIPStr = " + sIPStr);
 
                     dIpPoint = DrawBlendingRectangle.xorIP(dIPStr);
                     Log.i(TAG, "dIpPoint = " + dIpPoint);
@@ -235,11 +225,10 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                     sIpPoint = DrawBlendingRectangle.xorIP(sIPStr);
                     Log.i(TAG, "sIpPoint = " + sIpPoint);
 
-                    if (!dEthernetStrFlg.equals(dEthernetStr))
-                    {
+                    if (!typeMacAddress.equals(dEthernetStr)){
                         dIpPoint = (short) (255 - dIpPoint);
                         Log.i(TAG, "revdIpPoint = " + dIpPoint);
-//												sIpPoint = (short) (255 - sIpPoint);
+						sIpPoint = (short) (255 - sIpPoint);
                         Log.i(TAG, "revsIpPoint = " + sIpPoint);
                     }
 
@@ -273,12 +262,14 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                     }
 
 
+                    //TODO カラー指定を，ポート番号を使うようにする（MACアドレスで，dかsかを切り替え）
+                    // IPヘッダのlengthで分岐
 
 					// TCPかUDPのポート番号から，カラーを指定する
 					// PORT番号は，分割せずそのまま利用する
 					if (pa.hasTcp())
 						{
-							if (dEthernetStrFlg.equals(dEthernetStr))
+							if (typeMacAddress.equals(dEthernetStr))
 								{
 									int sPort = pa.getTcpPortSource();
 
@@ -293,7 +284,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 						}
 					if (pa.hasUdp())
 						{
-							if (dEthernetStrFlg.equals(dEthernetStr))
+							if (typeMacAddress.equals(dEthernetStr))
 								{
 									int sPort = pa.getUdpPortSource();
 
@@ -306,10 +297,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 									color = DrawBlendingRectangle.choiceColorFromPort(dPort);
 								}
 						}
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
                 }
                 catch (IllegalArgumentException e)
                 {

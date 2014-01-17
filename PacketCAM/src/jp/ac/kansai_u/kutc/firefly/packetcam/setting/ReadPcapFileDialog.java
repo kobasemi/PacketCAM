@@ -3,7 +3,6 @@ package jp.ac.kansai_u.kutc.firefly.packetcam.setting;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import jp.ac.kansai_u.kutc.firefly.packetcam.opengl.EffectRenderer;
 import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Path;
 
@@ -46,8 +45,5 @@ public class ReadPcapFileDialog implements DialogInterface.OnClickListener {
         // 選択されたパケットファイルのパス
         String filePath = Path.PACKETFOLDER_PATH + File.separator + str_items[which];
         PcapManager.getInstance().open(new File(filePath));
-
-		// EffectRendererのMACアドレス読み込みフラグを初期化する
-		EffectRenderer.macFlg = false;
     }
 }
