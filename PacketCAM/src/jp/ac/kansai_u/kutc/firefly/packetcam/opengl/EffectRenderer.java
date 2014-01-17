@@ -8,8 +8,6 @@ import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
 import org.jnetstream.capture.file.pcap.PcapPacket;
-import org.jnetstream.protocol.lan.Ethernet2;
-import org.jnetstream.protocol.tcpip.Tcp;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -115,6 +113,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
         short sIpPoint;
         short sizeX = 0;
         short sizeY = 0;
+        short ttl;
         Enum.COLOR color = null;
 
 		/**
@@ -139,14 +138,9 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 								// 描画オブジェクト用のパラメータを作成する
 								buildDrawBlendingRectangleParametor();
 
-                                if(color == null)
-                                    color = Enum.COLOR.BLACK;
-
                                 /**
                                  * @see jp.ac.kansai_u.kutc.firefly.packetcam.opengl.DrawBlendingRectangle
                                  */
-        
-                                short ttl = pa.getIpTtl();
                                 drawBlendingRectangleList.add(new DrawBlendingRectangle(dIpPoint, sIpPoint, sizeX, sizeY, color, ttl));
 							}
 						packet = null;
@@ -177,7 +171,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 					}
 
 				// OpenGLで描画したフレームバッファからbitmapを生成する
-				if (mSwitch.getShutter() == true)
+				if (mSwitch.getShutter())
 					{
 						createOpenGLBitmap(gl);
 						mSwitch.switchShutter();
@@ -189,6 +183,15 @@ public class EffectRenderer implements GLSurfaceView.Renderer
          */
         public void buildDrawBlendingRectangleParametor(){
 
+            // 初期化
+            sizeX = 0;
+            sizeY = 0;
+            dIpPoint = 0;
+            sIpPoint = 0;
+            ttl = 0;
+            color = Enum.COLOR.MAGENTA;
+
+            // Ethernetヘッダから，スイッチ用MACアドレスを取得する
             if (pa.hasEthernet()){
                 // MACアドレスを取得
                 if(typeMacAddress == null)
@@ -202,100 +205,248 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                         typeMacAddress = pa.getMacAddressSource().toString();
             }
 
-            // 解析機からヘッダを取り出す場合
-            // 先にヘッダがあるかを確認してほしい
-            if (pa.hasIp4() && pa.hasEthernet())
-            {
-                Ethernet2 ethernet2 = pa.getEthernet();
+            // IP4ヘッダから座標位置を算出，及びオブジェクトの寿命を設定する
+            if (pa.hasIp4()){
+                try{
+                    // IP4.source/destination から座標位置を算出する
+                    dIpPoint = xorIP(pa.getIpAddressDestination().toString());
+                    sIpPoint = xorIP(pa.getIpAddressSource().toString());
 
-                try
-                {
-                    // IPアドレスの各オクテットをXOR演算したものをオブジェクトのXY座標点として利用する
-                    // MACアドレスを取得
-                    String dEthernetStr = pa.getMacAddressDestination().toString();
-
-                    String dIPStr = pa.getIpAddressDestination().toString();
-                    String sIPStr = pa.getIpAddressSource().toString();
-
-                    dIpPoint = DrawBlendingRectangle.xorIP(dIPStr);
-
-                    sIpPoint = DrawBlendingRectangle.xorIP(sIPStr);
-
-                    if (!typeMacAddress.equals(dEthernetStr)){
+                    if (!typeMacAddress.equals(pa.getMacAddressDestination().toString())){
                         dIpPoint = (short) (255 - dIpPoint);
 						sIpPoint = (short) (255 - sIpPoint);
                     }
 
-                    // サイズ指定はTCP or UDPを利用する
-                    if (pa.hasTcp())
-                    {
-                        // Tcpの場合，windowで求めたもので
-                        Tcp tcp = pa.getTcp();
-
-                        short window = tcp.window();
-                        if (0 < window)
-                        {
-                            short[] size = DrawBlendingRectangle.calcSize(window);
-
-                            sizeX = size[0];
-                            sizeY = size[1];
-                        }
-                        else
-                        {
-                            sizeX = 0;
-                            sizeY = 0;
-                        }
-                    }
-                    else if (pa.hasUdp())
-                    {
-                        sizeX = 30;
-                        sizeY = 30;
-                    }
-
-					// TCPかUDPのポート番号から，カラーを指定する
-					// PORT番号は，分割せずそのまま利用する
-					if (pa.hasTcp())
-						{
-							if (typeMacAddress.equals(dEthernetStr))
-								{
-									int sPort = pa.getTcpPortSource();
-
-									color = DrawBlendingRectangle.choiceColorFromPort(sPort);
-								}
-							else
-								{
-									int dPort = pa.getTcpPortDestination();
-
-									color = DrawBlendingRectangle.choiceColorFromPort(dPort);
-								}
-						}
-					if (pa.hasUdp())
-						{
-							if (typeMacAddress.equals(dEthernetStr))
-								{
-									int sPort = pa.getUdpPortSource();
-
-									color = DrawBlendingRectangle.choiceColorFromPort(sPort);
-								}
-							else
-								{
-									int dPort = pa.getUdpPortDestination();
-
-									color = DrawBlendingRectangle.choiceColorFromPort(dPort);
-								}
-						}
-                }
-                catch (IllegalArgumentException e)
-                {
+                    // IP4.ttlから寿命を設定する
+                    ttl = pa.getIpTtl();
+                }catch (IllegalArgumentException e){
+                    e.printStackTrace();
+                }catch (IndexOutOfBoundsException e){
                     e.printStackTrace();
                 }
-                catch (IndexOutOfBoundsException e)
-                {
+            }
+
+            // TCPヘッダからサイズとカラーを算出する
+            if (pa.hasTcp()){
+                // TCP.windowからサイズを算出する
+                if(pa.getTcpWindow() > 0){
+                    short[] size = calcSize(pa.getTcpWindow());
+                    sizeX = size[0];
+                    sizeY = size[1];
+                }
+
+                // TCP.portからカラーを指定する
+                // PORT番号は，分割せずそのまま利用する
+                if (typeMacAddress.equals(pa.getMacAddressDestination().toString()))
+                    color = choiceColorFromPort(pa.getTcpPortSource());
+                else
+                    color = choiceColorFromPort(pa.getTcpPortDestination());
+            }
+
+            // UDPヘッダからサイズとカラーを算出する
+            if (pa.hasUdp()){
+                // サイズは固定
+                sizeX = 30;
+                sizeY = 30;
+
+                try {
+                    // UDP.portからカラーを指定する
+                    // PORT番号は，分割せずそのまま利用する
+                    if (typeMacAddress.equals(pa.getMacAddressDestination().toString()))
+                        color = choiceColorFromPort(pa.getUdpPortSource());
+                    else
+                        color = choiceColorFromPort(pa.getUdpPortDestination());
+                }catch(IllegalArgumentException e){
+                    e.printStackTrace();
+                }catch(IndexOutOfBoundsException e){
                     e.printStackTrace();
                 }
             }
         }
 
+
+        // パラメータ作成用メソッド群
+        /**
+         * TCPヘッダ又はUDPヘッダのポート番号を元に条件判定を行い，カラーを返す
+         * @param num ポート番号
+         * @return Enum.COLOR
+         */
+        private Enum.COLOR choiceColorFromPort(int num)
+            {
+                if ((0 <= num && num <= 79) || (81 <= num && num <= 442) || (444 <= num && num <= 1023))
+                    {
+                        return Enum.COLOR.RED;
+                    }
+                    else if (num == 80)
+                    {
+                        return Enum.COLOR.GREEN;
+                    }
+                    else if (num == 443)
+                    {
+                        return Enum.COLOR.BLUE;
+                    }
+                    else if (1024 <= num && num <= 30000)
+                    {
+                        return Enum.COLOR.BLACK;
+                    }
+                    else if (30001 <= num && num <= 50000)
+                    {
+                        return Enum.COLOR.WHITE;
+                    }
+                    else if (50001 <= num && num <= 55000)
+                    {
+                        return Enum.COLOR.CYAN;
+                    }
+                    else if (55001 <= num && num <= 60000)
+                    {
+                        return Enum.COLOR.YELLOW;
+                    }
+                    else
+                    {
+                        return Enum.COLOR.MAGENTA;
+                    }
+
+            }
+
+        /**
+         * IPアドレスの各オクテットをXOR演算し，結果を返す
+         * @param ipaddr String型のIPアドレス
+         * @return short型で，10で割って2桁に処理したXOR計算結果
+         */
+        private short xorIP(String ipaddr)
+            {
+                String[] point = ipaddr.split("\\.");
+
+                short[] ipaddrPoint = new short[point.length];
+                for (int i = 0; i < point.length; i++)
+                {
+                    ipaddrPoint[i] = Short.valueOf(point[i]);
+                }
+
+                short xorValue = (short) (ipaddrPoint[0] ^ ipaddrPoint[1]);
+                xorValue = (short)(xorValue ^ ipaddrPoint[2]);
+                xorValue = (short)(xorValue ^ ipaddrPoint[3]);
+
+                return xorValue;
+            }
+
+        /**
+         * windowサイズから，オブジェクト生成用の座標を求める
+         * @param value int型の数値
+         * @return だいたい真ん中で分けられ，10で割って2桁に処理されたshort配列
+         */
+        private short[] calcSize(int value)
+            {
+                // ポート番号をchar配列に
+                char[] portChar = String.valueOf(value).toCharArray();
+
+                if ((portChar.length % 2) != 0)
+                    {
+                        // 桁数が奇数の場合の処理
+                        // だいたい真ん中を求める
+                        int aboutCenter = portChar.length / 2;
+
+                        char[] firstChar = new char[aboutCenter + 1];
+
+                        int j = 0;
+                        for (int i = 0; i < aboutCenter + 1; i++)
+                        {
+                            firstChar[i] = portChar[i];
+                            j++;
+                        }
+
+                        char[] secondChar = new char[aboutCenter];
+
+                        for (int i = 0; i < aboutCenter; i++)
+                        {
+                            secondChar[i] = portChar[j];
+                            j++;
+                        }
+
+                        // firstの方が桁数が多くなるはず
+                        short first = Short.valueOf(String.valueOf(firstChar));
+                        short second = Short.valueOf(String.valueOf(secondChar));
+
+                        // PORT番号の幅は，0~65535
+                        // firstが3桁以上の場合，ひたすら2で割って2桁に抑える
+                        first = digitReducer(first);
+                        second = digitReducer(second);
+
+                        short[] data = new short[2];
+                        data[0] = first;
+                        data[1] = second;
+                        return data;
+                    }
+                else
+                    {
+                        // 桁数が偶数の場合
+                        // 4桁か，2桁
+                        int center = portChar.length / 2;
+                        char[] firstChar = new char[center];
+
+                        int j = 0;
+                        for (int i = 0; i < center; i++)
+                        {
+                            firstChar[i] = portChar[i];
+                            j++;
+                        }
+
+                        char[] secondChar = new char[center];
+
+                        for (int i = 0; i < center; i++)
+                        {
+                            secondChar[i] = portChar[j];
+                            j++;
+                        }
+
+                        short first = Short.valueOf(String.valueOf(firstChar));
+                        short second = Short.valueOf(String.valueOf(secondChar));
+
+                        first = digitReducer(first);
+                        second = digitReducer(second);
+
+                        short[] data = new short[2];
+                        data[0] = first;
+                        data[1] = second;
+                        return data;
+                    }
+            }
+
+        /**
+         * 数値内にマイナスが含まれている場合，マイナスを取り除く
+         * @param num 処理するshort型の数値
+         * @return マイナスが取り除かれたshort型の数値
+         */
+        private short minusReducer(short num)
+            {
+                if (num >= 0) return num;
+
+                char[] oldNumCharArray = String.valueOf(num).toCharArray();
+                char[] newNumCharArray = new char[oldNumCharArray.length - 1];
+
+                System.arraycopy(oldNumCharArray, 1, newNumCharArray, 0, oldNumCharArray.length - 1);
+
+                return Short.valueOf(String.valueOf(newNumCharArray));
+            }
+
+
+        // 3桁以上の値を10で割って2桁に抑える
+
+        /**
+         * 3桁以上の値を10で割って2桁に抑える
+         * @param source 処理するshort型の数値
+         * @return 2桁のshort型の数値
+         */
+        private short digitReducer(short source)
+            {
+                if (String.valueOf(source).length() > 2)
+                    {
+                        source = (short)(source / 10);
+                        digitReducer(source);
+                    }
+
+                return source;
+            }
 
 		/**
 		 * OpenGLのフレームバッファからBitmapを作る
