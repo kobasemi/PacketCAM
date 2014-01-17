@@ -1,8 +1,6 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.opengl;
 
 import android.graphics.Bitmap;
-import android.os.Environment;
-import android.util.Log;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Path;
 
 import java.io.File;
@@ -41,13 +39,11 @@ public class SaveSDCard
 					}
 				catch (FileNotFoundException e)
 					{
-						Log.d(TAG, "FileNotFoundException");
-						Log.d(TAG, e.getMessage());
+						e.printStackTrace();
 					}
 				catch (Exception e)
 					{
-						Log.d(TAG, "Exception");
-						Log.d(TAG, e.getMessage());
+						e.printStackTrace();
 					}
 			}
 

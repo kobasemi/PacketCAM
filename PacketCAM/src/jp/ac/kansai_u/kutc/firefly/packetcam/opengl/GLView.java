@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.STATUS;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.VISIBILITY;
@@ -86,7 +85,6 @@ public class GLView extends GLSurfaceView
 		 */
 		public void setShutter()
 			{
-				Log.d(TAG, "setShutter()");
 				if (!mSwitch.getShutter())
 					{
 						mSwitch.switchShutter();

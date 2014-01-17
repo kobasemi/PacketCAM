@@ -1,8 +1,5 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.opengl;
 
-import android.util.Log;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.*;
-import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.COLOR;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -79,37 +76,35 @@ public class DrawBlendingRectangle
 		 */
 		public void draw(GL10 gl)
 			{
-				if (objectCountDown > 0)
-					{
-						// カメラプレビュー描画後に，ブレンドを有効化する
-						gl.glEnable(GL10.GL_BLEND);
+				// カメラプレビュー描画後に，ブレンドを有効化する
+				gl.glEnable(GL10.GL_BLEND);
 
-						// ブレンドモードを指定
-						// src, dst
-						gl.glBlendFunc(GL10.GL_ONE_MINUS_DST_COLOR, GL10.GL_ONE_MINUS_SRC_ALPHA);
+				// ブレンドモードを指定
+				// src, dst
+				gl.glBlendFunc(GL10.GL_ONE_MINUS_DST_COLOR, GL10.GL_ONE_MINUS_SRC_ALPHA);
 
-						gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-						gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
+				gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+				gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 
-						gl.glMatrixMode(GL10.GL_MODELVIEW);
-						gl.glLoadIdentity();
-						gl.glTranslatef(x, y, 0.f);
-						gl.glScalef(width, height, 0.f);
+				gl.glMatrixMode(GL10.GL_MODELVIEW);
+				gl.glLoadIdentity();
+				gl.glTranslatef(x, y, 0.f);
+				gl.glScalef(width, height, 0.f);
 
-						// 頂点バッファのポインタの場所を設定
-						gl.glVertexPointer(2, GL10.GL_FLOAT, 0, mVertexBuffer);
-						// 色バッファのポインタの場所を設定
-						gl.glColorPointer(4, GL10.GL_FLOAT, 0, mColorBuffer);
+				// 頂点バッファのポインタの場所を設定
+				gl.glVertexPointer(2, GL10.GL_FLOAT, 0, mVertexBuffer);
+				// 色バッファのポインタの場所を設定
+				gl.glColorPointer(4, GL10.GL_FLOAT, 0, mColorBuffer);
 
-						// 描画モード（点とか線とかいろいろ）を設定
-						gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
-						gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
-						gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-						gl.glDisable(GL10.GL_BLEND);
+				// 描画モード（点とか線とかいろいろ）を設定
+				gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+				gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+				gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+				gl.glDisable(GL10.GL_BLEND);
 
-						this.objectCountDown--;
-					}
-				else
+				this.objectCountDown--;
+
+				if (this.objectCountDown <= 0)
 					{
 						deadFlag = true;
 					}
@@ -130,7 +125,6 @@ public class DrawBlendingRectangle
 		protected static short xorIP(String ipaddr)
 			{
 				String[] point = ipaddr.split("\\.");
-				Log.i(TAG, "point.length = " + point.length);
 
 				short[] ipaddrPoint = new short[point.length];
 				for (int i = 0; i < point.length; i++)
@@ -141,9 +135,6 @@ public class DrawBlendingRectangle
 				xorValue = (short)(ipaddrPoint[0] ^ ipaddrPoint[1]);
 				xorValue = (short)(xorValue ^ ipaddrPoint[2]);
 				xorValue = (short)(xorValue ^ ipaddrPoint[3]);
-
-
-				Log.i(TAG, "xorValue = " + xorValue);
 
 				return xorValue;
 			}

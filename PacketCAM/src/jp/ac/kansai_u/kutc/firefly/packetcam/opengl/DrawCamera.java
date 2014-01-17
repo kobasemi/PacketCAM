@@ -2,7 +2,6 @@ package jp.ac.kansai_u.kutc.firefly.packetcam.opengl;
 
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
-import android.util.Log;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.DRAWSTATE;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.ZOOM;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
@@ -57,7 +56,6 @@ public class DrawCamera
 		 */
 		public DrawCamera()
 			{
-				Log.i(TAG, "DrawCamera");
 				mSwitch = Switch.getInstance();
 
 				mVertexBuffer = EffectRenderer.makeFloatBuffer(vertices);
@@ -99,7 +97,6 @@ public class DrawCamera
 									// 新規フレームが来た際に呼ばれる
 									if (surfaceTexture == null)
 										{
-											Log.i(TAG, "surfaceTextureIsNull");
 											return;
 										}
 									else if (mSwitch.getDrawstate() == DRAWSTATE.PREPARATION)

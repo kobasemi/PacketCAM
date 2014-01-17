@@ -3,19 +3,16 @@ package jp.ac.kansai_u.kutc.firefly.packetcam.opengl;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PacketAnalyser;
 import jp.ac.kansai_u.kutc.firefly.packetcam.readpcap.PcapManager;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
 import org.jnetstream.capture.file.pcap.PcapPacket;
 import org.jnetstream.protocol.lan.Ethernet2;
-import org.jnetstream.protocol.tcpip.Ip4;
 import org.jnetstream.protocol.tcpip.Tcp;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -41,8 +38,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 		private Switch mSwitch = Switch.getInstance();
 
 		private DrawCamera mDrawCamera;
-
-		int colorFlg = 0;
 
 		PcapPacket packet = null;
 		/**
@@ -74,8 +69,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 		 */
 		public void onSurfaceCreated (GL10 gl, EGLConfig config)
 			{
-				Log.i(TAG, "onSurfaceCreated()");
-
 				mDrawCamera = new DrawCamera();
 				mDrawCamera.generatedTexture(gl);
 				// キューの取得
@@ -94,7 +87,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 		 */
 		public void onSurfaceChanged (GL10 gl, int width, int height)
 			{
-				Log.i(TAG, "onSurfaceChanged()");
 				mWidth = width;
 				mHeight = height;
 
@@ -167,8 +159,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
 				mDrawCamera.draw(gl);
 
-
-				Log.e(TAG, "listSize = " + drawBlendingRectangleList.size());
 				// GLViewクラスのvisibility変数をいじることで、描画のON・OFFが可能
 				//SwitchクラスのswitchVisibilityメソッドをcallして描画のON・OFFを行う
 				if (mSwitch.getVisibility() == Enum.VISIBILITY.VISIBLE)
@@ -189,7 +179,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 				// OpenGLで描画したフレームバッファからbitmapを生成する
 				if (mSwitch.getShutter() == true)
 					{
-						Log.d(TAG, "callCreateBitmap");
 						createOpenGLBitmap(gl);
 						mSwitch.switchShutter();
 					}
@@ -224,25 +213,17 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                     // IPアドレスの各オクテットをXOR演算したものをオブジェクトのXY座標点として利用する
                     // MACアドレスを取得
                     String dEthernetStr = pa.getMacAddressDestination().toString();
-                    Log.i(TAG, "dEthernetStr = " + dEthernetStr);
 
                     String dIPStr = pa.getIpAddressDestination().toString();
-                    Log.i(TAG, "dIPStr = " + dIPStr);
-
                     String sIPStr = pa.getIpAddressSource().toString();
-                    Log.i(TAG, "sIPStr = " + sIPStr);
 
                     dIpPoint = DrawBlendingRectangle.xorIP(dIPStr);
-                    Log.i(TAG, "dIpPoint = " + dIpPoint);
 
                     sIpPoint = DrawBlendingRectangle.xorIP(sIPStr);
-                    Log.i(TAG, "sIpPoint = " + sIpPoint);
 
                     if (!typeMacAddress.equals(dEthernetStr)){
                         dIpPoint = (short) (255 - dIpPoint);
-                        Log.i(TAG, "revdIpPoint = " + dIpPoint);
 						sIpPoint = (short) (255 - sIpPoint);
-                        Log.i(TAG, "revsIpPoint = " + sIpPoint);
                     }
 
                     // サイズ指定はTCP or UDPを利用する
@@ -252,7 +233,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                         Tcp tcp = pa.getTcp();
 
                         short window = tcp.window();
-                        Log.i(TAG, "window = " + window);
                         if (0 < window)
                         {
                             short[] size = DrawBlendingRectangle.calcSize(window);
@@ -265,8 +245,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                             sizeX = 0;
                             sizeY = 0;
                         }
-                        Log.i(TAG, "TcpSizeX = " + sizeX);
-                        Log.i(TAG, "TcpSizeY = " + sizeY);
                     }
                     else if (pa.hasUdp())
                     {
@@ -318,17 +296,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
             }
         }
 
-		/**
-		 * 指定したオブジェクトを破棄する
-		 *
-		 * @param num 何番目のオブジェクトを破棄するか
-		 */
-		public void removeGraphic (int num)
-			{
-				Log.d(TAG, "removeGraphic()");
-				drawBlendingRectangleList.remove(num);
-			}
-
 
 		/**
 		 * OpenGLのフレームバッファからBitmapを作る
@@ -338,11 +305,9 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 		 */
 		private void createOpenGLBitmap (GL10 gl)
 			{
-				Log.d(TAG, "createOpenglBitmap()");
 				// Bitmap作ったあとに、透明化の処理を施す？
 				if (mWidth == 0 || mHeight == 0)
 					{
-						Log.d(TAG, "Error1");
 						return;
 					}
 				int size = mWidth * mHeight;
