@@ -329,17 +329,9 @@ public class PacketAnalyser {
      * @return ttl/ -1（失敗）
      */
     public short getIpTtl(){
-		try
-			{
-				if((ip4 = getIp4()) != null)
-					return (short)(ip4.ttl() & 0xFF);
-				return -1;
-			}
-		catch (IndexOutOfBoundsException e)
-			{
-				e.printStackTrace();
-				return -1;
-			}
+        if((ip4 = getIp4()) != null)
+            return (short)(ip4.ttl() & 0xFF);
+        return -1;
 	}
 
     /**
