@@ -80,8 +80,8 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 		 * ２：画面サイズが変わった時（縦と横で端末が切り替わった時）
 		 *
 		 * @param gl
-		 * @param width
-		 * @param height
+		 * @param width 変更後のSurfaceの幅
+		 * @param height 変更後のSurfaceの高さ
 		 */
 		public void onSurfaceChanged (GL10 gl, int width, int height)
 			{
@@ -311,7 +311,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
         /**
          * IPアドレスの各オクテットをXOR演算し，結果を返す
          * @param ipaddr String型のIPアドレス
-         * @return short型で，10で割って2桁に処理したXOR計算結果
+         * @return short型のXOR計算結果
          */
         private short xorIP(String ipaddr)
             {
@@ -368,7 +368,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                         short second = Short.valueOf(String.valueOf(secondChar));
 
                         // PORT番号の幅は，0~65535
-                        // firstが3桁以上の場合，ひたすら2で割って2桁に抑える
+                        // firstが3桁以上の場合，10で割って2桁に抑える
                         first = digitReducer(first);
                         second = digitReducer(second);
 
@@ -429,8 +429,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                 return Short.valueOf(String.valueOf(newNumCharArray));
             }
 
-
-        // 3桁以上の値を10で割って2桁に抑える
 
         /**
          * 3桁以上の値を10で割って2桁に抑える

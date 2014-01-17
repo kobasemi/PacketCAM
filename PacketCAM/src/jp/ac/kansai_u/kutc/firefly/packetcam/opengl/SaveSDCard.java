@@ -10,14 +10,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
- * Created by Kousaka on 14/01/07.
- * 作成した画像をSDカードに保存する
+ * Bitmap画像をpng形式でSDカードに保存する
+ * @author Kousaka
  */
 public class SaveSDCard
 	{
-		private static final String TAG = "SaveSDCard";
-
-
 		/**
 		 * 作成した画像を受け取って，SDカードに保存する
 		 *

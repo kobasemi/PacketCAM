@@ -3,7 +3,6 @@ package jp.ac.kansai_u.kutc.firefly.packetcam;
 import android.app.Activity;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
-import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -20,8 +19,11 @@ import jp.ac.kansai_u.kutc.firefly.packetcam.utils.*;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.VISIBILITY;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.ZOOM;
 
-import java.util.List;
 
+/**
+ * 起動時に呼ばれる，アクティビティクラス
+ * @auther Kousaka akasaka Funada Hibino
+ */
 public class MainActivity extends Activity
 	{
 		private static final String TAG = MainActivity.class.getSimpleName();
@@ -149,35 +151,6 @@ public class MainActivity extends Activity
                 });
 			}
 
-		/**
-		 * 画面サイズに応じて最適なカメラプレビューのサイズを返すメソッド 参考URL：http://www.seeda.jp/modules/d3blog/details.php?bid=29&cid=7
-		 *
-		 * @param params CameraParameter
-		 * @return カメラプレビューサイズ
-		 */
-		private Size getOptimalPreviewSize(Parameters params)
-			{
-				Size optimalSize = null;
-				List<Size> sizes = params.getSupportedPreviewSizes();
-				float horizontalViewAngle = params.getHorizontalViewAngle();
-				float verticalViewAngle = params.getVerticalViewAngle();
-				double targetRatio = (double) horizontalViewAngle / verticalViewAngle;
-				double minDiff = Double.MAX_VALUE;
-
-				for (Size size : sizes)
-					{
-						double ratio = (double) size.width / size.height;
-						double tempDiff = Math.abs(targetRatio - ratio);
-						// 比率の差が少ない，より小さいプレビューサイズを選ぶ
-						if (tempDiff <= minDiff)
-							{
-								minDiff = tempDiff;
-								optimalSize = size;
-							}
-					}
-
-				return optimalSize;
-			}
 
 //
 //	/**
@@ -196,6 +169,12 @@ public class MainActivity extends Activity
 //
 //	}
 
+
+		/**
+		 * キーイベントを取得し，イベントに応じた処理を行う
+		 * @param event 取得したキーイベント
+		 * @return
+		 */
 		@Override
 		public boolean dispatchKeyEvent(KeyEvent event)
 			{
