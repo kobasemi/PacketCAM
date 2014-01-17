@@ -189,6 +189,10 @@ public class DrawCamera
 
 		public void zoom(ZOOM zoom)
 			{
+				if (mCamera == null)
+					{
+						return;
+					}
 				Camera.Parameters parameters = mCamera.getParameters();
 				nowZoom = parameters.getZoom();
 
