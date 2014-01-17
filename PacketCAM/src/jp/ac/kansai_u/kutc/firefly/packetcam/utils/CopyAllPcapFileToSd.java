@@ -23,24 +23,21 @@ public class CopyAllPcapFileToSd {
         this.am = context.getAssets();
 
         try {
-            for(String filename: am.list(DIRNAME_FROMASSETSROOT)){
-                if(isDirectory(DIRNAME_FROMASSETSROOT + File.separator + filename)){
-                    if(CreateDirectory.createDirectory(filename, Path.PACKETFOLDER_PATH)){
-                        for(String fnameInDir: am.list(DIRNAME_FROMASSETSROOT + File.separator + filename)){
+            for(String filename: am.list(DIRNAME_FROMASSETSROOT))
+                if(isDirectory(DIRNAME_FROMASSETSROOT + File.separator + filename))
+                    if(CreateDirectory.createDirectory(filename, Path.PACKETFOLDER_PATH))
+                        for(String fnameInDir: am.list(DIRNAME_FROMASSETSROOT + File.separator + filename))
                             if(copyPcapFileToSd(filename + File.separator + fnameInDir))
                                 Log.d(TAG, "File Copy Success: " + fnameInDir);
                             else
                                 Log.d(TAG, "File Copy Failed... " + fnameInDir);
-                        }
-                    }else
+                    else
                         Log.d(TAG, "Create Directory Failed... " + filename);
-                }else{
+                else
                     if(copyPcapFileToSd(filename))
                         Log.d(TAG, "File Copy Success: " + filename);
                     else
                         Log.d(TAG, "File Copy Failed... " + filename);
-                }
-            }
         }catch(IOException e){
             e.printStackTrace();
         }

@@ -34,11 +34,9 @@ public class CopyAllRawFieldToSd{
             // ResourceID <= (FieldName, DirectoryName, PackageName)
             int id = res.getIdentifier(fname, "raw", context.getPackageName());
 
-            if(copyRawFileToSd(id, fname + ".cap")){
-                Log.d("CopyAllRawFieldToSd.java", "File Copy Success: " + fname + ".cap");
-            }else {
+            if(!copyRawFileToSd(id, fname + ".cap"))
+                // ファイルコピーに失敗した場合
                 Log.d("CopyAllRawFieldToSd.java", "File Copy Failed... " + fname + ".cap");
-            }
         }
     }
 

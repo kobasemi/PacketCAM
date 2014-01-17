@@ -95,7 +95,6 @@ public class PcapManager implements Runnable{
         try {
             pcapFile = Captures.openFile(PcapFile.class, file, FileMode.ReadOnly);
             setPacketsToPacketList();
-            Log.d(TAG, "FILE OPEN SUCCESS: " + file.getName());
         } catch (IOException e) {
             Log.d(TAG, "FAILED TO OPEN");
         }
@@ -245,8 +244,7 @@ public class PcapManager implements Runnable{
     @Override
     public void run() {
         if(packetIterator.hasNext())
-            if(packetsQueue.add(packetIterator.next()))  // キューに装填
-                Log.d(TAG + ": add", "Success");
+            packetsQueue.add(packetIterator.next());  // キューに装填
         else
             stop();
     }
