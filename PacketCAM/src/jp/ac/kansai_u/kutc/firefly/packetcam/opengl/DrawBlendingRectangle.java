@@ -24,23 +24,24 @@ public class DrawBlendingRectangle
 
         float x, y, width, height;
 
-		private int objectIDcount = 0;
-		private int objectID = 0;
+		private int objectCountDown = 0;
+		private boolean deadFlag = false;
 
 		private static short xorValue;
 
-        public DrawBlendingRectangle(int x, int y, int w, int h, COLOR color)
+        public DrawBlendingRectangle(int x, int y, int w, int h, COLOR color, short ttl)
             {
                 // 座標を0 ~ 255の範囲に正規化
-                this(x/255.f, y/255.f, w/100.f, h/100.f, color);
+                this(x/255.f, y/255.f, w/100.f, h/100.f, color, ttl);
             }
 
-        private DrawBlendingRectangle(float x, float y, float width, float height, COLOR color){
+        private DrawBlendingRectangle(float x, float y, float width, float height, COLOR color, short ttl){
+			// IDとttlを設定
+			this.objectCountDown = ttl;
+
             mVertexBuffer = EffectRenderer.rectangleBuffer;
             mColorBuffer  = GL_Color.getColorFloatBuffer(color);
             setDrawObject(x, y, width, height);
-			objectIDcount++;
-			objectID = objectIDcount;
 		}
 
         /**
@@ -78,31 +79,46 @@ public class DrawBlendingRectangle
 		 */
 		public void draw(GL10 gl)
 			{
-                // カメラプレビュー描画後に，ブレンドを有効化する
-                gl.glEnable(GL10.GL_BLEND);
+				if (objectCountDown > 0)
+					{
+						// カメラプレビュー描画後に，ブレンドを有効化する
+						gl.glEnable(GL10.GL_BLEND);
 
-                // ブレンドモードを指定
-                // src, dst
-                gl.glBlendFunc(GL10.GL_ONE_MINUS_DST_COLOR, GL10.GL_ONE_MINUS_SRC_ALPHA);
+						// ブレンドモードを指定
+						// src, dst
+						gl.glBlendFunc(GL10.GL_ONE_MINUS_DST_COLOR, GL10.GL_ONE_MINUS_SRC_ALPHA);
 
-				gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-				gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
+						gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+						gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 
-				gl.glMatrixMode(GL10.GL_MODELVIEW);
-				gl.glLoadIdentity();
-                gl.glTranslatef(x, y, 0.f);
-                gl.glScalef(width, height, 0.f);
+						gl.glMatrixMode(GL10.GL_MODELVIEW);
+						gl.glLoadIdentity();
+						gl.glTranslatef(x, y, 0.f);
+						gl.glScalef(width, height, 0.f);
 
-				// 頂点バッファのポインタの場所を設定
-				gl.glVertexPointer(2, GL10.GL_FLOAT, 0, mVertexBuffer);
-				// 色バッファのポインタの場所を設定
-				gl.glColorPointer(4, GL10.GL_FLOAT, 0, mColorBuffer);
+						// 頂点バッファのポインタの場所を設定
+						gl.glVertexPointer(2, GL10.GL_FLOAT, 0, mVertexBuffer);
+						// 色バッファのポインタの場所を設定
+						gl.glColorPointer(4, GL10.GL_FLOAT, 0, mColorBuffer);
 
-				// 描画モード（点とか線とかいろいろ）を設定
-				gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
-				gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
-				gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-                gl.glDisable(GL10.GL_BLEND);
+						// 描画モード（点とか線とかいろいろ）を設定
+						gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
+						gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+						gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+						gl.glDisable(GL10.GL_BLEND);
+
+						this.objectCountDown--;
+					}
+				else
+					{
+						deadFlag = true;
+					}
+			}
+
+
+		protected boolean getDeadFlag()
+			{
+				return deadFlag;
 			}
 
 
