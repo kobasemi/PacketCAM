@@ -1,7 +1,8 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.utils;
 
 /**
- * Created by Kousaka on 13/12/22.
+ * パラメータ列挙型クラス
+ * @author Kousaka
  */
 public class Enum
 	{

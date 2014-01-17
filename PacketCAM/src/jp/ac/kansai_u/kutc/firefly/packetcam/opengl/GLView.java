@@ -10,8 +10,8 @@ import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.VISIBILITY;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Switch;
 
 /**
- * Created by Kousaka on 2013/12/10.
- * https://sites.google.com/a/gclue.jp/android-docs-2009/openglno-kiso
+ * GLSurfaceViewの設定を行う
+ * @auther Kousaka
  */
 public class GLView extends GLSurfaceView
 	{

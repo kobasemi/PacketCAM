@@ -12,7 +12,6 @@ import java.nio.FloatBuffer;
  */
 public class DrawBlendingRectangle
 	{
-		private static final String TAG = DrawBlendingRectangle.class.getSimpleName();
 		// Java NIOに転送した頂点バッファや色バッファを格納する変数を定義
 		// 頂点バッファ
 		private FloatBuffer mVertexBuffer;
@@ -24,12 +23,32 @@ public class DrawBlendingRectangle
 		private int objectCountDown = 0;
 		private boolean deadFlag = false;
 
+		/**
+		 * intの値を用いたコンストラクタ
+		 *
+		 * @param x int型の図形のx座標
+		 * @param y int型の図形のy座標
+		 * @param w int型の図形の幅
+		 * @param h int型の図形の高さ
+		 * @param color COLOR型の図形の色
+		 * @param ttl short型の図形描画持続時間（生存時間）
+		 */
         public DrawBlendingRectangle(int x, int y, int w, int h, COLOR color, short ttl)
             {
                 // 座標を0 ~ 255の範囲に正規化
                 this(x/255.f, y/255.f, w/100.f, h/100.f, color, ttl);
             }
 
+		/**
+		 * floatの値を用いたコンストラクタ
+		 *
+		 * @param x float型の図形のx座標
+		 * @param y float型の図形のy座標
+		 * @param width float型の図形の幅
+		 * @param height float型の図形の高さ
+		 * @param color COLOR型の図形の色
+		 * @param ttl short型の図形描画持続時間（生存時間）
+		 */
         private DrawBlendingRectangle(float x, float y, float width, float height, COLOR color, short ttl){
 			// IDとttlを設定
 			this.objectCountDown = ttl;
@@ -109,6 +128,12 @@ public class DrawBlendingRectangle
 			}
 
 
+		/**
+		 * 図形のデッドフラグを返す
+		 * ttlをデクリメントし，0以下になればこのフラグがtrueになる
+		 *
+		 * @return boolean型のデッドフラグ
+		 */
 		protected boolean getDeadFlag()
 			{
 				return deadFlag;

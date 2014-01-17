@@ -19,9 +19,6 @@ import static android.opengl.GLES11Ext.GL_TEXTURE_EXTERNAL_OES;
  */
 public class DrawCamera
 	{
-
-		private static final String TAG = DrawCamera.class.getSimpleName(); // デバッグ用タグ
-
 		private FloatBuffer mVertexBuffer; // 描画先の頂点座標バッファ
 		private FloatBuffer mTexCoordsBuffer; // 描画元の座標バッファ（どこを使うか的な）
 
@@ -171,11 +168,19 @@ public class DrawCamera
 				gl.glFlush();
 			}
 
+		/**
+		 * カメラインスタンスを返す
+		 *
+		 * @return カメラインスタンス
+		 */
 		public static Camera getCamera()
 			{
 				return mCamera;
 			}
 
+		/**
+		 * カメラを解放する
+		 */
         public static void cameraRelease(){
             if(mCamera != null){
                 mCamera.stopPreview();
@@ -184,6 +189,11 @@ public class DrawCamera
             }
         }
 
+		/**
+		 * カメラのズーム処理を行う
+		 *
+		 * @param zoom ZOOM型の値．ZOOMUPなのか，ZOOMDOWNなのか
+		 */
 		public void zoom(ZOOM zoom)
 			{
 				if (mCamera == null)

@@ -4,7 +4,8 @@ import android.util.Log;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.*;
 
 /**
- * Created by kousaka on 2014/01/06.
+ * スイッチクラス．まさにスイッチ
+ * @author Kousaka
  */
 public class Switch
 	{
@@ -12,6 +13,10 @@ public class Switch
 
 		private static Switch instance = new Switch();
 
+		/**
+		 * スイッチのインスタンスを返す
+		 * @return Switchインスタンス
+		 */
 		public static Switch getInstance()
 			{
 				return instance;
@@ -22,13 +27,19 @@ public class Switch
 		private DRAWSTATE drawstate = DRAWSTATE.PREPARATION;
 
 		private boolean shutter = false;
-		private boolean inoutStatus = false;
 
+		/**
+		 * 現在のVISIBILITYを返す
+		 * @return VISIBILITY
+		 */
 		public VISIBILITY getVisibility()
 			{
 				return visibility;
 			}
 
+		/**
+		 * VISIBILITYをスイッチする（VISIBLE or INVISIBLE）
+		 */
 		public void switchVisibility()
 			{
 				Log.d(TAG, "switchVisibility");
@@ -42,11 +53,18 @@ public class Switch
 					}
 			}
 
+		/**
+		 * シャッターステータスを返す
+		 * @return boolean型のシャッターステータス
+		 */
 		public boolean getShutter()
 			{
 				return shutter;
 			}
 
+		/**
+		 * シャッターステータスをスイッチする（true or false）
+		 */
 		public void switchShutter()
 			{
 				if (!shutter)
@@ -59,11 +77,18 @@ public class Switch
 					}
 			}
 
+		/**
+		 * 現在の描画ステータスを返す
+		 * @return DRAWSTATE
+		 */
 		public DRAWSTATE getDrawstate()
 			{
 				return drawstate;
 			}
 
+		/**
+		 * 描画ステータスをスイッチする（PREPARATION or READY）
+		 */
 		public void switchDrawState()
 			{
 				if (drawstate == DRAWSTATE.PREPARATION)
@@ -77,12 +102,19 @@ public class Switch
 			}
 
 
+		/**
+		 * 動作ステータスを返す
+		 * @return STATUS
+		 */
 		public STATUS getStatus()
 			{
 				return status;
 			}
 
 
+		/**
+		 * 動作ステータスをスイッチする（STOP or RUNNING）
+		 */
 		public void switchStatus()
 			{
 				if (status == STATUS.STOP)
@@ -92,23 +124,6 @@ public class Switch
 				else
 					{
 						status = STATUS.STOP;
-					}
-			}
-
-		public boolean getCameraInOut()
-			{
-				return inoutStatus;
-			}
-
-		public void switchCameraInOut()
-			{
-				if (!inoutStatus)
-					{
-						inoutStatus = true;
-					}
-				else
-					{
-						inoutStatus = false;
 					}
 			}
 	}
