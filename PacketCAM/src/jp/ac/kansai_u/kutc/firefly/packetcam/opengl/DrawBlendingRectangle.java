@@ -1,6 +1,8 @@
 package jp.ac.kansai_u.kutc.firefly.packetcam.opengl;
 
 import android.util.Log;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.*;
+import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum;
 import jp.ac.kansai_u.kutc.firefly.packetcam.utils.Enum.COLOR;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -127,13 +129,12 @@ public class DrawBlendingRectangle
 
 				Log.i(TAG, "xorValue = " + xorValue);
 
-				xorValue = digitReducer(xorValue);
 				return xorValue;
 			}
 
 
 		/**
-		 * ポート番号から，オブジェクト生成用の座標を求める
+		 * windowサイズから，オブジェクト生成用の座標を求める
 		 * @param value short型の数値
 		 * @return だいたい真ん中で分けられ，10で割って2桁に処理されたshort配列
 		 */
@@ -215,6 +216,49 @@ public class DrawBlendingRectangle
 						data[1] = second;
 						return data;
 					}
+			}
+
+
+		/**
+		 * TCPヘッダ又はUDPヘッダのポート番号を元に条件判定を行い，カラーを返す
+		 * @param num
+		 * @return
+		 */
+		protected static COLOR choiceColorFromPort(int num)
+			{
+				if ((0 <= num && num <= 79) || (81 <= num && num <= 442) || (444 <= num && num <= 1023))
+					{
+						return COLOR.RED;
+					}
+				else if (num == 80)
+					{
+						return COLOR.GREEN;
+					}
+				else if (num == 443)
+					{
+						return COLOR.BLUE;
+					}
+				else if (1024 <= num && num <= 30000)
+					{
+						return COLOR.BLACK;
+					}
+				else if (30001 <= num && num <= 50000)
+					{
+						return COLOR.WHITE;
+					}
+				else if (50001 <= num && num <= 55000)
+					{
+						return COLOR.CYAN;
+					}
+				else if (55001 <= num && num <= 60000)
+					{
+						return COLOR.YELLOW;
+					}
+				else
+					{
+						return COLOR.MAGENTA;
+					}
+
 			}
 
 

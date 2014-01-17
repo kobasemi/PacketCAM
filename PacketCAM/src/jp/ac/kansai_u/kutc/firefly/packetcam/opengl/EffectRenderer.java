@@ -142,14 +142,17 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                         // 解析機にパケットをセットする
                         pa.setPacket(packet);
 
-                        // 描画オブジェクト用のパラメータを作成する
-                        buildDrawBlendingRectangleParametor();
+						// ICMPヘッダ以外のパケットを受信した際に，オブジェクトを作成する
+						if (!pa.hasIcmp())
+							{
+								// 描画オブジェクト用のパラメータを作成する
+								buildDrawBlendingRectangleParametor();
 
-                        /**
-                         * @see DrawBlendingRectangle
-                         */
-                        drawBlendingRectangleList.add(new DrawBlendingRectangle(dIpPoint, sIpPoint, sizeX, sizeY, color));
-
+								/**
+								 * @see DrawBlendingRectangle
+								 */
+								drawBlendingRectangleList.add(new DrawBlendingRectangle(dIpPoint, sIpPoint, sizeX, sizeY, color));
+							}
                         packet = null;
 					}
 
@@ -206,7 +209,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
             // 解析機からヘッダを取り出す場合
             // 先にヘッダがあるかを確認してほしい
-            if (pa.hasIp4() && pa.hasEthernet() && dEthernetStrFlg != null)
+            if (pa.hasIp4() && pa.hasEthernet() && dEthernetStrFlg != null && !pa.hasIcmp())
             {
                 Ethernet2 ethernet2 = pa.getEthernet();
 
@@ -268,59 +271,41 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                         sizeX = 30;
                         sizeY = 30;
                     }
-                    else
-                    {
-                        // ICMPが来た場合
-                        sizeX = 0;
-                        sizeY = 0;
-                    }
 
 
-                    //TODO カラー指定を，ポート番号を使うようにする（MACアドレスで，dかsかを切り替え）
-                    // IPヘッダのlengthで分岐
 
-                    short length = ip4.length();
+					// TCPかUDPのポート番号から，カラーを指定する
+					// PORT番号は，分割せずそのまま利用する
+					if (pa.hasTcp())
+						{
+							if (dEthernetStrFlg.equals(dEthernetStr))
+								{
+									int sPort = pa.getTcpPortSource();
 
-                    short id = ip4.id();
+									color = DrawBlendingRectangle.choiceColorFromPort(sPort);
+								}
+							else
+								{
+									int dPort = pa.getTcpPortDestination();
 
+									color = DrawBlendingRectangle.choiceColorFromPort(dPort);
+								}
+						}
+					if (pa.hasUdp())
+						{
+							if (dEthernetStrFlg.equals(dEthernetStr))
+								{
+									int sPort = pa.getUdpPortSource();
 
-                    Log.i(TAG, "length = " + length);
+									color = DrawBlendingRectangle.choiceColorFromPort(sPort);
+								}
+							else
+								{
+									int dPort = pa.getUdpPortDestination();
 
-                    if (length < 40)
-                    {
-                        color = Enum.COLOR.RED;
-                    }
-                    else if (40 <= length && length < 50)
-                    {
-                        color = Enum.COLOR.GREEN;
-                    }
-                    else if (50 <= length && length < 60)
-                    {
-                        color = Enum.COLOR.BLUE;
-                    }
-                    else if (60 <= length && length < 70)
-                    {
-                        color = Enum.COLOR.CYAN;
-                    }
-                    else if (70 <= length && length < 80)
-                    {
-                        color = Enum.COLOR.MAGENTA;
-                    }
-                    else if (80 <= length && length < 500)
-                    {
-                        color = Enum.COLOR.YELLOW;
-                    }
-                    else if (500 <= length && length < 700)
-                    {
-                        color = Enum.COLOR.WHITE;
-                    }
-                    else
-                    {
-                        color = Enum.COLOR.BLACK;
-                    }
-
-                    Log.i(TAG, "color = " + color);
-
+									color = DrawBlendingRectangle.choiceColorFromPort(dPort);
+								}
+						}
                 }
                 catch (IOException e)
                 {
