@@ -97,6 +97,8 @@ public class PcapManager implements Runnable{
             setPacketsToPacketList();
         } catch (IOException e) {
             Log.d(TAG, "FAILED TO OPEN");
+        }catch(IndexOutOfBoundsException e){
+            Log.d(TAG, "FAILED TO OPEN");
         }
     }
 
@@ -218,7 +220,7 @@ public class PcapManager implements Runnable{
             // 復帰時にシャットダウンしていた場合
             executor = Executors.newSingleThreadScheduledExecutor();
         // this: スレッド，1000: 周期，TimeUnit.MILLSECONDS: ミリ秒単位
-        future = executor.scheduleAtFixedRate(this, 0, 100, TimeUnit.MILLISECONDS);
+        future = executor.scheduleAtFixedRate(this, 0, 250, TimeUnit.MILLISECONDS);
     }
     /**
      * スレッド処理を一時停止する
