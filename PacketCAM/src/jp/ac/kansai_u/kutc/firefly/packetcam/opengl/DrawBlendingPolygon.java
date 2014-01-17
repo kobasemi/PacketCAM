@@ -81,7 +81,7 @@ public class DrawBlendingPolygon {
         for(int i=0; i<=d; i++){
             // 分割数+1までループする
             // 最後の三角形を繋げるため，ループの最初の値と同じ値を最後に追加する
-            theta = Math.toRadians(360/d * i);
+            theta = Math.toRadians(360.d/d * i);
             positionX = (float)Math.cos(theta);
             positionY = (float)Math.sin(theta);
             floatList.add(positionX);
