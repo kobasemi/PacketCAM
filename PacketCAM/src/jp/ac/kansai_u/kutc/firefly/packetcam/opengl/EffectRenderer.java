@@ -27,6 +27,7 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
 		// オブジェクトを格納するリスト
 		List<DrawBlendingRectangle> drawBlendingRectangleList = new ArrayList<DrawBlendingRectangle>();
+        List<DrawBlendingPolygon>   drawBlendingPolygonList   = new ArrayList<DrawBlendingPolygon>();
 
 		int mWidth = 0, mHeight = 0;
 
@@ -108,9 +109,11 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
         short dIpPoint;
         short sIpPoint;
-        short sizeX = 0;
-        short sizeY = 0;
+        short sizeX;
+        short sizeY;
         short ttl;
+        short divide;
+        int   id;
         Enum.COLOR color = null;
 
 		/**
@@ -129,17 +132,22 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                         // 解析機にパケットをセットする
                         pa.setPacket(packet);
 
-						// ICMPヘッダ以外のパケットを受信した際に，オブジェクトを作成する
-						if (!pa.hasIcmp())
-							{
-								// 描画オブジェクト用のパラメータを作成する
-								buildDrawBlendingRectangleParametor();
+                        // 描画オブジェクト用のパラメータを作成する
+                        buildDrawBlendingRectangleParametor();
 
-                                /**
-                                 * @see jp.ac.kansai_u.kutc.firefly.packetcam.opengl.DrawBlendingRectangle
-                                 */
-                                drawBlendingRectangleList.add(new DrawBlendingRectangle(dIpPoint, sIpPoint, sizeX, sizeY, color, ttl));
-							}
+                        if(pa.hasIcmp())
+                            // ICMPヘッダの場合，多角形オブジェクトを表示
+                            /**
+                             * @see jp.ac.kansai_u.kutc.firefly.packetcam.opengl.DrawBlendingPolygon
+                             */
+                            drawBlendingPolygonList.add(new DrawBlendingPolygon(dIpPoint, sIpPoint, color, ttl, divide));
+                        else
+    						// ICMPヘッダ以外の場合，長方形オブジェクトを表示
+						    /**
+                             * @see jp.ac.kansai_u.kutc.firefly.packetcam.opengl.DrawBlendingRectangle
+                             */
+                            drawBlendingRectangleList.add(new DrawBlendingRectangle(dIpPoint, sIpPoint, sizeX, sizeY, color, ttl));
+
 						packet = null;
 					}
 
@@ -152,21 +160,19 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 
 				// GLViewクラスのvisibility変数をいじることで、描画のON・OFFが可能
 				//SwitchクラスのswitchVisibilityメソッドをcallして描画のON・OFFを行う
-				if (mSwitch.getVisibility() == Enum.VISIBILITY.VISIBLE)
-					{
-						for (int i = 0; i < this.drawBlendingRectangleList.size(); i++)
-							{
-								if (drawBlendingRectangleList.get(i).getDeadFlag())
-									{
-										drawBlendingRectangleList.remove(i);
-									}
-								else
-									{
-										drawBlendingRectangleList.get(i).draw(gl);
-									}
-							}
-					}
+				if (mSwitch.getVisibility() == Enum.VISIBILITY.VISIBLE){
+                    for (int i = 0; i < this.drawBlendingRectangleList.size(); i++)
+                        if (drawBlendingRectangleList.get(i).getDeadFlag())
+                            drawBlendingRectangleList.remove(i);
+                        else
+                            drawBlendingRectangleList.get(i).draw(gl);
 
+                    for(int i=0; i<drawBlendingPolygonList.size(); i++)
+                        if(drawBlendingPolygonList.get(i).getDeadFlag())
+                            drawBlendingPolygonList.remove(i);
+                        else
+                            drawBlendingPolygonList.get(i).draw(gl);
+                }
 				// OpenGLで描画したフレームバッファからbitmapを生成する
 				if (mSwitch.getShutter())
 					{
@@ -186,6 +192,8 @@ public class EffectRenderer implements GLSurfaceView.Renderer
             dIpPoint = 0;
             sIpPoint = 0;
             ttl = 0;
+            id = 0;
+            divide = 0;
             color = Enum.COLOR.MAGENTA;
 
             // Ethernetヘッダから，スイッチ用MACアドレスを取得する
@@ -257,6 +265,40 @@ public class EffectRenderer implements GLSurfaceView.Renderer
                     e.printStackTrace();
                 }catch(IndexOutOfBoundsException e){
                     e.printStackTrace();
+                }
+            }
+
+            // ICMPヘッダからタイプ情報を抜き出す
+            if(pa.hasIcmp()){
+                divide = pa.getIcmpType();
+                id = pa.getIpId();
+                switch(id % 8){
+                    case 0:
+                        color = Enum.COLOR.RED;
+                        break;
+                    case 1:
+                        color = Enum.COLOR.GREEN;
+                        break;
+                    case 2:
+                        color = Enum.COLOR.BLUE;
+                        break;
+                    case 3:
+                        color = Enum.COLOR.CYAN;
+                        break;
+                    case 4:
+                        color = Enum.COLOR.MAGENTA;
+                        break;
+                    case 5:
+                        color = Enum.COLOR.YELLOW;
+                        break;
+                    case 6:
+                        color = Enum.COLOR.WHITE;
+                        break;
+                    case 7:
+                        color = Enum.COLOR.BLACK;
+                        break;
+                    default:
+                        color = Enum.COLOR.MAGENTA;
                 }
             }
         }
