@@ -11,10 +11,7 @@ import org.jnetstream.capture.file.pcap.PcapPacket;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.nio.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -511,5 +508,20 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 				ib.position(0);
 				return ib;
 			}
+
+        /**
+         * OpenGL ESはVMのヒープ領域は使用できないため，ネイティブのメモリ領域に書き込む
+         *
+         * @param buf double型の配列
+         * @return ネイティブ領域に書き込まれたバッファの参照
+         */
+        public static DoubleBuffer makeDoubleBuffer(double[] buf){
+            ByteBuffer bb = ByteBuffer.allocateDirect(buf.length * Double.SIZE);
+            bb.order(ByteOrder.nativeOrder());
+            DoubleBuffer db = bb.asDoubleBuffer();
+            db.put(buf);
+            db.position(0);
+            return db;
+        }
 
 	}
