@@ -346,6 +346,16 @@ public class PacketAnalyser {
     }
 
     /**
+     * IPヘッダに含まれる識別子を返す
+     * @return id/ -1（失敗）
+     */
+    public int getIpId(){
+        if((ip4 = getIp4()) != null)
+            return (int)(char)ip4.id();
+        return -1;
+    }
+
+    /**
      * 送信元ポートを返す
      * @return source/ -1（失敗）
      */
