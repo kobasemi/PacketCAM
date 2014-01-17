@@ -178,7 +178,6 @@ public class EffectRenderer implements GLSurfaceView.Renderer
 								if (drawBlendingRectangleList.get(i).getDeadFlag())
 									{
 										drawBlendingRectangleList.remove(i);
-										i++;
 									}
 								else
 									{
